@@ -7,7 +7,9 @@ Cada escena = una tarjeta con texto + narración TTS (Piper, local). Sin materia
 from __future__ import annotations
 
 import glob
+import math
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -24,7 +26,7 @@ BOLD = "/usr/share/fonts/opentype/inter/Inter-ExtraBold.otf"
 SEMI = "/usr/share/fonts/opentype/inter/Inter-Bold.otf"
 GREEN_D, STRIPE, LINE = (6, 46, 28), (9, 56, 34), (40, 110, 70)
 YELLOW, WHITE = (255, 214, 10), (255, 255, 255)
-HANDLE = "@DatoCrack"
+HANDLE = "@DatoCrackFutboll"
 
 
 def _voice() -> str:
@@ -98,14 +100,10 @@ def tts_piper(text: str, out: Path, length_scale: float = 0.9) -> float:
         return w.getnframes() / w.getframerate()
 
 
-def _background() -> tuple[Image.Image, ImageDraw.ImageDraw]:
-    img = Image.new("RGB", (W, H), GREEN_D)
-    d = ImageDraw.Draw(img)
-    for i in range(0, 8, 2):
-        d.rectangle([i * W // 8, 0, (i + 1) * W // 8, H], fill=STRIPE)
-    d.ellipse([W // 2 - 300, H // 2 - 300, W // 2 + 300, H // 2 + 300], outline=LINE, width=6)
-    d.line([(0, H // 2), (W, H // 2)], fill=LINE, width=6)
-    return img, d
+def _ease_out_back(x: float) -> float:
+    x = min(max(x, 0.0), 1.0)
+    c1, c3 = 1.70158, 2.70158
+    return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2
 
 
 def _fit(d, text: str, max_w: int, size: int, font_path: str, max_lines: int = 6):
@@ -120,73 +118,156 @@ def _fit(d, text: str, max_w: int, size: int, font_path: str, max_lines: int = 6
     return ImageFont.truetype(font_path, size), textwrap.wrap(text, 20)
 
 
-def card(label: str, text: str, out: Path, highlight: str | None = None, big: str | None = None,
-         progress: float = 0.0) -> None:
-    img, d = _background()
-    # etiqueta superior
-    lf = ImageFont.truetype(BOLD, 64)
-    lw = d.textlength(label, font=lf)
-    d.rounded_rectangle([(W - lw) / 2 - 40, 250, (W + lw) / 2 + 40, 360], 30, fill=YELLOW)
-    d.text(((W - lw) / 2, 262), label, font=lf, fill=GREEN_D)
-    # número o palabra grande opcional
-    y = 560
-    if big:
-        bf, _ = _fit(d, big, 900, 260, BOLD, 1)
-        d.text(((W - d.textlength(big, font=bf)) / 2, 520), big, font=bf, fill=YELLOW)
-        y = 880
-    # texto principal (zona segura: evita los 250 px inferiores de la interfaz de Shorts)
-    font, lines = _fit(d, text, 900, 92, BOLD)
-    lh = font.size * 1.22
-    if not big:
-        y = (H - lh * len(lines)) / 2 - 60
-    for line in lines:
-        x = (W - d.textlength(line, font=font)) / 2
-        if highlight and highlight.lower() in line.lower():
-            i = line.lower().index(highlight.lower())
-            pre, hl = line[:i], line[i:i + len(highlight)]
-            d.text((x, y), pre, font=font, fill=WHITE)
-            x2 = x + d.textlength(pre, font=font)
-            d.text((x2, y), hl, font=font, fill=YELLOW)
-            d.text((x2 + d.textlength(hl, font=font), y), line[i + len(highlight):], font=font, fill=WHITE)
-        else:
-            d.text((x, y), line, font=font, fill=WHITE)
-        y += lh
-    # barra de progreso y firma
-    d.rectangle([0, 0, int(W * progress), 14], fill=YELLOW)
-    hf = ImageFont.truetype(SEMI, 48)
-    d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf, fill=(170, 210, 185))
-    img.save(out)
+class Background:
+    """Césped con franjas que se desplazan y círculo central que late."""
+
+    def __init__(self):
+        self.tile = Image.new("RGB", (W * 2, H), GREEN_D)
+        d = ImageDraw.Draw(self.tile)
+        for i in range(0, 16, 2):
+            d.rectangle([i * W // 8, 0, (i + 1) * W // 8, H], fill=STRIPE)
+
+    def frame(self, t: float) -> Image.Image:
+        off = int(t * 60) % (W // 4)
+        img = self.tile.crop((off, 0, off + W, H))
+        d = ImageDraw.Draw(img)
+        r = 300 + 12 * math.sin(t * 2 * math.pi * 104 / 60)  # late al ritmo de la música
+        d.ellipse([W / 2 - r, H / 2 - r, W / 2 + r, H / 2 + r], outline=LINE, width=6)
+        d.line([(0, H // 2), (W, H // 2)], fill=LINE, width=6)
+        # viñeta inferior y superior para dar profundidad
+        return img
+
+
+def _word_img(word: str, font, color) -> Image.Image:
+    w = int(font.getlength(word)) + 20
+    h = int(font.size * 1.35)
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.text((10 + 4, 6), word, font=font, fill=(0, 0, 0, 140))  # sombra
+    d.text((10, 0), word, font=font, fill=color)
+    return im
+
+
+class Scene:
+    def __init__(self, sc: dict, default_label: str, speech: float, dur: float):
+        self.sc, self.speech, self.dur = sc, speech, dur
+        self.label = sc.get("label", default_label)
+        probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+        self.big = sc.get("big")
+        self.font, lines = _fit(probe, sc["text"], 900, 92, BOLD)
+        hl = (sc.get("highlight") or "").lower().split()
+        lh = self.font.size * 1.22
+        y = 880 if self.big else (H - lh * len(lines)) / 2 - 40
+        self.words = []  # (img, x, y)
+        for line in lines:
+            x = (W - probe.textlength(line, font=self.font)) / 2
+            for word in line.split():
+                color = YELLOW if word.lower().strip(".,¿?¡!") in hl else WHITE
+                im = _word_img(word, self.font, color)
+                self.words.append((im, x - 10, y))
+                x += probe.textlength(word + " ", font=self.font)
+            y += lh
+        self.lf = ImageFont.truetype(BOLD, 64)
+        if self.big:
+            self.bf, _ = _fit(probe, self.big, 900, 260, BOLD, 1)
+            m = re.match(r"(\d+)(.*)", self.big)
+            self.count = (int(m.group(1)), m.group(2)) if m and int(m.group(1)) > 9 else None
+
+    def draw(self, img: Image.Image, t: float) -> None:
+        d = ImageDraw.Draw(img)
+        # etiqueta: cae desde arriba
+        k = _ease_out_back(t / 0.35)
+        lw = d.textlength(self.label, font=self.lf)
+        y0 = -120 + (250 + 120) * k
+        d.rounded_rectangle([(W - lw) / 2 - 40, y0, (W + lw) / 2 + 40, y0 + 110], 30, fill=YELLOW)
+        d.text(((W - lw) / 2, y0 + 12), self.label, font=self.lf, fill=GREEN_D)
+        # número grande: cuenta hacia arriba y rebota
+        if self.big:
+            text = self.big
+            if "countdown" in self.sc.get("sfx", []):
+                text = str(max(1, 3 - int((t - 0.15) / max(self.speech / 3, 0.3))))
+            elif self.count:
+                p = min(t / 0.7, 1.0)
+                text = f"{round(self.count[0] * (1 - (1 - p) ** 3))}{self.count[1]}"
+            s = 0.3 + 0.7 * _ease_out_back(t / 0.4)
+            big = _word_img(text, self.bf, YELLOW)
+            bw, bh = max(1, int(big.width * s)), max(1, int(big.height * s))
+            big = big.resize((bw, bh), Image.LANCZOS)
+            img.paste(big, (int((W - bw) / 2), int(640 - bh / 2)), big)
+        # palabras: aparecen una a una al ritmo de la voz
+        n = len(self.words)
+        span = max(self.speech * 0.8, 0.3)
+        for i, (im, x, y) in enumerate(self.words):
+            t0 = 0.15 + span * i / max(n, 1)
+            if t < t0:
+                continue
+            s = 0.4 + 0.6 * _ease_out_back((t - t0) / 0.18)
+            if s >= 0.999 and abs(s - 1) < 1e-3:
+                img.paste(im, (int(x), int(y)), im)
+            else:
+                w2, h2 = max(1, int(im.width * s)), max(1, int(im.height * s))
+                r = im.resize((w2, h2), Image.BILINEAR)
+                img.paste(r, (int(x + (im.width - w2) / 2), int(y + (im.height - h2) / 2)), r)
 
 
 def render(script_path: str | Path, out_path: str | Path) -> float:
+    from . import audio
+
     spec = yaml.safe_load(Path(script_path).read_text(encoding="utf-8"))
-    scenes = spec["scenes"]
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    default_label = spec.get("label", "¿SABÍAS QUE...?")
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        clips = []
-        for i, sc in enumerate(scenes):
-            png, wav, mp4 = tmp / f"{i}.png", tmp / f"{i}.wav", tmp / f"{i}.mp4"
-            card(sc.get("label", spec.get("label", "¿SABÍAS QUE...?")), sc["text"], png,
-                 sc.get("highlight"), sc.get("big"), (i + 1) / len(scenes))
-            dur = tts(sc.get("say", sc["text"]), wav) + sc.get("pause", 0.15)
-            frames = int(dur * FPS)
-            # zoom lento para dar movimiento a la tarjeta
-            vf = (f"scale=1188:2112,zoompan=z='min(1+0.0009*on,1.08)':d={frames}"
-                  f":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS},format=yuv420p")
-            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", str(png),
-                            "-i", str(wav), "-vf", vf, "-af", f"apad=pad_dur={sc.get('pause', 0.35)}",
-                            "-t", f"{dur:.3f}", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-                            "-c:a", "aac", "-b:a", "160k", "-ar", "44100", str(mp4)], check=True)
-            clips.append(mp4)
-        lst = tmp / "list.txt"
-        lst.write_text("".join(f"file '{c}'\n" for c in clips))
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i",
-                        str(lst), "-c", "copy", "-movflags", "+faststart", str(out_path)], check=True)
-    probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
-                            "csv=p=0", str(out_path)], capture_output=True, text=True, check=True)
-    return float(probe.stdout.strip())
+        scenes, voices, sfx, t = [], [], [], 0.0
+        for i, sc in enumerate(spec["scenes"]):
+            wav = tmp / f"{i}.wav"
+            speech = tts(sc.get("say", sc["text"]), wav)
+            dur = speech + sc.get("pause", 0.15) + 0.15
+            voices.append((t + 0.15, audio.read_wav(wav)))
+            sfx.append((max(0.0, t - 0.1), "whoosh"))
+            if sc.get("big"):
+                sfx.append((t + 0.1, "pop"))
+            for name in sc.get("sfx", []):
+                if name == "countdown":
+                    sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
+                else:
+                    sfx.append((t + 0.15, name))
+            scenes.append((t, Scene(sc, default_label, speech, dur)))
+            t += dur
+        total = t
+        mixwav = tmp / "mix.wav"
+        audio.mix(total, voices, sfx, mixwav)
+
+        bg = Background()
+        hf = ImageFont.truetype(SEMI, 48)
+        proc = subprocess.Popen(
+            ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
+             "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", str(mixwav),
+             "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
+             "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out_path)],
+            stdin=subprocess.PIPE)
+        for f in range(int(total * FPS)):
+            now = f / FPS
+            start, scene = next((s, sc) for s, sc in reversed(scenes) if s <= now)
+            local = now - start
+            img = bg.frame(now)
+            scene.draw(img, local)
+            d = ImageDraw.Draw(img)
+            d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
+            d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf,
+                   fill=(170, 210, 185))
+            # transición: pequeño zoom de entrada en cada escena
+            if local < 0.2:
+                z = 1.06 - 0.06 * (local / 0.2)
+                zw, zh = int(W * z), int(H * z)
+                img = img.resize((zw, zh), Image.BILINEAR).crop(
+                    ((zw - W) // 2, (zh - H) // 2, (zw - W) // 2 + W, (zh - H) // 2 + H))
+            proc.stdin.write(img.tobytes())
+        proc.stdin.close()
+        if proc.wait() != 0:
+            raise RuntimeError("ffmpeg falló al codificar el vídeo")
+    return total
 
 
 if __name__ == "__main__":

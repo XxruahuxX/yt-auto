@@ -19,6 +19,7 @@ scenes:
   - text: "Más de 20 años después, el récord sigue en pie"
     say: "Más de veinte años después, el récord sigue en pie."
   - label: "TU TURNO"
+    sfx: [ding]
     text: "¿Cuál es el gol más rápido que has visto en directo?"
     say: "¿Cuál es el gol más rápido que has visto en directo? Te leo."
     pause: 0.6

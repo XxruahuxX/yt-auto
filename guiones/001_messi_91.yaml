@@ -21,6 +21,7 @@ scenes:
     highlight: "pulverizó"
     say: "Cuarenta años después, Messi lo pulverizó."
   - label: "TU TURNO"
+    sfx: [ding]
     text: "¿Alguien lo superará algún día? Te leo en comentarios"
     say: "¿Crees que alguien lo superará algún día? Te leo en comentarios."
     pause: 0.6

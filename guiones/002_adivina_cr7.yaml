@@ -22,8 +22,10 @@ scenes:
     pause: 0.6
   - big: "3, 2, 1..."
     text: "¿Lo tienes?"
+    sfx: [countdown]
     say: "Tres. Dos. Uno."
   - label: "RESPUESTA"
+    sfx: [ding]
     big: "CR7"
     text: "Cristiano Ronaldo. Nacido en Madeira"
     highlight: "Cristiano Ronaldo"
