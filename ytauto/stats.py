@@ -23,7 +23,7 @@ HISTORY = Path("data/own_stats.jsonl")
 
 def fetch() -> list[dict]:
     uploads = json.loads(UPLOADS.read_text()) if UPLOADS.exists() else {}
-    ids = {vid: script for script, vid in uploads.items()}
+    ids = {(v["id"] if isinstance(v, dict) else v): script for script, v in uploads.items()}
     rows = []
     for i in range(0, len(ids), 50):
         chunk = list(ids)[i:i + 50]
@@ -38,6 +38,7 @@ def fetch() -> list[dict]:
             views = int(st.get("viewCount", 0))
             rows.append({
                 "id": v["id"], "script": script, "format": spec.get("format", "?"),
+                "experiment": spec.get("experiment", "-"),
                 "title": v["snippet"]["title"], "privacy": v["status"]["privacyStatus"],
                 "views": views, "likes": int(st.get("likeCount", 0)),
                 "comments": int(st.get("commentCount", 0)),
@@ -63,6 +64,13 @@ def report(rows: list[dict]) -> str:
     for fmt, rs in sorted(by_fmt.items(), key=lambda kv: -statistics.median(r["vph"] for r in kv[1])):
         out.append(f"| {fmt} | {len(rs)} | {statistics.median(r['views'] for r in rs):.0f} | "
                    f"{statistics.median(r['vph'] for r in rs):.2f} | {statistics.mean(r['likes'] for r in rs):.1f} |")
+    by_exp = defaultdict(list)
+    for r in pub:
+        by_exp[r["experiment"]].append(r)
+    if len(by_exp) > 1:
+        out += ["", "| Experimento | Vídeos | Vistas/hora medianas |", "|---|---|---|"]
+        for exp, rs in sorted(by_exp.items(), key=lambda kv: -statistics.median(r["vph"] for r in kv[1])):
+            out.append(f"| {exp} | {len(rs)} | {statistics.median(r['vph'] for r in rs):.2f} |")
     out += ["", "| Vídeo | Formato | Estado | Vistas | Likes | Coment. | Edad (h) |", "|---|---|---|---|---|---|---|"]
     for r in sorted(rows, key=lambda r: -r["views"]):
         out.append(f"| [{r['title'][:50]}](https://youtu.be/{r['id']}) | {r['format']} | {r['privacy']} | "
