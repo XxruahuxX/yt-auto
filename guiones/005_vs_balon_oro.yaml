@@ -1,0 +1,35 @@
+format: vs
+title: "Messi vs Cristiano: ¿quién tiene más Balones de Oro? 🏆 #shorts"
+description: |
+  Messi tiene 8 Balones de Oro y Cristiano Ronaldo 5. ¿Quién es el mejor de la historia para ti?
+  #fútbol #messi #cristianoronaldo #balondeoro #shorts
+tags: [messi, cristiano ronaldo, balón de oro, messi vs cristiano, fútbol]
+label: "VS"
+scenes:
+  - emoji: "🥊"
+    text: "Messi contra Cristiano. ¿Quién tiene más Balones de Oro?"
+    highlight: "Balones de Oro?"
+    say: "Messi contra Cristiano. ¿Quién tiene más Balones de Oro?"
+  - emoji: "🤔"
+    text: "Piénsalo antes de que salga la respuesta"
+    sfx: [countdown]
+    big: "3, 2, 1..."
+    say: "Piénsalo. Tres. Dos. Uno."
+  - label: "CRISTIANO"
+    big: "5"
+    emoji: "🇵🇹"
+    text: "2008, 2013, 2014, 2016 y 2017"
+    say: "Cristiano tiene cinco."
+  - label: "MESSI"
+    big: "8"
+    emoji: "🇦🇷"
+    sfx: [ding]
+    text: "Récord absoluto de la historia"
+    highlight: "Récord absoluto"
+    say: "Y Messi, ocho. Récord absoluto de la historia."
+  - label: "TU TURNO"
+    emoji: "🐐"
+    text: "¿Para ti quién es el mejor? Comenta Messi o Cristiano"
+    highlight: "Messi o Cristiano"
+    say: "¿Para ti quién es el mejor? Comenta: Messi, o Cristiano."
+    pause: 0.6

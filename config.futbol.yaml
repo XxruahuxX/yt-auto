@@ -1,0 +1,12 @@
+# Recolección diaria barata (~1.000 unidades): solo nichos de fútbol.
+quota_budget: 2000
+max_age_days: 7
+regions: [ES]
+trending_pages: 1
+max_channels_per_run: 300
+min_videos_per_niche: 20
+niches:
+  futbol:
+    keywords: ["fútbol", "la liga", "curiosidades fútbol"]
+  futbol_retos:
+    keywords: ["adivina el jugador", "quiz fútbol"]

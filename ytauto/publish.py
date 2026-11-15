@@ -34,7 +34,7 @@ def upload_video(path: str | Path, title: str, description: str, tags: list[str]
                  category_id: str = "17", synthetic: bool = False, publish_at: str | None = None) -> str:
     """Subida reanudable (1.600 unidades). Devuelve el id del vídeo. Siempre privado."""
     status = {"privacyStatus": "private", "selfDeclaredMadeForKids": False,
-              "containsSyntheticMedia": synthetic}
+              "containsSyntheticMedia": synthetic, "embeddable": True, "publicStatsViewable": True}
     if publish_at:
         status["publishAt"] = publish_at
     meta = {"snippet": {"title": title[:100], "description": description[:5000], "tags": tags,
@@ -81,3 +81,13 @@ def update_channel(description: str | None = None, keywords: str | None = None,
         del body["brandingSettings"]["image"]
     _check(requests.put(f"{API}/channels", params={"part": "brandingSettings"}, headers=_h(
         {"Content-Type": "application/json"}), data=json.dumps(body), timeout=30))
+
+
+def schedule(video_id: str, publish_at: str) -> dict:
+    """Programa la publicación (RFC 3339, UTC). El vídeo debe estar en privado."""
+    status = {"privacyStatus": "private", "publishAt": publish_at, "embeddable": True,
+              "publicStatsViewable": True, "selfDeclaredMadeForKids": False,
+              "containsSyntheticMedia": True}
+    return _check(requests.put(f"{API}/videos", params={"part": "status"}, timeout=30,
+                               headers=_h({"Content-Type": "application/json"}),
+                               data=json.dumps({"id": video_id, "status": status})))

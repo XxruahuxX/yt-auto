@@ -1,0 +1,33 @@
+format: dato
+title: "El partido que acabó 149-0 😱 (y no es broma) #shorts"
+description: |
+  En 2002, en Madagascar, el AS Adema ganó 149-0 al SO l'Emyrne. Todos los goles fueron en propia puerta, como protesta contra el arbitraje.
+  #fútbol #récords #curiosidades #shorts
+tags: [récord fútbol, 149-0, curiosidades fútbol, madagascar, goles en propia puerta]
+label: "¿SABÍAS QUE...?"
+scenes:
+  - emoji: "😱"
+    text: "El partido con más goles de la historia acabó 149 a 0"
+    highlight: "149 a 0"
+    say: "El partido con más goles de la historia acabó ciento cuarenta y nueve a cero."
+  - big: "149"
+    emoji: "⚽"
+    text: "goles en 90 minutos. Más de uno y medio por minuto"
+    say: "Ciento cuarenta y nueve goles. Más de uno y medio por minuto."
+  - emoji: "🇲🇬"
+    text: "Fue en Madagascar, en 2002. AS Adema contra SO l'Emyrne"
+    say: "Fue en Madagascar, en dos mil dos. AS Adema contra SO l'Emyrne."
+  - emoji: "🤯"
+    text: "Lo más loco: todos los goles fueron en propia puerta"
+    highlight: "en propia puerta"
+    say: "Lo más loco: todos los goles fueron en propia puerta."
+  - emoji: "😤"
+    text: "El Emyrne protestaba así contra el árbitro de su partido anterior"
+    highlight: "protestaba"
+    say: "El Emyrne protestaba así contra un arbitraje de su partido anterior."
+  - label: "TU TURNO"
+    emoji: "💬"
+    sfx: [ding]
+    text: "¿Cuál es la mayor goleada que has visto?"
+    say: "¿Cuál es la mayor goleada que has visto? Te leo."
+    pause: 0.6

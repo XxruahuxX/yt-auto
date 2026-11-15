@@ -1,0 +1,33 @@
+format: porque
+title: "¿Por qué las porterías tienen RED? 🥅 El motivo te sorprenderá #shorts"
+description: |
+  Hasta 1891 las porterías no tenían red. La inventó el ingeniero John Brodie, de Liverpool, para acabar con las discusiones sobre si el balón había entrado.
+  #fútbol #curiosidades #historia #shorts
+tags: [curiosidades fútbol, portería, red, historia del fútbol, john brodie]
+label: "¿POR QUÉ...?"
+scenes:
+  - emoji: "🥅"
+    text: "¿Por qué las porterías tienen red? No siempre fue así"
+    highlight: "red?"
+    say: "¿Por qué las porterías tienen red? No siempre fue así."
+  - emoji: "😤"
+    text: "Antes solo había dos postes y un larguero, y cada gol era una discusión"
+    highlight: "discusión"
+    say: "Antes solo había dos postes y un larguero. Y cada gol acababa en discusión."
+  - emoji: "🤷"
+    text: "¿Entró o pasó por fuera del palo? Nadie lo sabía seguro"
+    say: "¿Entró, o pasó por fuera del palo? Nadie lo sabía seguro."
+  - emoji: "🧠"
+    text: "Un ingeniero de Liverpool, John Brodie, tuvo la idea"
+    highlight: "John Brodie"
+    say: "Hasta que un ingeniero de Liverpool, John Brodie, tuvo la idea."
+  - big: "1891"
+    emoji: "📅"
+    text: "Primer partido con redes en la portería"
+    say: "En mil ochocientos noventa y uno se jugó el primer partido con redes."
+  - label: "TU TURNO"
+    emoji: "💬"
+    sfx: [ding]
+    text: "¿Qué otra regla del fútbol te parece absurda?"
+    say: "¿Qué otra regla del fútbol te parece absurda? Te leo."
+    pause: 0.6

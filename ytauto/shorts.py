@@ -173,7 +173,7 @@ class Scene:
         emoji = sc.get("emoji") or found
         self.emoji = _emoji_img(emoji, 230 if not self.big else 150) if emoji else None
         self.font, lines = _fit(probe, text, 900, 92, BOLD)
-        hl = (sc.get("highlight") or "").lower().split()
+        hl = [w.strip(".,¿?¡!") for w in (sc.get("highlight") or "").lower().split()]
         lh = self.font.size * 1.22
         y = 880 if self.big else (H - lh * len(lines)) / 2 + (90 if self.emoji else -40)
         self.words = []  # (img, x, y)
@@ -222,7 +222,10 @@ class Scene:
                                                                resample=Image.BICUBIC)
                 float_y = 14 * math.sin(t * 4)
                 if self.big:
-                    cx, cy = W - 170, 520
+                    half = self.bf.getlength(self.big) / 2
+                    cx, cy = W / 2 + half + 90, 520
+                    if cx > W - 90:  # número muy ancho: emoji en la esquina
+                        cx, cy = W - 110, 370
                 else:
                     first_y = self.words[0][2] if self.words else H / 2
                     cx, cy = W / 2, first_y - 170

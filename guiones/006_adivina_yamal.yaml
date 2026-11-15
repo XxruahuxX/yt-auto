@@ -1,0 +1,44 @@
+format: quiz
+title: "Adivina el jugador: 3 pistas 🔥 Solo los que saben lo sacan #shorts"
+description: |
+  Tres pistas, un crack. ¿Lo has sacado a la primera?
+  #fútbol #adivinaeljugador #quiz #laliga #shorts
+tags: [adivina el jugador, quiz fútbol, lamine yamal, barcelona, eurocopa]
+label: "ADIVINA EL JUGADOR"
+scenes:
+  - emoji: "🧠"
+    text: "Solo los que saben lo sacan con la primera pista"
+    highlight: "primera pista"
+    say: "Solo unos pocos lo sacan con la primera pista."
+  - label: "PISTA 1"
+    emoji: "👶"
+    text: "Nació en 2007"
+    say: "Pista uno. Nació en dos mil siete."
+    pause: 0.8
+  - label: "PISTA 2"
+    emoji: "🏆"
+    text: "Ganó la Eurocopa 2024 con España"
+    say: "Pista dos. Ganó la Eurocopa de dos mil veinticuatro con España."
+    pause: 0.8
+  - label: "PISTA 3"
+    emoji: "🎯"
+    text: "Es el goleador más joven de la historia de la Eurocopa"
+    say: "Pista tres. Es el goleador más joven de la historia de la Eurocopa."
+    pause: 0.6
+  - emoji: "⏱️"
+    big: "3, 2, 1..."
+    sfx: [countdown]
+    text: "¿Lo tienes?"
+    say: "Tres. Dos. Uno."
+  - label: "RESPUESTA"
+    emoji: "🔥"
+    sfx: [ding]
+    big: "YAMAL"
+    text: "Lamine Yamal. Marcó a Francia con 16 años"
+    highlight: "Lamine Yamal."
+    say: "¡Lamine Yamal! Marcó a Francia con dieciséis años."
+  - label: "TU TURNO"
+    emoji: "💬"
+    text: "¿En qué pista lo sacaste? Comenta 1, 2 o 3"
+    say: "¿En qué pista lo sacaste? Comenta uno, dos, o tres."
+    pause: 0.6

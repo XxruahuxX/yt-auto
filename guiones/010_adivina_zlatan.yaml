@@ -1,0 +1,45 @@
+format: quiz
+title: "Adivina el jugador con 3 pistas 🦁 ¿A la primera? #shorts"
+description: |
+  Tres pistas, un crack. Si lo sacas a la primera, comenta 🦁
+  #fútbol #adivinaeljugador #quiz #retos #shorts
+tags: [adivina el jugador, quiz fútbol, zlatan ibrahimovic, reto fútbol]
+label: "ADIVINA EL JUGADOR"
+scenes:
+  - emoji: "🧠"
+    text: "3 pistas. Este es para expertos"
+    highlight: "expertos"
+    say: "Tres pistas. Este es para expertos."
+  - label: "PISTA 1"
+    emoji: "🇸🇪"
+    text: "Es sueco"
+    say: "Pista uno. Es sueco."
+    pause: 0.8
+  - label: "PISTA 2"
+    emoji: "✈️"
+    text: "Jugó en Ajax, Juventus, Inter, Barça, Milan y PSG"
+    say: "Pista dos. Jugó en el Ajax, la Juventus, el Inter, el Barça, el Milan y el PSG."
+    pause: 0.8
+  - label: "PISTA 3"
+    emoji: "🤸"
+    text: "Ganó el Premio Puskás por una chilena a Inglaterra"
+    highlight: "chilena"
+    say: "Pista tres. Ganó el Premio Puskás por una chilena contra Inglaterra."
+    pause: 0.6
+  - emoji: "⏱️"
+    big: "3, 2, 1..."
+    sfx: [countdown]
+    text: "¿Lo tienes?"
+    say: "Tres. Dos. Uno."
+  - label: "RESPUESTA"
+    emoji: "🦁"
+    sfx: [ding]
+    big: "ZLATAN"
+    text: "Zlatan Ibrahimović"
+    highlight: "Zlatan Ibrahimović"
+    say: "¡Zlatan Ibrahimović!"
+  - label: "TU TURNO"
+    emoji: "💬"
+    text: "¿A la primera? Comenta en qué pista lo sacaste"
+    say: "¿Lo sacaste a la primera? Comenta en qué pista."
+    pause: 0.6
