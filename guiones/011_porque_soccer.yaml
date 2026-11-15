@@ -1,0 +1,45 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué en EE. UU. dicen SOCCER? 🤯 No lo inventaron ellos #shorts"
+description: |
+  «Soccer» nació en Inglaterra. Viene de «association football», el nombre del juego de la Football Association (Londres, 1863). Los estudiantes de Oxford acortaban palabras y les añadían «-er»: rugby pasó a «rugger» y association a «soccer».
+  #fútbol #curiosidades #historia #shorts
+tags: [curiosidades fútbol, soccer, historia del fútbol, football association, por qué]
+hook: "¿Sabías que «soccer» no lo inventaron los americanos?"
+scenes:
+  - emoji: "🤯"
+    say: "¿Sabías que la palabra soccer no la inventaron los americanos? La inventaron los ingleses."
+    highlight: "ingleses."
+  - emoji: "🏛️"
+    big: "1863"
+    say: "En mil ochocientos sesenta y tres nace en Londres la Football Association, la primera federación de fútbol."
+    highlight: "Londres"
+  - emoji: "🏉⚽"
+    say: "Su juego se llamó association football, para no confundirlo con el rugby, que también se llamaba football."
+    highlight: "association rugby,"
+  - emoji: "🎓"
+    say: "Y aquí entran los estudiantes de Oxford. Tenían la manía de acortar palabras y añadirles e, erre, al final."
+    highlight: "Oxford."
+  - tiles: [R, U, G, B, Y]
+    say: "Así, rugby..."
+  - tiles: [R, U, G, G, E, R]
+    tiles_hl: [4, 5]
+    say: "pasó a ser rugger."
+    highlight: "rugger."
+  - tiles: [A, S, S, O, C]
+    say: "Y association se quedó en assoc..."
+  - tiles: [S, O, C, C, E, R]
+    tiles_hl: [4, 5]
+    say: "y con la e, erre, nació soccer."
+    highlight: "soccer."
+    sfx: [ding]
+  - emoji: "🏈"
+    say: "En Estados Unidos, football ya era su deporte de casco y balón ovalado. Así que se quedaron con soccer."
+    highlight: "soccer."
+  - emoji: "🇬🇧"
+    say: "Y los ingleses la usaron durante décadas, hasta que empezó a sonarles demasiado americana."
+    highlight: "americana."
+  - emoji: "⚽"
+    say: "Un porqué futbolero cada día. Síguenos."
+    highlight: "Síguenos."

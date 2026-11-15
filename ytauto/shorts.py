@@ -246,6 +246,158 @@ class Scene:
                 img.paste(r, (int(x + (im.width - w2) / 2), int(y + (im.height - h2) / 2)), r)
 
 
+NAVY, NAVY_L, ORANGE, INK = (16, 24, 44), (26, 38, 66), (255, 140, 40), (20, 20, 28)
+
+
+class KBackground:
+    """Fondo oscuro tipo pizarra con líneas de campo muy tenues (estilo karaoke)."""
+
+    def __init__(self):
+        self.base = Image.new("RGB", (W, H), NAVY)
+        d = ImageDraw.Draw(self.base)
+        for y in range(H):  # degradado vertical suave
+            k = abs(y - H / 2) / (H / 2)
+            c = tuple(int(NAVY_L[i] * (1 - k) + NAVY[i] * k) for i in range(3))
+            d.line([(0, y), (W, y)], fill=c)
+        lc = (36, 52, 86)
+        d.rectangle([60, 140, W - 60, H - 140], outline=lc, width=4)
+        d.line([(60, H // 2), (W - 60, H // 2)], fill=lc, width=4)
+        d.rectangle([W / 2 - 220, 140, W / 2 + 220, 420], outline=lc, width=4)
+        d.rectangle([W / 2 - 220, H - 420, W / 2 + 220, H - 140], outline=lc, width=4)
+
+    def frame(self, t: float) -> Image.Image:
+        img = self.base.copy()
+        d = ImageDraw.Draw(img)
+        r = 260 + 10 * math.sin(t * 2 * math.pi * 104 / 60)
+        d.ellipse([W / 2 - r, H / 2 - r, W / 2 + r, H / 2 + r], outline=(40, 58, 96), width=4)
+        return img
+
+
+def _tile(ch: str, size: int, fill, fg) -> Image.Image:
+    im = Image.new("RGBA", (size + 12, size + 16), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([6, 12, size + 6, size + 14], 22, fill=(0, 0, 0, 120))  # sombra
+    d.rounded_rectangle([0, 0, size, size], 22, fill=fill)
+    f = ImageFont.truetype(BOLD, int(size * 0.62))
+    tw = d.textlength(ch, font=f)
+    d.text(((size - tw) / 2, size * 0.12), ch, font=f, fill=fg)
+    return im
+
+
+def _word_times(words: list[str], speech: float) -> list[float]:
+    """Reparte la duración de la voz entre palabras según su longitud."""
+    w = [len(x) + 2 for x in words]
+    tot, acc, out = sum(w), 0, []
+    for x in w:
+        out.append(0.15 + speech * acc / tot)
+        acc += x
+    return out
+
+
+class KScene:
+    """Escena estilo karaoke: gancho fijo arriba, visual en el centro, subtítulo palabra a palabra."""
+
+    def __init__(self, sc: dict, speech: float, dur: float):
+        self.sc, self.speech, self.dur = sc, speech, dur
+        probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+        say = sc.get("say", sc.get("text", ""))
+        self.words = _EMOJI_RE.sub("", say).split()
+        self.times = _word_times(self.words, speech)
+        self.hl = {w.strip(".,¿?¡!:;…").lower() for w in (sc.get("highlight") or "").split()}
+        self.cf = ImageFont.truetype(BOLD, 86)
+        # bloques de subtítulo de ~18 caracteres
+        self.chunks, cur = [], []
+        for i, w in enumerate(self.words):
+            if cur and (len(" ".join(self.words[j] for j in cur + [i])) > 18 or len(cur) >= 4):
+                self.chunks.append(cur)
+                cur = []
+            cur.append(i)
+        if cur:
+            self.chunks.append(cur)
+        emoji = sc.get("emoji") or "".join(_EMOJI_RE.findall(sc.get("text", ""))).replace("\ufe0f", "")
+        self.tiles = sc.get("tiles") or []
+        self.big = sc.get("big")
+        small = bool(self.tiles or self.big)
+        self.emoji = _emoji_img(emoji, 200 if small else 380) if emoji else None
+        if self.tiles:
+            n = len(self.tiles)
+            self.ts = min(150, int((W - 120) / n) - 14)
+            hl_idx = set(sc.get("tiles_hl", []))
+            self.tile_imgs = [_tile(c, self.ts, ORANGE if i in hl_idx else (245, 240, 228),
+                                    WHITE if i in hl_idx else INK) for i, c in enumerate(self.tiles)]
+        if self.big:
+            self.bf, _ = _fit(probe, self.big, 900, 240, BOLD, 1)
+            m = re.match(r"(\d+)(.*)", self.big)
+            self.count = (int(m.group(1)), m.group(2)) if m and int(m.group(1)) > 9 else None
+
+    def _paste_scaled(self, img, im, cx, cy, s, rot=0.0):
+        if s <= 0.05:
+            return
+        w2, h2 = max(1, int(im.width * s)), max(1, int(im.height * s))
+        r = im.resize((w2, h2), Image.BILINEAR)
+        if rot:
+            r = r.rotate(rot, expand=True, resample=Image.BICUBIC)
+        img.paste(r, (int(cx - r.width / 2), int(cy - r.height / 2)), r)
+
+    def draw(self, img: Image.Image, t: float) -> None:
+        d = ImageDraw.Draw(img)
+        cy = 860  # centro de la zona visual
+        if self.tiles:
+            n, step = len(self.tiles), self.ts + 14
+            x0 = (W - step * n) / 2 + step / 2
+            ty = cy + (120 if self.emoji is not None else 0)
+            span = max(min(self.speech * 0.6, 0.12 * n), 0.3)
+            for i, im in enumerate(self.tile_imgs):
+                t0 = 0.15 + span * i / n
+                s = _ease_out_back((t - t0) / 0.22) if t > t0 else 0
+                self._paste_scaled(img, im, x0 + i * step, ty, s)
+        if self.big:
+            text = self.big
+            if self.count:
+                p = min(t / 0.7, 1.0)
+                text = f"{round(self.count[0] * (1 - (1 - p) ** 3))}{self.count[1]}"
+            big = _word_img(text, self.bf, YELLOW)
+            by = cy + (110 if self.emoji is not None else 0)
+            self._paste_scaled(img, big, W / 2, by, 0.3 + 0.7 * _ease_out_back(t / 0.4))
+        if self.emoji is not None:
+            ey = cy - 150 if (self.tiles or self.big) else cy
+            s = _ease_out_back((t - 0.05) / 0.35) if t > 0.05 else 0
+            self._paste_scaled(img, self.emoji, W / 2, ey + 14 * math.sin(t * 4), s, 6 * math.sin(t * 3))
+        # subtítulo karaoke
+        cur = max([i for i, t0 in enumerate(self.times) if t >= t0] or [0])
+        chunk = next(c for c in self.chunks if cur in c or c[-1] >= cur)
+        line = " ".join(self.words[i] for i in chunk)
+        lw = d.textlength(line, font=self.cf)
+        y = 1300
+        pop = 1 + 0.06 * max(0.0, 1 - (t - self.times[chunk[0]]) / 0.12)
+        pad = 34
+        d.rounded_rectangle([(W - lw) / 2 - pad * pop, y - 22, (W + lw) / 2 + pad * pop, y + 118], 36,
+                            fill=(8, 10, 18))
+        x = (W - lw) / 2
+        for i in chunk:
+            w = self.words[i]
+            key = w.strip(".,¿?¡!:;…").lower()
+            col = YELLOW if i == cur else (ORANGE if key in self.hl else WHITE)
+            if i > cur:
+                col = (150, 156, 170)
+            d.text((x, y), w, font=self.cf, fill=col)
+            x += d.textlength(w + " ", font=self.cf)
+
+
+def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
+    """Pregunta gancho fija arriba durante todo el vídeo."""
+    d = ImageDraw.Draw(img)
+    lines = textwrap.wrap(hook, 26)
+    lh = font.size * 1.2
+    h = lh * len(lines) + 50
+    k = _ease_out_back(t / 0.4)
+    y0 = -h + (200 + h) * k
+    d.rounded_rectangle([70, y0, W - 70, y0 + h], 34, fill=WHITE)
+    for j, l in enumerate(lines):
+        lw = d.textlength(l, font=font)
+        d.text(((W - lw) / 2, y0 + 22 + j * lh), l, font=font, fill=INK)
+
+
 def render(script_path: str | Path, out_path: str | Path) -> float:
     from . import audio
 
@@ -253,30 +405,36 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     default_label = spec.get("label", "¿SABÍAS QUE...?")
+    karaoke = spec.get("style") == "karaoke"
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         scenes, voices, sfx, t = [], [], [], 0.0
         for i, sc in enumerate(spec["scenes"]):
             wav = tmp / f"{i}.wav"
-            speech = tts(sc.get("say", sc["text"]), wav)
+            speech = tts(sc.get("say") or sc["text"], wav)
             dur = speech + sc.get("pause", 0.15) + 0.15
             voices.append((t + 0.15, audio.read_wav(wav)))
             sfx.append((max(0.0, t - 0.1), "whoosh"))
             if sc.get("big"):
                 sfx.append((t + 0.1, "pop"))
+            if sc.get("tiles"):
+                n = len(sc["tiles"])
+                span = max(min(speech * 0.6, 0.12 * n), 0.3)
+                sfx += [(t + 0.15 + span * k / n, "tick") for k in range(n)]
             for name in sc.get("sfx", []):
                 if name == "countdown":
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
                 else:
                     sfx.append((t + 0.15, name))
-            scenes.append((t, Scene(sc, default_label, speech, dur)))
+            scenes.append((t, KScene(sc, speech, dur) if karaoke else Scene(sc, default_label, speech, dur)))
             t += dur
         total = t
         mixwav = tmp / "mix.wav"
         audio.mix(total, voices, sfx, mixwav)
 
-        bg = Background()
+        bg = KBackground() if karaoke else Background()
         hf = ImageFont.truetype(SEMI, 48)
+        hookf = ImageFont.truetype(BOLD, 62)
         proc = subprocess.Popen(
             ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
              "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", str(mixwav),
@@ -289,6 +447,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             local = now - start
             img = bg.frame(now)
             scene.draw(img, local)
+            if karaoke and spec.get("hook"):
+                _hook_bar(img, spec["hook"], now, hookf)
             d = ImageDraw.Draw(img)
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
             d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf,
