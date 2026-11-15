@@ -1,5 +1,6 @@
 .env
-data/
+data/*
+!data/uploads.json
 reports/
 __pycache__/
 .pytest_cache/
