@@ -38,7 +38,31 @@ def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
     """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
+    if (MODELS / "kokoro-v1.0.onnx").exists():
+        return tts_kokoro(text, out)
     return tts_piper(text, out, length_scale)
+
+
+MODELS = Path(__file__).resolve().parent.parent / "models"
+_kokoro = None
+
+
+def tts_kokoro(text: str, out: Path) -> float:
+    """Kokoro (Apache 2.0, local, uso comercial permitido). Voces: em_alex, ef_dora, em_santa."""
+    global _kokoro
+    import soundfile as sf
+    from kokoro_onnx import Kokoro
+    if _kokoro is None:
+        _kokoro = Kokoro(str(MODELS / "kokoro-v1.0.onnx"), str(MODELS / "voices-v1.0.bin"))
+    samples, sr = _kokoro.create(text, voice=os.environ.get("KOKORO_VOICE", "em_alex"),
+                                 speed=float(os.environ.get("KOKORO_SPEED", "1.1")), lang="es")
+    raw = out.with_suffix(".raw.wav")
+    sf.write(str(raw), samples, sr)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
+                    "silenceremove=start_periods=1:start_threshold=-45dB,aresample=44100", str(out)],
+                   check=True)
+    with wave.open(str(out)) as w:
+        return w.getnframes() / w.getframerate()
 
 
 def tts_elevenlabs(text: str, out: Path) -> float:
