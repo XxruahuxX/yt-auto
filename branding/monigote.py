@@ -1,6 +1,10 @@
 """Mascota de DatoCrack: monigote de trazo grueso con esqueleto animable.
 
-    python branding/monigote.py            -> PNG de poses + vídeo demo
+Cinemática directa: cada postura son ángulos de hueso (0 = derecha, 90 = abajo).
+Los huesos tienen longitud fija, así que al interpolar no se estiran ni se encogen,
+y las rodillas siempre doblan hacia delante (el monigote mira a la derecha).
+
+    python branding/monigote.py   -> posturas en PNG + vídeo demo
 """
 from __future__ import annotations
 
@@ -12,25 +16,19 @@ from PIL import Image, ImageDraw, ImageFont
 
 OUT = Path("/mnt/project-files/yt-auto/canal/mascota")
 GREEN_D, STRIPE, YELLOW, WHITE, INK = (6, 46, 28), (9, 56, 34), (255, 214, 10), (255, 255, 255), (24, 24, 30)
-K = 2  # supermuestreo
+K = 2
+GROUND = 880
+L = dict(spine=230, neck=26, head=92, thigh=150, shin=145, upper=118, fore=110, foot=62)
 
-# Poses en un lienzo de 1000x1000 (cadera hacia el centro). Articulaciones:
-# head, neck, hip, le, lh (codo/mano izq.), re, rh, lk, lf (rodilla/pie izq.), rk, rf
+# ángulos en grados; lift = altura sobre el suelo (saltos)
 POSES = {
-    "quieto": dict(head=(500, 250), neck=(500, 350), hip=(500, 600), le=(420, 470), lh=(395, 590),
-                   re=(580, 470), rh=(605, 590), lk=(465, 740), lf=(455, 880), rk=(540, 740), rf=(550, 880)),
-    "celebra": dict(head=(445, 250), neck=(490, 345), hip=(540, 590), le=(400, 470), lh=(320, 520),
-                    re=(600, 260), rh=(610, 120), lk=(450, 720), lf=(510, 840), rk=(600, 720), rf=(650, 860)),
-    "agacha": dict(head=(500, 330), neck=(500, 430), hip=(500, 660), le=(430, 540), lh=(440, 650),
-                   re=(570, 540), rh=(560, 650), lk=(440, 760), lf=(455, 890), rk=(565, 760), rf=(550, 890)),
-    "salto": dict(head=(500, 160), neck=(500, 260), hip=(500, 500), le=(400, 160), lh=(370, 50),
-                  re=(600, 160), rh=(630, 50), lk=(450, 630), lf=(470, 740), rk=(560, 630), rf=(540, 740)),
-    "piensa": dict(head=(500, 250), neck=(500, 350), hip=(500, 600), le=(420, 470), lh=(395, 590),
-                   re=(600, 440), rh=(540, 330), lk=(465, 740), lf=(455, 880), rk=(540, 740), rf=(550, 880)),
-    "chuta_atras": dict(head=(480, 250), neck=(490, 350), hip=(500, 600), le=(420, 430), lh=(360, 380),
-                        re=(580, 470), rh=(640, 540), lk=(470, 740), lf=(460, 880), rk=(520, 720), rf=(420, 800)),
-    "chuta": dict(head=(470, 260), neck=(485, 360), hip=(500, 600), le=(420, 440), lh=(360, 400),
-                  re=(570, 470), rh=(630, 520), lk=(470, 740), lf=(460, 880), rk=(600, 730), rf=(680, 830)),
+    "quieto": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=115, lfa=100, rua=65, rfa=80, lift=0),
+    "piensa": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=115, lfa=100, rua=45, rfa=-105, lift=0, tilt=10),
+    "agacha": dict(spine=-88, lth=140, lsh=72, rth=40, rsh=108, lua=125, lfa=105, rua=55, rfa=75, lift=0),
+    "salto": dict(spine=-92, lth=120, lsh=80, rth=60, rsh=100, lua=-145, lfa=-120, rua=-35, rfa=-60, lift=150),
+    "celebra": dict(spine=-110, lth=118, lsh=100, rth=62, rsh=98, lua=155, lfa=148, rua=-50, rfa=-88, lift=0, tilt=-15),
+    "chuta_atras": dict(spine=-96, lth=96, lsh=92, rth=118, rsh=165, lua=190, lfa=172, rua=40, rfa=70, lift=0),
+    "chuta": dict(spine=-100, lth=98, lsh=96, rth=30, rsh=46, lua=200, lfa=188, rua=30, rfa=60, lift=0),
 }
 
 
@@ -38,8 +36,15 @@ def lerp(a, b, t):
     return a + (b - a) * t
 
 
+def lerp_ang(a, b, t):
+    d = (b - a + 180) % 360 - 180
+    return a + d * t
+
+
 def blend(p, q, t):
-    return {k: (lerp(p[k][0], q[k][0], t), lerp(p[k][1], q[k][1], t)) for k in p}
+    keys = set(p) | set(q)
+    return {k: (lerp(p.get(k, 0), q.get(k, 0), t) if k in ("lift", "tilt")
+                else lerp_ang(p[k], q[k], t)) for k in keys}
 
 
 def ease(t):
@@ -47,47 +52,74 @@ def ease(t):
     return t * t * (3 - 2 * t)
 
 
-def stroke(d, a, b, r0, r1, col, n=24):
-    for i in range(n + 1):
-        t = i / n
-        x, y, r = lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(r0, r1, t)
+def _go(p, ang, length):
+    a = math.radians(ang)
+    return (p[0] + length * math.cos(a), p[1] + length * math.sin(a))
+
+
+def solve(pose, x=500):
+    """Posiciones de articulaciones con la cadera en (x, ?) y los pies apoyados en GROUND."""
+    hip = (x, 0.0)
+    j = {"hip": hip}
+    for s in "lr":
+        hs = (hip[0] + (6 if s == "r" else -6), hip[1])
+        j[s + "k"] = _go(hs, pose[s + "th"], L["thigh"])
+        j[s + "f"] = _go(j[s + "k"], pose[s + "sh"], L["shin"])
+        j[s + "hs"] = hs
+    neck = _go(hip, pose["spine"], L["spine"])
+    j["neck"] = neck
+    j["sh"] = _go(neck, pose["spine"] + 180, 22)  # hombros un poco por debajo del cuello
+    for s in "lr":
+        j[s + "e"] = _go(j["sh"], pose[s + "ua"], L["upper"])
+        j[s + "h"] = _go(j[s + "e"], pose[s + "fa"], L["fore"])
+    j["head"] = _go(neck, pose["spine"] + pose.get("tilt", 0), L["neck"] + L["head"])
+    low = max(j["lf"][1], j["rf"][1])
+    dy = GROUND - low - pose.get("lift", 0)
+    return {k: (v[0], v[1] + dy) for k, v in j.items()}
+
+
+def _curve(a, j, b, n=40):
+    """Curva cuadrática que pasa por la articulación j (codo/rodilla redondeados)."""
+    c = (2 * j[0] - (a[0] + b[0]) / 2, 2 * j[1] - (a[1] + b[1]) / 2)
+    return [((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0],
+             (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1]) for t in (i / n for i in range(n + 1))]
+
+
+def _tube(d, pts, r0, r1, col):
+    n = len(pts) - 1
+    for i, (x, y) in enumerate(pts):
+        r = lerp(r0, r1, i / n)
         d.ellipse([x - r, y - r, x + r, y + r], fill=col)
 
 
-def draw(img, pose, col=WHITE, dx=0, dy=0, scale=1.0, head_r=92):
-    d = ImageDraw.Draw(img)
+def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0):
+    j = solve(pose, x)
     s = scale * K
-
-    def P(k):
-        x, y = pose[k]
-        return (x * s + dx * K, y * s + dy * K)
-    w = 32 * s
-    # tronco: curva cuello -> cadera
-    n0, h0 = P("neck"), P("hip")
-    c = ((n0[0] + h0[0]) / 2 + (h0[1] - n0[1]) * 0.18, (n0[1] + h0[1]) / 2)
-    pts = [((1 - t) ** 2 * n0[0] + 2 * (1 - t) * t * c[0] + t * t * h0[0],
-            (1 - t) ** 2 * n0[1] + 2 * (1 - t) * t * c[1] + t * t * h0[1]) for t in (i / 30 for i in range(31))]
-    for p, q in zip(pts, pts[1:]):
-        stroke(d, p, q, w * 1.05, w * 1.05, col, 3)
-    # extremidades (más gruesas cerca del cuerpo)
-    for a, b, e in (("neck", "le", "lh"), ("neck", "re", "rh"), ("hip", "lk", "lf"), ("hip", "rk", "rf")):
-        stroke(d, P(a), P(b), w * 0.95, w * 0.8, col)
-        stroke(d, P(b), P(e), w * 0.8, w * 0.6, col)
-    for h in ("lh", "rh"):  # puños
-        x, y = P(h)
-        d.ellipse([x - w * 1.25, y - w * 1.15, x + w * 1.25, y + w * 1.15], fill=col)
-    for k_, f in (("lk", "lf"), ("rk", "rf")):  # pies
-        x, y = P(f)
-        kx = P(k_)[0]
-        sgn = 1
-        d.polygon([(x - w * 0.6, y - w * 0.6), (x + w * 0.4, y - w * 0.6), (x + sgn * w * 2.2, y + w * 0.7), (x - w * 0.6, y + w * 0.7)], fill=col)
-    # cabeza: aro grueso
-    x, y = P("head")
-    r = head_r * s
-    d.ellipse([x - r, y - r, x + r, y + r], outline=col, width=int(w * 0.95))
+    P = {k: ((v[0] + dx) * s, (v[1] + dy) * s) for k, v in j.items()}
+    d = ImageDraw.Draw(img)
+    w = 30 * s
+    # piernas
+    for sd in "lr":
+        _tube(d, _curve(P[sd + "hs"], P[sd + "k"], P[sd + "f"]), w, w * 0.8, col)
+        fa = (pose[sd + "sh"] - 85) if sd == "r" else (pose[sd + "sh"] + 85)  # pies hacia fuera
+        tip = _go(P[sd + "f"], fa, L["foot"] * s)
+        _tube(d, [(lerp(P[sd + "f"][0], tip[0], u / 12), lerp(P[sd + "f"][1], tip[1], u / 12)) for u in range(13)], w * 0.8, w * 0.35, col)
+    # tronco ligeramente curvo
+    mid = ((P["hip"][0] + P["neck"][0]) / 2 + 10 * s, (P["hip"][1] + P["neck"][1]) / 2)
+    _tube(d, _curve(P["neck"], mid, P["hip"]), w * 1.05, w * 1.1, col)
+    # brazos y puños
+    for sd in "lr":
+        _tube(d, _curve(P["sh"], P[sd + "e"], P[sd + "h"]), w * 0.9, w * 0.72, col)
+        hx, hy = P[sd + "h"]
+        d.ellipse([hx - w * 1.15, hy - w * 1.05, hx + w * 1.15, hy + w * 1.05], fill=col)
+    # cabeza: aro
+    hx, hy = P["head"]
+    r = L["head"] * s
+    d.ellipse([hx - r, hy - r, hx + r, hy + r], outline=col, width=int(w * 0.95))
+    return j
 
 
-def ball(img, x, y, r=48, rot=0.0):
+def ball(img, x, y, r=46, rot=0.0):
     d = ImageDraw.Draw(img)
     x, y, r = x * K, y * K, r * K
     d.ellipse([x - r, y - r, x + r, y + r], fill=WHITE, outline=INK, width=6 * K)
@@ -96,7 +128,7 @@ def ball(img, x, y, r=48, rot=0.0):
 
 
 def canvas(w=1000, h=1000, bg=True):
-    img = Image.new("RGBA" if not bg else "RGB", (w * K, h * K), GREEN_D if bg else (0, 0, 0, 0))
+    img = Image.new("RGB" if bg else "RGBA", (w * K, h * K), GREEN_D if bg else (0, 0, 0, 0))
     if bg:
         d = ImageDraw.Draw(img)
         for i in range(0, 8, 2):
@@ -104,12 +136,13 @@ def canvas(w=1000, h=1000, bg=True):
     return img
 
 
+KEYS = [(0.0, "quieto"), (0.6, "quieto"), (1.0, "piensa"), (1.8, "piensa"), (2.1, "agacha"),
+        (2.4, "salto"), (2.75, "celebra"), (3.6, "celebra"), (4.0, "quieto"), (4.4, "chuta_atras"),
+        (4.62, "chuta"), (5.3, "chuta"), (5.8, "quieto"), (6.4, "quieto")]
+
+
 def timeline(t):
-    """Demo de ~6 s: quieto, piensa, celebra con salto, chuta."""
-    keys = [(0.0, "quieto"), (0.6, "quieto"), (1.0, "piensa"), (1.8, "piensa"), (2.1, "agacha"),
-            (2.35, "salto"), (2.6, "celebra"), (3.6, "celebra"), (4.0, "quieto"), (4.4, "chuta_atras"),
-            (4.65, "chuta"), (5.3, "chuta"), (5.8, "quieto"), (6.4, "quieto")]
-    for (t0, a), (t1, b) in zip(keys, keys[1:]):
+    for (t0, a), (t1, b) in zip(KEYS, KEYS[1:]):
         if t0 <= t <= t1:
             return blend(POSES[a], POSES[b], ease((t - t0) / max(t1 - t0, 1e-6)))
     return POSES["quieto"]
@@ -120,25 +153,24 @@ def demo(out, fps=30, size=720):
                              "-s", f"{size}x{size}", "-r", str(fps), "-i", "-", "-c:v", "libx264",
                              "-pix_fmt", "yuv420p", "-crf", "20", str(out)], stdin=subprocess.PIPE)
     f = ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-ExtraBold.otf", 56 * K)
+    kick_x = None
     for i in range(int(6.4 * fps)):
         t = i / fps
         img = canvas()
         pose = timeline(t)
-        bob = 4 * math.sin(t * 6) if t < 2 or t > 6 else 0
-        draw(img, pose, dy=bob)
-        if t > 2.6 and t < 3.6:  # texto de celebración
-            d = ImageDraw.Draw(img)
-            d.text((700 * K, 150 * K), "¡DATO!", font=f, fill=YELLOW)
+        j = draw(img, pose, dy=3 * math.sin(t * 5) if t < 1.9 or t > 5.8 else 0)
+        d = ImageDraw.Draw(img)
+        if 2.75 < t < 3.6:
+            d.text((690 * K, 140 * K), "¡DATO!", font=f, fill=YELLOW)
         if 1.0 < t < 1.8:
-            d = ImageDraw.Draw(img)
-            d.text((630 * K, 170 * K), "?", font=f, fill=YELLOW)
-        # balón: quieto delante del pie y sale disparado al chutar
+            d.text((640 * K, 170 * K), "?", font=f, fill=YELLOW)
         if t >= 3.9:
-            if t < 4.65:
-                ball(img, 700, 885)
+            bx, by = 640, GROUND - 46
+            if t < 4.6:
+                ball(img, bx, by)
             else:
-                k = (t - 4.65) / 0.7
-                ball(img, 700 + 500 * k, 885 - 700 * k + 450 * k * k, rot=k * 12)
+                k = (t - 4.6) / 0.7
+                ball(img, bx + 520 * k, by - 650 * k + 420 * k * k, rot=k * 12)
         proc.stdin.write(img.resize((size, size), Image.LANCZOS).tobytes())
     proc.stdin.close()
     proc.wait()
@@ -146,14 +178,14 @@ def demo(out, fps=30, size=720):
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    names = ["quieto", "piensa", "celebra", "chuta"]
-    sheet = Image.new("RGB", (4 * 500, 500))
+    names = ["quieto", "piensa", "agacha", "celebra", "chuta"]
+    sheet = Image.new("RGB", (len(names) * 400, 400))
     for i, n in enumerate(names):
         img = canvas()
         draw(img, POSES[n])
         if n == "chuta":
-            ball(img, 760, 840)
-        sheet.paste(img.resize((500, 500), Image.LANCZOS), (i * 500, 0))
+            ball(img, 700, GROUND - 120)
+        sheet.paste(img.resize((400, 400), Image.LANCZOS), (i * 400, 0))
     sheet.save(OUT / "monigote_poses.png")
     img = canvas(bg=False)
     draw(img, POSES["celebra"])
