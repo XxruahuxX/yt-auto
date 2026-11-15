@@ -1,0 +1,14 @@
+quota_budget: 2900
+max_age_days: 7
+regions: []
+max_channels_per_run: 700
+min_videos_per_niche: 20
+niches:
+  minecraft: {keywords: ["minecraft", "minecraft pero"]}
+  roblox: {keywords: ["roblox", "roblox español"]}
+  brawl_clash: {keywords: ["brawl stars", "clash royale"]}
+  anime: {keywords: ["anime", "anime recomendaciones"]}
+  humor_memes: {keywords: ["memes", "humor"]}
+  retos_quiz: {keywords: ["adivina el", "quiz"]}
+  futbol_curiosidades: {keywords: ["curiosidades fútbol", "futbolistas"]}
+  ia_trucos: {keywords: ["IA gratis", "trucos chatgpt"]}
