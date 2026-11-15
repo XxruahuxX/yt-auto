@@ -28,6 +28,69 @@ def grass(size):
     return Image.fromarray(np.dstack([r, g, b]).clip(0, 255).astype(np.uint8)).convert("RGBA")
 
 
+def _coeffs(src, dst):
+    """Coeficientes de Image.transform(PERSPECTIVE) que llevan dst -> src."""
+    A, B = [], []
+    for (x, y), (u, v) in zip(dst, src):
+        A += [[x, y, 1, 0, 0, 0, -u * x, -u * y], [0, 0, 0, x, y, 1, -v * x, -v * y]]
+        B += [u, v]
+    return np.linalg.solve(np.array(A, float), np.array(B, float)).tolist()
+
+
+def pitch_lines(size):
+    """Campo visto desde arriba (105x68 m, eje largo en vertical) y proyectado en perspectiva."""
+    k = 20  # px por metro
+    W, H = 68 * k, 105 * k
+    m = 6 * k
+    lay = Image.new("L", (W + 2 * m, H + 2 * m), 0)
+    d = ImageDraw.Draw(lay)
+    lw = int(0.12 * k * 6)
+    X0, Y0 = m, m
+    d.rectangle([X0, Y0, X0 + W, Y0 + H], outline=255, width=lw)
+    d.line([X0, Y0 + H / 2, X0 + W, Y0 + H / 2], fill=255, width=lw)
+    cx, cy = X0 + W / 2, Y0 + H / 2
+    r = 9.15 * k
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=255, width=lw)
+    d.ellipse([cx - 0.4 * k, cy - 0.4 * k, cx + 0.4 * k, cy + 0.4 * k], fill=255)
+    for top in (True, False):
+        y = Y0 if top else Y0 + H
+        sgn = 1 if top else -1
+        d.rectangle(sorted_box(cx - 20.16 * k, y, cx + 20.16 * k, y + sgn * 16.5 * k), outline=255, width=lw)
+        d.rectangle(sorted_box(cx - 9.16 * k, y, cx + 9.16 * k, y + sgn * 5.5 * k), outline=255, width=lw)
+        py = y + sgn * 11 * k
+        d.ellipse([cx - 0.3 * k, py - 0.3 * k, cx + 0.3 * k, py + 0.3 * k], fill=255)
+        bb = [cx - r, py - r, cx + r, py + r]
+        d.arc(bb, 37 if top else 217, 143 if top else 323, fill=255, width=lw)
+    # perspectiva: fondo estrecho arriba, primer plano ancho abajo
+    src = [(0, 0), (lay.width, 0), (lay.width, lay.height), (0, lay.height)]
+    dst = PITCH_DST(size)
+    proj = lay.transform((size, size), Image.PERSPECTIVE, _coeffs(src, dst), Image.BICUBIC)
+    # se desvanecen hacia el fondo
+    fade = np.clip(0.55 + np.linspace(0, 1, size) * 0.6, 0, 1)[:, None] * np.ones((1, size))
+    a = (np.asarray(proj, float) * fade * 0.85).astype(np.uint8)
+    out = Image.new("RGBA", (size, size), (240, 255, 240, 0))
+    out.putalpha(Image.fromarray(a).filter(ImageFilter.GaussianBlur(1.2)))
+    return out
+
+
+def PITCH_DST(size):
+    return [(size * 0.30, size * 0.30), (size * 0.70, size * 0.30), (size * 1.25, size * 1.30), (-size * 0.25, size * 1.30)]
+
+
+def center_spot(size):
+    """Dónde cae el centro del campo tras la perspectiva."""
+    m, W, H = 120, 68 * 20, 105 * 20
+    src = [(0, 0), (W + 2 * m, 0), (W + 2 * m, H + 2 * m), (0, H + 2 * m)]
+    c = _coeffs(PITCH_DST(size), src)  # src -> dst
+    x, y = m + W / 2, m + H / 2
+    den = c[6] * x + c[7] * y + 1
+    return (c[0] * x + c[1] * y + c[2]) / den, (c[3] * x + c[4] * y + c[5]) / den
+
+
+def sorted_box(x0, y0, x1, y1):
+    return [min(x0, x1), min(y0, y1), max(x0, x1), max(y0, y1)]
+
+
 def icosa():
     p = (1 + 5 ** 0.5) / 2
     v = []
@@ -121,16 +184,18 @@ def gold_text(text, font_size, size):
 
 
 img = grass(S)
+img.alpha_composite(pitch_lines(S))
 # foco de estadio
 glow = Image.new("RGBA", (S, S), (0, 0, 0, 0))
 ImageDraw.Draw(glow).ellipse([S * .1, -S * .4, S * .9, S * .35], fill=(255, 255, 220, 70))
 img.alpha_composite(glow.filter(ImageFilter.GaussianBlur(120)))
-B = int(S * 0.62)
+B = int(S * 0.44)
+spot_x, spot_y = center_spot(S)
 b = ball(B)
 # sombra de contacto del balón
 sh = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-ImageDraw.Draw(sh).ellipse([S / 2 - B * .45, S * .70, S / 2 + B * .55, S * .80], fill=(0, 0, 0, 170))
+ImageDraw.Draw(sh).ellipse([spot_x - B * .42, spot_y - B * .06, spot_x + B * .50, spot_y + B * .07], fill=(0, 0, 0, 170))
 img.alpha_composite(sh.filter(ImageFilter.GaussianBlur(40)))
-img.alpha_composite(b, (int(S / 2 - B / 2), int(S * 0.13)))
-img.alpha_composite(gold_text("DC", int(S * 0.42), S), (0, int(S * 0.17)))
+img.alpha_composite(b, (int(spot_x - B / 2), int(spot_y - B * 0.97)))
+img.alpha_composite(gold_text("DC", int(S * 0.34), S), (0, int(S * 0.24)))
 img.convert("RGB").resize((800, 800), Image.LANCZOS).save(OUT)
