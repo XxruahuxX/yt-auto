@@ -1,7 +1,9 @@
 .env
 data/*
 !data/uploads.json
-reports/
+reports/*
+!reports/experimentos.md
+!reports/own_*.md
 __pycache__/
 .pytest_cache/
 client_secret*.json
