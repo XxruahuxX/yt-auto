@@ -7,6 +7,7 @@ Cada escena = una tarjeta con texto + narración TTS (Piper, local). Sin materia
 from __future__ import annotations
 
 import glob
+import os
 import subprocess
 import sys
 import tempfile
@@ -14,6 +15,7 @@ import textwrap
 import wave
 from pathlib import Path
 
+import requests
 import yaml
 from PIL import Image, ImageDraw, ImageFont
 
@@ -33,6 +35,31 @@ def _voice() -> str:
 
 
 def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
+    """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
+    if os.environ.get("ELEVENLABS_API_KEY"):
+        return tts_elevenlabs(text, out)
+    return tts_piper(text, out, length_scale)
+
+
+def tts_elevenlabs(text: str, out: Path) -> float:
+    voice = os.environ.get("ELEVENLABS_VOICE_ID", "pNInz6obpgDQGcFmaJgB")
+    resp = requests.post(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{voice}",
+        params={"output_format": "mp3_44100_128"}, timeout=120,
+        headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"], "Content-Type": "application/json"},
+        json={"text": text, "model_id": os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2"),
+              "voice_settings": {"stability": 0.45, "similarity_boost": 0.8, "style": 0.3}})
+    if not resp.ok:
+        raise RuntimeError(f"ElevenLabs HTTP {resp.status_code}: {resp.text[:300]}")
+    mp3 = out.with_suffix(".mp3")
+    mp3.write_bytes(resp.content)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(mp3), "-ar", "44100", str(out)],
+                   check=True)
+    with wave.open(str(out)) as w:
+        return w.getnframes() / w.getframerate()
+
+
+def tts_piper(text: str, out: Path, length_scale: float = 0.9) -> float:
     raw = out.with_suffix(".raw.wav")
     subprocess.run([sys.executable, "-m", "piper", "-m", _voice(), "-f", str(raw),
                     "--length-scale", str(length_scale), "--noise-w", "0.5",
@@ -139,4 +166,6 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
 
 
 if __name__ == "__main__":
+    from .cli import load_env
+    load_env()
     print(f"{render(sys.argv[1], sys.argv[2]):.1f} s -> {sys.argv[2]}")
