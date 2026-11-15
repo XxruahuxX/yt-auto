@@ -1,0 +1,35 @@
+# Presupuesto de cuota por ejecución (la cuota diaria por defecto es 10.000 unidades).
+# Cada palabra clave cuesta 100 unidades (search.list). 12 nichos x 3 = 3.600 unidades.
+quota_budget: 9000
+max_age_days: 7
+regions: [ES, MX, US]
+trending_pages: 1
+max_channels_per_run: 150
+min_videos_per_niche: 20
+
+# Nichos candidatos en español. El comando `niches` los ordena por oportunidad.
+niches:
+  tecnologia_programacion:
+    keywords: ["programación", "trucos de ordenador", "inteligencia artificial herramientas"]
+  ia_noticias:
+    keywords: ["chatgpt", "inteligencia artificial noticias", "IA gratis"]
+  curiosidades:
+    keywords: ["curiosidades", "datos que no sabías", "sabías que"]
+  ciencia_espacio:
+    keywords: ["ciencia explicada", "espacio universo", "experimentos"]
+  historia:
+    keywords: ["historia", "historia de españa", "misterios históricos"]
+  finanzas_personales:
+    keywords: ["finanzas personales", "ahorrar dinero", "invertir para principiantes"]
+  psicologia:
+    keywords: ["psicología", "hábitos", "productividad"]
+  futbol:
+    keywords: ["fútbol", "la liga", "mejores goles"]
+  gaming:
+    keywords: ["minecraft", "fortnite", "juegos"]
+  cocina_rapida:
+    keywords: ["receta fácil", "receta rápida", "cocina"]
+  fitness:
+    keywords: ["rutina gimnasio", "perder grasa", "ejercicios en casa"]
+  coches_motor:
+    keywords: ["coches", "motor", "fórmula 1"]
