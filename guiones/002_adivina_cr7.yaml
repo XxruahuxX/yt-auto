@@ -1,0 +1,34 @@
+title: "Adivina el jugador con 3 pistas ⚽ ¿Lo sacas a la primera? #shorts"
+description: |
+  Reto rápido: tres pistas, un crack. Si lo has acertado a la primera, comenta 🐐
+  #fútbol #adivinaeljugador #quiz #retos #shorts
+tags: [adivina el jugador, quiz fútbol, reto, cristiano ronaldo, champions]
+label: "ADIVINA EL JUGADOR"
+scenes:
+  - text: "3 pistas. Si lo aciertas a la primera, eres un crack"
+    highlight: "crack"
+    say: "Tres pistas. Si lo aciertas a la primera, eres un crack."
+  - label: "PISTA 1"
+    text: "Nació en una isla en 1985"
+    say: "Pista uno. Nació en una isla, en mil novecientos ochenta y cinco."
+    pause: 0.8
+  - label: "PISTA 2"
+    text: "Ha ganado 5 Champions League con dos clubes distintos"
+    say: "Pista dos. Ha ganado cinco Champions League con dos clubes distintos."
+    pause: 0.8
+  - label: "PISTA 3"
+    text: "Es el máximo goleador de la historia de la Champions"
+    say: "Pista tres. Es el máximo goleador de la historia de la Champions."
+    pause: 0.6
+  - big: "3, 2, 1..."
+    text: "¿Lo tienes?"
+    say: "Tres. Dos. Uno."
+  - label: "RESPUESTA"
+    big: "CR7"
+    text: "Cristiano Ronaldo. Nacido en Madeira"
+    highlight: "Cristiano Ronaldo"
+    say: "¡Cristiano Ronaldo! Nacido en Madeira."
+  - label: "TU TURNO"
+    text: "¿A la primera? Comenta 🐐 si lo sacaste"
+    say: "¿Lo sacaste a la primera? Dímelo en comentarios."
+    pause: 0.6

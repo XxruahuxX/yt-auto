@@ -1,0 +1,26 @@
+title: "El récord de Messi que NADIE ha vuelto a tocar 🤯 #shorts"
+description: |
+  En 2012 Messi marcó 91 goles en un solo año natural, récord Guinness que rompió la marca de 85 de Gerd Müller (1972).
+  ¿Crees que alguien lo superará? Te leo en comentarios 👇
+  #fútbol #messi #récords #curiosidades #shorts
+tags: [messi, récord, fútbol, curiosidades, barcelona, gerd müller]
+label: "¿SABÍAS QUE...?"
+scenes:
+  - text: "Este récord de Messi lleva más de 10 años sin que nadie se acerque"
+    highlight: "Messi"
+    say: "Este récord de Messi lleva más de diez años sin que nadie se acerque."
+  - big: "91"
+    text: "goles en un solo año. Fue en 2012."
+    say: "Noventa y un goles en un solo año. Fue en dos mil doce."
+  - text: "Con el Barça y con Argentina, sumando todas las competiciones"
+    say: "Con el Barça y con Argentina, sumando todas las competiciones."
+  - big: "85"
+    text: "era el récord anterior, de Gerd Müller, desde 1972"
+    say: "El récord anterior era de Gerd Müller: ochenta y cinco goles, en mil novecientos setenta y dos."
+  - text: "40 años después, Messi lo pulverizó"
+    highlight: "pulverizó"
+    say: "Cuarenta años después, Messi lo pulverizó."
+  - label: "TU TURNO"
+    text: "¿Alguien lo superará algún día? Te leo en comentarios"
+    say: "¿Crees que alguien lo superará algún día? Te leo en comentarios."
+    pause: 0.6
