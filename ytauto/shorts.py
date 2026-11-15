@@ -100,6 +100,20 @@ def tts_piper(text: str, out: Path, length_scale: float = 0.9) -> float:
         return w.getnframes() / w.getframerate()
 
 
+EMOJI_FONT = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
+_EMOJI_RE = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D]+")
+
+
+def _emoji_img(emoji: str, size: int) -> Image.Image:
+    """Noto Color Emoji solo se rasteriza a 109 px; se escala después."""
+    font = ImageFont.truetype(EMOJI_FONT, 109)
+    im = Image.new("RGBA", (int(140 * len(emoji)), 140), (0, 0, 0, 0))
+    ImageDraw.Draw(im).text((0, 0), emoji, font=font, embedded_color=True)
+    im = im.crop(im.getbbox())
+    k = size / im.height
+    return im.resize((max(1, int(im.width * k)), size), Image.LANCZOS)
+
+
 def _ease_out_back(x: float) -> float:
     x = min(max(x, 0.0), 1.0)
     c1, c3 = 1.70158, 2.70158
@@ -154,10 +168,14 @@ class Scene:
         self.label = sc.get("label", default_label)
         probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
         self.big = sc.get("big")
-        self.font, lines = _fit(probe, sc["text"], 900, 92, BOLD)
+        found = "".join(_EMOJI_RE.findall(sc["text"])).replace("\ufe0f", "")
+        text = " ".join(_EMOJI_RE.sub("", sc["text"]).split())
+        emoji = sc.get("emoji") or found
+        self.emoji = _emoji_img(emoji, 230 if not self.big else 150) if emoji else None
+        self.font, lines = _fit(probe, text, 900, 92, BOLD)
         hl = (sc.get("highlight") or "").lower().split()
         lh = self.font.size * 1.22
-        y = 880 if self.big else (H - lh * len(lines)) / 2 - 40
+        y = 880 if self.big else (H - lh * len(lines)) / 2 + (90 if self.emoji else -40)
         self.words = []  # (img, x, y)
         for line in lines:
             x = (W - probe.textlength(line, font=self.font)) / 2
@@ -194,6 +212,21 @@ class Scene:
             bw, bh = max(1, int(big.width * s)), max(1, int(big.height * s))
             big = big.resize((bw, bh), Image.LANCZOS)
             img.paste(big, (int((W - bw) / 2), int(640 - bh / 2)), big)
+        # emoji: entra con rebote y luego flota
+        if self.emoji is not None:
+            s = _ease_out_back((t - 0.1) / 0.35) if t > 0.1 else 0
+            if s > 0.05:
+                e = self.emoji
+                ew, eh = max(1, int(e.width * s)), max(1, int(e.height * s))
+                e = e.resize((ew, eh), Image.BILINEAR).rotate(8 * math.sin(t * 3), expand=True,
+                                                               resample=Image.BICUBIC)
+                float_y = 14 * math.sin(t * 4)
+                if self.big:
+                    cx, cy = W - 170, 520
+                else:
+                    first_y = self.words[0][2] if self.words else H / 2
+                    cx, cy = W / 2, first_y - 170
+                img.paste(e, (int(cx - e.width / 2), int(cy - e.height / 2 + float_y)), e)
         # palabras: aparecen una a una al ritmo de la voz
         n = len(self.words)
         span = max(self.speech * 0.8, 0.3)
