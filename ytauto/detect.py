@@ -6,7 +6,7 @@ import statistics
 from datetime import datetime, timedelta, timezone
 
 from . import db
-from .api import QuotaExceeded, YouTubeAPI
+from .api import NotFound, QuotaExceeded, YouTubeAPI
 from .scoring import (acceleration, hours_since, is_short, parse_duration,
                       parse_time, viral_score, views_per_hour)
 
@@ -100,7 +100,10 @@ def refresh_channels(api: YouTubeAPI, conn, limit: int) -> int:
         uploads = cd.get("relatedPlaylists", {}).get("uploads")
         median = None
         if uploads:
-            recent = api.videos(api.recent_uploads(uploads, 30))
+            try:
+                recent = api.videos(api.recent_uploads(uploads, 30))
+            except NotFound:  # canal sin lista de subidas pública
+                recent = []
             views = [int(v.get("statistics", {}).get("viewCount", 0)) for v in recent]
             median = statistics.median(views) if len(views) >= 3 else None
         db.upsert_channel(conn, {
@@ -109,7 +112,7 @@ def refresh_channels(api: YouTubeAPI, conn, limit: int) -> int:
             "video_count": int(st.get("videoCount", 0)), "uploads_playlist": uploads,
             "median_views": median, "updated_at": _iso(_now()),
         })
-    conn.commit()
+        conn.commit()
     return len(ids)
 
 

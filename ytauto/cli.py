@@ -10,8 +10,8 @@ from pathlib import Path
 import yaml
 
 from . import db
-from .api import YouTubeAPI
-from .detect import collect, score
+from .api import QuotaExceeded, YouTubeAPI
+from .detect import collect, refresh_channels, score
 from .niches import rank_niches
 
 
@@ -46,6 +46,7 @@ def main(argv=None) -> None:
     ap.add_argument("--db", default="data/ytauto.db")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("collect", help="Descarga tendencias y búsquedas por nicho")
+    sub.add_parser("channels", help="Solo actualiza suscriptores y mediana de los canales")
     top = sub.add_parser("top", help="Muestra los vídeos con más puntuación")
     top.add_argument("-n", type=int, default=25)
     top.add_argument("--shorts", action="store_true", help="Solo Shorts")
@@ -61,6 +62,14 @@ def main(argv=None) -> None:
         api = YouTubeAPI(budget=config.get("quota_budget", 9000))
         stats = collect(api, conn, config)
         print(json.dumps(stats, indent=2))
+    elif args.cmd == "channels":
+        api = YouTubeAPI(budget=config.get("quota_budget", 9000))
+        try:
+            n = refresh_channels(api, conn, config.get("max_channels_per_run", 150))
+        except QuotaExceeded as exc:
+            n = "parcial"
+            print(f"Cuota agotada: {exc}")
+        print(f"Canales actualizados: {n}. Cuota usada: {api.used}")
     elif args.cmd == "top":
         rows = score(conn, config.get("max_age_days", 7))
         if args.shorts:

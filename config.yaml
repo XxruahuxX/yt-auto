@@ -4,7 +4,7 @@ quota_budget: 9000
 max_age_days: 7
 regions: [ES, MX, US]
 trending_pages: 1
-max_channels_per_run: 150
+max_channels_per_run: 1500
 min_videos_per_niche: 20
 
 # Nichos candidatos en español. El comando `niches` los ordena por oportunidad.

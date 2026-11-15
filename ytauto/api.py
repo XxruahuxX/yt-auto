@@ -16,6 +16,10 @@ class QuotaExceeded(RuntimeError):
     pass
 
 
+class NotFound(RuntimeError):
+    pass
+
+
 class YouTubeAPI:
     def __init__(self, api_key: str | None = None, budget: int = 9000, session=None):
         self.api_key = api_key or os.environ.get("YOUTUBE_API_KEY")
@@ -34,7 +38,11 @@ class YouTubeAPI:
         self.used += cost
         if resp.status_code == 403 and "quota" in resp.text.lower():
             raise QuotaExceeded(resp.text)
-        resp.raise_for_status()
+        if resp.status_code == 404:
+            raise NotFound(f"{resource}: recurso no encontrado")
+        if not resp.ok:
+            # sin la URL, para no filtrar la clave en los logs
+            raise RuntimeError(f"{resource}: HTTP {resp.status_code} {resp.text[:300]}")
         return resp.json()
 
     # --- descubrimiento ---
