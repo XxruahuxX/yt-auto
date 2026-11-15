@@ -33,7 +33,7 @@ def ball(d, bx, by, r):
         d.line([(bx + r * .36 * math.cos(a), by + r * .36 * math.sin(a)), (bx + r * .85 * math.cos(a), by + r * .85 * math.sin(a))], fill=INK, width=8)
 
 
-def player(skin, hair, beard=False, bg=True):
+def player(skin, hair, beard=False, bg=True, wave=0.0, mouth=0.0, blink=False):
     skin_d = tuple(int(c * 0.86) for c in skin)
     img = Image.new("RGBA", (S, S), GREEN_D if bg else (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -52,11 +52,13 @@ def player(skin, hair, beard=False, bg=True):
     ball(d, 1040, 1435, 85)
     outlined(img, lambda d, f: (d.rounded_rectangle([650, 1440, 790, 1495], 26, fill=f),
                                 d.polygon([(915, 1385), (1040, 1360), (1060, 1405), (935, 1440)], fill=f)), (34, 34, 42))
+    a = math.radians(-74 + wave)
+    hand = (1080 + 145 * math.cos(a), 520 + 145 * math.sin(a))
     # brazos: izquierdo relajado, derecho señalando arriba ("¡dato!")
     outlined(img, lambda d, f: (thick(d, (625, 640), (575, 830), 70, f), thick(d, (575, 830), (590, 990), 62, f),
                                 d.ellipse([555, 970, 630, 1045], fill=f),
-                                thick(d, (975, 640), (1080, 520), 70, f), thick(d, (1080, 520), (1120, 380), 62, f),
-                                d.ellipse([1080, 330, 1160, 410], fill=f)), skin)
+                                thick(d, (975, 640), (1080, 520), 70, f), thick(d, (1080, 520), hand, 62, f),
+                                d.ellipse([hand[0] - 40, hand[1] - 40, hand[0] + 40, hand[1] + 40], fill=f)), skin)
     # pantalón
     outlined(img, lambda d, f: d.polygon([(650, 950), (950, 950), (975, 1150), (815, 1160), (800, 1080), (785, 1160), (625, 1150)], fill=f), WHITE)
     # camiseta
@@ -89,15 +91,40 @@ def player(skin, hair, beard=False, bg=True):
     d.line([(cx - 40, 225), (cx - 20, 300)], fill=tuple(min(255, c + 40) for c in hair), width=8)
     # cara: ojos de punto, cejas, nariz y sonrisa
     for ex in (cx - 55, cx + 55):
-        d.ellipse([ex - 13, 372, ex + 13, 398], fill=INK)
+        if blink:
+            d.line([(ex - 15, 386), (ex + 15, 386)], fill=INK, width=8)
+        else:
+            d.ellipse([ex - 13, 372, ex + 13, 398], fill=INK)
     d.line([(cx - 80, 345), (cx - 32, 340)], fill=hair, width=12)
     d.line([(cx + 32, 340), (cx + 80, 345)], fill=hair, width=12)
     d.line([(cx + 4, 395), (cx + 14, 440), (cx - 6, 445)], fill=skin_d, width=8, joint="curve")
-    d.arc([cx - 55, 430, cx + 55, 495], 25, 155, fill=INK, width=10)
+    if mouth > 0.05:
+        d.chord([cx - 45, 445, cx + 45, 455 + 50 * mouth], 0, 180, fill=(120, 30, 40), outline=INK, width=8)
+    else:
+        d.arc([cx - 55, 430, cx + 55, 495], 25, 155, fill=INK, width=10)
     return img
 
 
+def animate(out, seconds=4.0, fps=30, size=720):
+    """Demo: saluda, parpadea y habla."""
+    import subprocess
+    proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
+                             "-s", f"{size}x{size}", "-r", str(fps), "-i", "-", "-c:v", "libx264",
+                             "-pix_fmt", "yuv420p", "-crf", "20", str(out)], stdin=subprocess.PIPE)
+    for f in range(int(seconds * fps)):
+        t = f / fps
+        im = player((236, 190, 150), (60, 40, 30), wave=28 * math.sin(t * 2 * math.pi * 1.6),
+                    mouth=abs(math.sin(t * 11)) if 1.2 < t < 3.4 else 0.0, blink=(t % 2.2) < 0.12)
+        proc.stdin.write(im.convert("RGB").resize((size, size), Image.BILINEAR).tobytes())
+    proc.stdin.close()
+    proc.wait()
+
+
 if __name__ == "__main__":
+    import sys
+    if sys.argv[1:2] == ["anim"]:
+        animate(OUT / "mascota_animada_demo.mp4")
+        sys.exit()
     OUT.mkdir(parents=True, exist_ok=True)
     a = player((236, 190, 150), (60, 40, 30))
     b = player((176, 120, 84), (24, 20, 20), beard=True)

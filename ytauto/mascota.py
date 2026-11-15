@@ -1,10 +1,10 @@
-"""Mascota de DatoCrack: monigote de trazo grueso con esqueleto animable.
+"""Mascota de DatoCrack: monigote de trazo grueso con esqueleto animable y boquita.
 
 Cinemática directa: cada postura son ángulos de hueso (0 = derecha, 90 = abajo).
 Los huesos tienen longitud fija, así que al interpolar no se estiran ni se encogen,
 y las rodillas siempre doblan hacia delante (el monigote mira a la derecha).
 
-    python branding/monigote.py   -> posturas en PNG + vídeo demo
+    python -m ytauto.mascota   -> posturas en PNG + vídeo demo
 """
 from __future__ import annotations
 
@@ -92,9 +92,9 @@ def _tube(d, pts, r0, r1, col):
         d.ellipse([x - r, y - r, x + r, y + r], fill=col)
 
 
-def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0):
+def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0, mouth=0.0, k=K):
     j = solve(pose, x)
-    s = scale * K
+    s = scale * k
     P = {k: ((v[0] + dx) * s, (v[1] + dy) * s) for k, v in j.items()}
     d = ImageDraw.Draw(img)
     w = 30 * s
@@ -116,7 +116,22 @@ def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0):
     hx, hy = P["head"]
     r = L["head"] * s
     d.ellipse([hx - r, hy - r, hx + r, hy + r], outline=col, width=int(w * 0.95))
+    # boquita: sonrisa pequeña; abierta (óvalo) cuando habla
+    mx, my = hx + r * 0.12, hy + r * 0.32
+    if mouth > 0.08:
+        mw, mh = r * 0.16, r * (0.06 + 0.16 * mouth)
+        d.ellipse([mx - mw, my - mh, mx + mw, my + mh], fill=col)
+    else:
+        d.arc([mx - r * 0.24, my - r * 0.2, mx + r * 0.24, my + r * 0.1], 25, 155, fill=col, width=max(2, int(w * 0.32)))
     return j
+
+
+def render_layer(pose, scale=0.35, mouth=0.0, col=WHITE):
+    """Devuelve el monigote en una capa RGBA de (1000*scale)^2 px, suavizada."""
+    size = int(1000 * scale)
+    lay = Image.new("RGBA", (size * 2, size * 2), (0, 0, 0, 0))
+    draw(lay, pose, col=col, scale=scale, mouth=mouth, k=2)
+    return lay.resize((size, size), Image.LANCZOS)
 
 
 def ball(img, x, y, r=46, rot=0.0):
@@ -158,7 +173,8 @@ def demo(out, fps=30, size=720):
         t = i / fps
         img = canvas()
         pose = timeline(t)
-        j = draw(img, pose, dy=3 * math.sin(t * 5) if t < 1.9 or t > 5.8 else 0)
+        j = draw(img, pose, dy=3 * math.sin(t * 5) if t < 1.9 or t > 5.8 else 0,
+                 mouth=abs(math.sin(t * 12)) if 0.2 < t < 0.9 else 0.0)
         d = ImageDraw.Draw(img)
         if 2.75 < t < 3.6:
             d.text((690 * K, 140 * K), "¡DATO!", font=f, fill=YELLOW)

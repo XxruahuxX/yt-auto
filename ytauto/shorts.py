@@ -318,7 +318,7 @@ class KScene:
         self.tiles = sc.get("tiles") or []
         self.big = sc.get("big")
         small = bool(self.tiles or self.big)
-        self.emoji = _emoji_img(emoji, 200 if small else 380) if emoji else None
+        self.emoji = _emoji_img(emoji, 180 if small else 330) if emoji else None
         if self.tiles:
             n = len(self.tiles)
             self.ts = min(150, int((W - 120) / n) - 14)
@@ -341,7 +341,7 @@ class KScene:
 
     def draw(self, img: Image.Image, t: float) -> None:
         d = ImageDraw.Draw(img)
-        cy = 860  # centro de la zona visual
+        cy = 640  # centro de la zona visual (la mascota va debajo)
         if self.tiles:
             n, step = len(self.tiles), self.ts + 14
             x0 = (W - step * n) / 2 + step / 2
@@ -382,6 +382,28 @@ class KScene:
                 col = (150, 156, 170)
             d.text((x, y), w, font=self.cf, fill=col)
             x += d.textlength(w + " ", font=self.cf)
+
+
+def _mascot_pose(sc: dict) -> str:
+    if sc.get("pose"):
+        return sc["pose"]
+    if sc.get("big") or "ding" in sc.get("sfx", []):
+        return "celebra"
+    if "?" in sc.get("say", ""):
+        return "piensa"
+    return "quieto"
+
+
+def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, speech: float) -> None:
+    from . import mascota as m
+    k = min(max(local / 0.35, 0.0), 1.0)
+    pose = m.blend(m.POSES[prev], m.POSES[cur], m.ease(k))
+    talking = 0.15 < local < speech + 0.1
+    mouth = abs(math.sin(local * 13)) if talking else 0.0
+    scale = 0.5
+    lay = m.render_layer(pose, scale=scale, mouth=mouth)
+    bob = 4 * math.sin(local * 5)
+    img.paste(lay, (int(W / 2 - 500 * scale), int(1270 - m.GROUND * scale + bob)), lay)
 
 
 def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
@@ -447,6 +469,11 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             local = now - start
             img = bg.frame(now)
             scene.draw(img, local)
+            if karaoke and spec.get("mascot", True):
+                idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
+                cur = _mascot_pose(spec["scenes"][idx])
+                prev = _mascot_pose(spec["scenes"][idx - 1]) if idx else "quieto"
+                _draw_mascot(img, prev, cur, local, scene.speech)
             if karaoke and spec.get("hook"):
                 _hook_bar(img, spec["hook"], now, hookf)
             d = ImageDraw.Draw(img)

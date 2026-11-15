@@ -19,6 +19,7 @@ scenes:
     say: "Su juego se llamó association football, para no confundirlo con el rugby, que también se llamaba football."
     highlight: "association rugby,"
   - emoji: "🎓"
+    pose: piensa
     say: "Y aquí entran los estudiantes de Oxford. Tenían la manía de acortar palabras y añadirles e, erre, al final."
     highlight: "Oxford."
   - tiles: [R, U, G, B, Y]
@@ -28,6 +29,7 @@ scenes:
     say: "pasó a ser rugger."
     highlight: "rugger."
   - tiles: [A, S, S, O, C]
+    pose: piensa
     say: "Y association se quedó en assoc..."
   - tiles: [S, O, C, C, E, R]
     tiles_hl: [4, 5]
@@ -41,5 +43,6 @@ scenes:
     say: "Y los ingleses la usaron durante décadas, hasta que empezó a sonarles demasiado americana."
     highlight: "americana."
   - emoji: "⚽"
+    pose: chuta
     say: "Un porqué futbolero cada día. Síguenos."
     highlight: "Síguenos."
