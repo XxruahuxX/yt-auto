@@ -246,6 +246,9 @@ class Scene:
                 img.paste(r, (int(x + (im.width - w2) / 2), int(y + (im.height - h2) / 2)), r)
 
 
+PANEL = (110, 425, 970, 885)  # zona del visual (x0, y0, x1, y1)
+PANEL_CY = (PANEL[1] + PANEL[3]) // 2
+MASCOT_FEET = 1262
 NAVY, NAVY_L, ORANGE, INK = (16, 24, 44), (26, 38, 66), (255, 140, 40), (20, 20, 28)
 
 
@@ -318,15 +321,15 @@ class KScene:
         self.tiles = sc.get("tiles") or []
         self.big = sc.get("big")
         small = bool(self.tiles or self.big)
-        self.emoji = _emoji_img(emoji, 180 if small else 330) if emoji else None
+        self.emoji = _emoji_img(emoji, 150 if small else 280) if emoji else None
         if self.tiles:
             n = len(self.tiles)
-            self.ts = min(150, int((W - 120) / n) - 14)
+            self.ts = min(130, int((PANEL[2] - PANEL[0] - 60) / n) - 14)
             hl_idx = set(sc.get("tiles_hl", []))
             self.tile_imgs = [_tile(c, self.ts, ORANGE if i in hl_idx else (245, 240, 228),
                                     WHITE if i in hl_idx else INK) for i, c in enumerate(self.tiles)]
         if self.big:
-            self.bf, _ = _fit(probe, self.big, 900, 240, BOLD, 1)
+            self.bf, _ = _fit(probe, self.big, 820, 200, BOLD, 1)
             m = re.match(r"(\d+)(.*)", self.big)
             self.count = (int(m.group(1)), m.group(2)) if m and int(m.group(1)) > 9 else None
 
@@ -341,11 +344,17 @@ class KScene:
 
     def draw(self, img: Image.Image, t: float) -> None:
         d = ImageDraw.Draw(img)
-        cy = 640  # centro de la zona visual (la mascota va debajo)
+        cy = PANEL_CY
+        # panel fijo para el visual: todo el vídeo usa las mismas zonas
+        k = _ease_out_back(t / 0.3)
+        if k > 0.02:
+            pw, ph = (PANEL[2] - PANEL[0]) / 2 * min(k, 1.04), (PANEL[3] - PANEL[1]) / 2 * min(k, 1.04)
+            d.rounded_rectangle([W / 2 - pw, cy - ph, W / 2 + pw, cy + ph], 44, fill=(22, 32, 58),
+                                outline=(46, 64, 104), width=4)
         if self.tiles:
             n, step = len(self.tiles), self.ts + 14
             x0 = (W - step * n) / 2 + step / 2
-            ty = cy + (120 if self.emoji is not None else 0)
+            ty = cy + (95 if self.emoji is not None else 0)
             span = max(min(self.speech * 0.6, 0.12 * n), 0.3)
             for i, im in enumerate(self.tile_imgs):
                 t0 = 0.15 + span * i / n
@@ -357,10 +366,10 @@ class KScene:
                 p = min(t / 0.7, 1.0)
                 text = f"{round(self.count[0] * (1 - (1 - p) ** 3))}{self.count[1]}"
             big = _word_img(text, self.bf, YELLOW)
-            by = cy + (110 if self.emoji is not None else 0)
+            by = cy + (85 if self.emoji is not None else 0)
             self._paste_scaled(img, big, W / 2, by, 0.3 + 0.7 * _ease_out_back(t / 0.4))
         if self.emoji is not None:
-            ey = cy - 150 if (self.tiles or self.big) else cy
+            ey = cy - 120 if (self.tiles or self.big) else cy
             s = _ease_out_back((t - 0.05) / 0.35) if t > 0.05 else 0
             self._paste_scaled(img, self.emoji, W / 2, ey + 14 * math.sin(t * 4), s, 6 * math.sin(t * 3))
         # subtítulo karaoke
@@ -391,19 +400,34 @@ def _mascot_pose(sc: dict) -> str:
         return "celebra"
     if "?" in sc.get("say", ""):
         return "piensa"
-    return "quieto"
+    if sc.get("tiles"):
+        return "senala"
+    return "explica"
 
 
-def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, speech: float) -> None:
+def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float, level: float) -> None:
+    """level: volumen de la voz en este fotograma (0-1), mueve la boca y los gestos."""
     from . import mascota as m
-    k = min(max(local / 0.35, 0.0), 1.0)
-    pose = m.blend(m.POSES[prev], m.POSES[cur], m.ease(k))
-    talking = 0.15 < local < speech + 0.1
-    mouth = abs(math.sin(local * 13)) if talking else 0.0
+    k = min(max(local / 0.4, 0.0), 1.0)
+    pose = m.blend(m.POSES[prev], m.POSES[cur], _ease_out_back(k) if k < 1 else 1.0)
+    # vida: respiración, balanceo y cabeza que asiente al hablar
+    pose["spine"] += 2.5 * math.sin(now * 2.0)
+    pose["tilt"] = pose.get("tilt", 0) + 4 * math.sin(now * 1.3) + 7 * level * math.sin(now * 9)
+    pose["lua"] += 4 * math.sin(now * 1.7)
+    pose["rua"] += 4 * math.sin(now * 1.9 + 1)
+    if cur in ("explica", "quieto"):  # gesticula con la mano mientras habla
+        pose["rfa"] += 22 * level * math.sin(now * 5)
+        pose["rua"] += 10 * level * math.sin(now * 5 + 0.6)
+    if cur == "senala":
+        pose["rfa"] += 6 * math.sin(now * 6)
+    if cur == "celebra" and local < 0.5:  # saltito al celebrar
+        pose["lift"] = pose.get("lift", 0) + 70 * math.sin(math.pi * local / 0.5)
     scale = 0.5
-    lay = m.render_layer(pose, scale=scale, mouth=mouth)
-    bob = 4 * math.sin(local * 5)
-    img.paste(lay, (int(W / 2 - 500 * scale), int(1270 - m.GROUND * scale + bob)), lay)
+    lay = m.render_layer(pose, scale=scale, mouth=min(1.0, level * 1.6))
+    d = ImageDraw.Draw(img)
+    sw = 130 - 0.6 * pose.get("lift", 0)
+    d.ellipse([W / 2 - sw, MASCOT_FEET - 10, W / 2 + sw, MASCOT_FEET + 14], fill=(10, 14, 28))
+    img.paste(lay, (int(W / 2 - 500 * scale), int(MASCOT_FEET - m.GROUND * scale)), lay)
 
 
 def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
@@ -454,6 +478,16 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
         mixwav = tmp / "mix.wav"
         audio.mix(total, voices, sfx, mixwav)
 
+        # volumen de la voz por fotograma (para la boca de la mascota)
+        import numpy as np
+        vtrack = np.zeros(int(total * audio.SR) + audio.SR)
+        for st, data in voices:
+            p0 = int(st * audio.SR)
+            vtrack[p0:p0 + len(data)] += data[: len(vtrack) - p0]
+        hop = audio.SR // FPS
+        env = np.array([np.sqrt(np.mean(vtrack[i * hop:(i + 1) * hop] ** 2)) for i in range(int(total * FPS) + 1)])
+        env = np.clip(env / (np.percentile(env[env > 0.005], 90) if (env > 0.005).any() else 1), 0, 1)
+        env = np.convolve(env, np.ones(3) / 3, mode="same")
         bg = KBackground() if karaoke else Background()
         hf = ImageFont.truetype(SEMI, 48)
         hookf = ImageFont.truetype(BOLD, 62)
@@ -473,7 +507,7 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
                 cur = _mascot_pose(spec["scenes"][idx])
                 prev = _mascot_pose(spec["scenes"][idx - 1]) if idx else "quieto"
-                _draw_mascot(img, prev, cur, local, scene.speech)
+                _draw_mascot(img, prev, cur, local, now, float(env[f]))
             if karaoke and spec.get("hook"):
                 _hook_bar(img, spec["hook"], now, hookf)
             d = ImageDraw.Draw(img)
