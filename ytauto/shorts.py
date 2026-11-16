@@ -347,13 +347,13 @@ class KScene:
         cy = PANEL_CY
         # panel fijo para el visual: todo el vídeo usa las mismas zonas
         k = _ease_out_back(t / 0.3)
-        if k > 0.02:
+        if self.sc.get("anim"):
+            from . import anim
+            anim.draw(img, self.sc["anim"], t, self.dur, PANEL, full=True)
+        elif k > 0.02:
             pw, ph = (PANEL[2] - PANEL[0]) / 2 * min(k, 1.04), (PANEL[3] - PANEL[1]) / 2 * min(k, 1.04)
             d.rounded_rectangle([W / 2 - pw, cy - ph, W / 2 + pw, cy + ph], 44, fill=(22, 32, 58),
                                 outline=(46, 64, 104), width=4)
-        if self.sc.get("anim") and k > 0.6:
-            from . import anim
-            anim.draw(img, self.sc["anim"], t, self.dur, (PANEL[0], PANEL[1], PANEL[2], PANEL[3]))
         if self.tiles:
             n, step = len(self.tiles), self.ts + 14
             x0 = (W - step * n) / 2 + step / 2
@@ -413,7 +413,8 @@ def _mascot_pose(sc: dict) -> str:
     return "explica"
 
 
-def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float, level: float) -> None:
+def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float, level: float,
+                 cx: float = W / 2, feet: float = MASCOT_FEET, scale: float = 0.5) -> None:
     """level: volumen de la voz en este fotograma (0-1), mueve la boca y los gestos."""
     from . import mascota as m
     k = min(max(local / 0.4, 0.0), 1.0)
@@ -433,12 +434,11 @@ def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float
         pose["rfa"] += 6 * math.sin(now * 6)
     if cur == "celebra" and local < 0.5:  # saltito al celebrar
         pose["lift"] = pose.get("lift", 0) + 70 * math.sin(math.pi * local / 0.5)
-    scale = 0.5
     lay = m.render_layer(pose, scale=scale, mouth=min(1.0, level * 1.6))
     d = ImageDraw.Draw(img)
-    sw = 130 - 0.6 * pose.get("lift", 0)
-    d.ellipse([W / 2 - sw, MASCOT_FEET - 10, W / 2 + sw, MASCOT_FEET + 14], fill=(10, 14, 28))
-    img.paste(lay, (int(W / 2 - 500 * scale), int(MASCOT_FEET - m.GROUND * scale)), lay)
+    sw = (130 - 0.6 * pose.get("lift", 0)) * scale / 0.5
+    d.ellipse([cx - sw, feet - 10 * scale / 0.5, cx + sw, feet + 14 * scale / 0.5], fill=(10, 14, 28))
+    img.paste(lay, (int(cx - 500 * scale), int(feet - m.GROUND * scale)), lay)
 
 
 _HOOK_CACHE: dict = {}
@@ -564,7 +564,10 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             if karaoke and spec.get("mascot", True):
                 cur = "saluda" if closing and not spec["scenes"][idx].get("pose") else _mascot_pose(spec["scenes"][idx])
                 prev = _mascot_pose(spec["scenes"][idx - 1]) if idx else "quieto"
-                _draw_mascot(img, prev, cur, local, now, float(env[f]))
+                if spec["scenes"][idx].get("anim") and not closing:  # animación a pantalla completa: mascota en la esquina
+                    _draw_mascot(img, prev, cur, local, now, float(env[f]), cx=W - 150, feet=1290, scale=0.3)
+                else:
+                    _draw_mascot(img, prev, cur, local, now, float(env[f]))
             if closing:
                 # cierre: la cámara se acerca a la mascota y los subtítulos quedan fijos encima
                 z = 1 + 0.75 * (1 - (1 - min(local / 0.7, 1.0)) ** 3)

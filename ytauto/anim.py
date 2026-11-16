@@ -25,7 +25,37 @@ def _ease(x: float) -> float:
     return 1 - (1 - x) ** 3
 
 
+def _pitch_v(im: Image.Image, t: float, run: float = 1.0) -> None:
+    """Campo en vertical (pantalla completa): porterías arriba y abajo."""
+    d = ImageDraw.Draw(im)
+    for i in range(12):
+        d.rectangle([i * PW / 12, 0, (i + 1) * PW / 12, PH], fill=GRASS[i % 2])
+    m = 40
+    x0, y0, x1, y1 = m, m, PW - m, PH - m
+    lw = 6
+    d.rectangle([x0, y0, x1, y1], outline=WHITE, width=lw)
+    d.line([(x0, PH / 2), (x1, PH / 2)], fill=WHITE, width=lw)
+    d.ellipse([PW / 2 - 80, PH / 2 - 80, PW / 2 + 80, PH / 2 + 80], outline=WHITE, width=lw)
+    for y, s in ((y0, 1), (y1, -1)):
+        d.rectangle([PW / 2 - 200, min(y, y + s * 130), PW / 2 + 200, max(y, y + s * 130)], outline=WHITE, width=lw)
+        d.rectangle([PW / 2 - 50, min(y, y - s * 16), PW / 2 + 50, max(y, y - s * 16)], fill=WHITE)
+    rng = random.Random(3)
+    for team, col in ((0, (230, 50, 60)), (1, (40, 110, 240))):
+        for k in range(11):
+            bx = rng.uniform(0.12, 0.88)
+            by = rng.uniform(0.1, 0.45) if team == 0 else rng.uniform(0.55, 0.9)
+            ph = rng.uniform(0, 6.28)
+            x = bx * PW + run * 22 * math.sin(t * 1.6 + ph)
+            y = by * PH + run * 30 * math.cos(t * 1.3 + ph)
+            d.ellipse([x - 13, y - 13, x + 13, y + 13], fill=col, outline=(15, 15, 20), width=3)
+    bx = PW / 2 + run * 120 * math.sin(t * 1.1)
+    by = PH / 2 + run * 160 * math.sin(t * 1.7)
+    d.ellipse([bx - 9, by - 9, bx + 9, by + 9], fill=WHITE, outline=(20, 20, 20), width=2)
+
+
 def _pitch(im: Image.Image, t: float, run: float = 1.0, scale: float = 1.0) -> None:
+    if PH > PW:
+        return _pitch_v(im, t, run)
     d = ImageDraw.Draw(im)
     for i in range(12):
         d.rectangle([i * PW / 12, 0, (i + 1) * PW / 12, PH], fill=GRASS[i % 2])
@@ -68,7 +98,7 @@ def _stadium(im: Image.Image) -> None:
     d = ImageDraw.Draw(im)
     base = PH - 70
     d.polygon([(60, PH), (130, base), (PW - 130, base), (PW - 60, PH)], fill=(28, 34, 52))
-    d.ellipse([170, base - 20, PW - 170, base + 60], fill=(34, 120, 62))
+    d.ellipse([170, base - 20, PW - 170, base + 30], fill=(34, 120, 62))
     for x in (110, PW - 110):
         d.line([(x, base), (x, base - 120)], fill=(70, 80, 100), width=6)
         d.rectangle([x - 26, base - 140, x + 26, base - 118], fill=(255, 245, 200))
@@ -141,6 +171,11 @@ BROWN, BROWN_D, BELLY = (140, 92, 52), (96, 62, 34), (196, 150, 104)
 TOOTH = (255, 170, 60)
 
 
+def _feet() -> float:
+    """Altura de los pies del castor: en pantalla completa, por encima de los subtítulos."""
+    return min(PH - 30, PH * 0.78)
+
+
 def _beaver(im: Image.Image, x: float, y: float, s: float, bite: float = 0.0, tail: float = 0.0,
             kit=(230, 50, 60), arms_up: float = 0.0) -> None:
     """Castor de dibujo con camiseta y el 7. (x, y) = pies; s = escala (1 ≈ 220 px de alto)."""
@@ -189,8 +224,7 @@ def _beaver(im: Image.Image, x: float, y: float, s: float, bite: float = 0.0, ta
         d.rounded_rectangle([x0, ty0, x0 + tw, ty0 + th], 4 * s, fill=TOOTH, outline=(120, 70, 20), width=max(1, int(2 * s)))
 
 
-def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int, int, int]) -> None:
-    """Dibuja la animación `kind` en el instante t (s desde el inicio de la escena)."""
+def _render(kind: str, t: float, dur: float):
     im = Image.new("RGB", (PW, PH))
     d = ImageDraw.Draw(im)
     shake = (0, 0)
@@ -213,17 +247,18 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
         _sky(im, t)
         p = (t / max(dur, 0.1))
         x = PW + 60 - (PW + 200) * p
-        y = -40 + (PH + 60) * p * 0.75
+        y = PH * 0.3 + PH * 0.45 * p
         _rock(d, x, y, 34, t * 4, -1, 0.75)
-        f = ImageFont.truetype(BOLD, 44)
-        d.text((24, PH - 70), "+40.000 km/h", font=f, fill=(255, 214, 10))
+        f = ImageFont.truetype(BOLD, 48)
+        d.rounded_rectangle([20, 20, 60 + d.textlength("+40.000 km/h", font=f), 88], 16, fill=(10, 12, 20))
+        d.text((40, 26), "+40.000 km/h", font=f, fill=(255, 214, 10))
     elif kind == "airburst":
         _sky(im, t)
         _stadium(im)
         bx, by = PW * 0.55, PH * 0.28
         if t < AIRBURST:
             p = t / AIRBURST
-            _rock(d, PW + 40 - (PW + 40 - bx) * p, -40 + (by + 40) * p, 18, t * 5, -1, 0.5)
+            _rock(d, PW + 40 - (PW + 40 - bx) * p, 60 + (by - 60) * p, 18, t * 5, -1, 0.5)
         else:
             q = (t - AIRBURST)
             fl = max(0.0, 1 - q / 0.35)
@@ -247,7 +282,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
             ImageDraw.Draw(sh).ellipse([cx - 90 * p, cy - 40 * p, cx + 90 * p, cy + 40 * p], fill=(0, 0, 0, int(120 * p)))
             im.paste(sh, (0, 0), sh)
             d = ImageDraw.Draw(im)
-            _rock(d, cx + 300 * (1 - p), cy - 420 * (1 - p) ** 1.2, 20 + 40 * p, t * 5, -0.6, 1)
+            _rock(d, cx + 300 * (1 - p), cy - (cy - 90) * (1 - p) ** 1.2, 20 + 40 * p, t * 5, -0.6, 1)
         else:
             q = t - IMPACT
             _pitch(im, t, run=0)
@@ -309,7 +344,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
     elif kind == "castor":
         _pitch(im, t, run=0.6)
         k = _ease(t / 0.5)
-        _beaver(im, PW / 2, PH - 30 + 200 * (1 - k), 1.2, tail=0.5 + 0.5 * math.sin(t * 3))
+        _beaver(im, PW / 2, _feet() + 200 * (1 - k), 1.2, tail=0.5 + 0.5 * math.sin(t * 3))
     elif kind == "paletas":
         for y in range(PH):
             ImageDraw.Draw(im).line([(0, y), (PW, y)], fill=(255, 214 - y // 8, 10 + y // 6))
@@ -330,7 +365,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
             p = t / hit
             bx, by = 40 + (ex + 40 - 40) * p, PH / 2 - 60 * math.sin(p * math.pi)
             d.ellipse([bx - 22, by - 22, bx + 22, by + 22], fill=WHITE, outline=(20, 20, 20), width=3)
-        _beaver(im, ex + 70, PH - 20, 1.1, bite=1.0 if hit - 0.15 < t < hit + 0.4 else 0.0)
+        _beaver(im, ex + 70, _feet(), 1.1, bite=1.0 if hit - 0.15 < t < hit + 0.4 else 0.0)
         if t >= hit:
             q = t - hit
             d = ImageDraw.Draw(im)
@@ -355,7 +390,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
             x0 = gx - 70 - row * 34
             d.rounded_rectangle([x0, y0, x0 + 30, y0 + 80], 12, fill=(120, 80, 44), outline=(70, 46, 26), width=3)
             d.ellipse([x0 + 4, y0 + 2, x0 + 26, y0 + 18], fill=(196, 150, 104))
-        _beaver(im, gx - 230, PH - 30, 0.9, tail=0.5 + 0.5 * math.sin(t * 6))
+        _beaver(im, gx - 230, _feet(), 0.9, tail=0.5 + 0.5 * math.sin(t * 6))
         if t > 2.4:
             q = (t - 2.4) % 1.4
             bx = 120 + 400 * min(q / 0.6, 1) - 300 * max(0.0, q - 0.6)
@@ -365,7 +400,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
     elif kind == "cola":
         _pitch(im, t, run=0)
         swing = math.sin(min(t / 0.6, 1) * math.pi)
-        _beaver(im, PW / 2 - 60, PH - 20, 1.1, tail=swing)
+        _beaver(im, PW / 2 - 60, _feet(), 1.1, tail=swing)
         d = ImageDraw.Draw(im)
         if t > 0.35:
             q = t - 0.35
@@ -383,8 +418,38 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
         d.text((PW / 2 - d.textlength(s1, font=f) / 2, 26), s1, font=f, fill=WHITE)
         f2 = ImageFont.truetype(BOLD, 150)
         d.text((PW / 2 - d.textlength("0", font=f2) / 2 + 220, 90), "0", font=f2, fill=(255, 214, 10))
-        _beaver(im, PW / 2 - 120, PH - 20, 0.95, arms_up=min(1.0, t / 0.4), tail=0.5 + 0.5 * math.sin(t * 7))
+        _beaver(im, PW / 2 - 120, _feet(), 0.95, arms_up=min(1.0, t / 0.4), tail=0.5 + 0.5 * math.sin(t * 7))
     else:
         raise ValueError(f"anim desconocida: {kind}")
-    x0, y0 = box[0] + shake[0], box[1] + shake[1]
-    img.paste(im, (x0, y0), _mask)
+    return im, shake
+
+
+FULL_TOP, FULL_H = 400, 1170   # zona de la animación a pantalla completa (px reales)
+
+
+def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int, int, int],
+         full: bool = False) -> None:
+    """Dibuja la animación `kind` en el instante t (s desde el inicio de la escena).
+
+    full=True: ocupa toda la pantalla. El centro se dibuja a 860 px de ancho y se escala;
+    arriba y abajo se prolongan la primera y la última fila para rellenar sin cortes.
+    """
+    global PW, PH
+    W, H = img.size
+    PW, PH = (860, round(860 * FULL_H / W)) if full else (860, 460)
+    try:
+        im, shake = _render(kind, t, dur)
+    finally:
+        PW, PH = 860, 460
+    if not full:
+        img.paste(im, (box[0] + shake[0], box[1] + shake[1]), _mask)
+        return
+    big = im.resize((W, FULL_H), Image.BICUBIC)
+    import numpy as np
+    a = np.asarray(big)
+    top = Image.fromarray(np.median(a[:30], axis=0).astype("uint8")[None]).resize((W, FULL_TOP + 40))
+    bot = Image.fromarray(np.median(a[-30:], axis=0).astype("uint8")[None]).resize((W, H - FULL_TOP - FULL_H + 40))
+    sx, sy = int(shake[0] * W / 860), int(shake[1] * W / 860)
+    img.paste(top, (sx, sy - 40))
+    img.paste(bot, (sx, FULL_TOP + FULL_H + sy))
+    img.paste(big, (sx, FULL_TOP + sy))
