@@ -137,6 +137,58 @@ def _smoke(im, cx, cy, t, n=7):
     im.paste(lay.filter(ImageFilter.GaussianBlur(6)), (0, 0), lay.filter(ImageFilter.GaussianBlur(6)))
 
 
+BROWN, BROWN_D, BELLY = (140, 92, 52), (96, 62, 34), (196, 150, 104)
+TOOTH = (255, 170, 60)
+
+
+def _beaver(im: Image.Image, x: float, y: float, s: float, bite: float = 0.0, tail: float = 0.0,
+            kit=(230, 50, 60), arms_up: float = 0.0) -> None:
+    """Castor de dibujo con camiseta y el 7. (x, y) = pies; s = escala (1 ≈ 220 px de alto)."""
+    d = ImageDraw.Draw(im)
+    # cola (pala plana) detrás
+    ta = math.radians(-20 + 50 * tail)
+    tx, ty = x + 70 * s * math.cos(ta), y - 20 * s + 70 * s * math.sin(ta)
+    pts = []
+    for a in range(0, 360, 20):
+        r = math.radians(a)
+        px, py = 48 * s * math.cos(r), 20 * s * math.sin(r)
+        pts.append((tx + px * math.cos(ta) - py * math.sin(ta), ty + px * math.sin(ta) + py * math.cos(ta)))
+    d.polygon(pts, fill=(70, 46, 30), outline=(40, 26, 16))
+    # piernas
+    for dx in (-28, 28):
+        d.rounded_rectangle([x + dx * s - 16 * s, y - 40 * s, x + dx * s + 16 * s, y], 10 * s, fill=BROWN_D)
+        d.ellipse([x + dx * s - 24 * s, y - 12 * s, x + dx * s + 24 * s, y + 6 * s], fill=BROWN_D)
+    # cuerpo con camiseta
+    d.ellipse([x - 66 * s, y - 150 * s, x + 66 * s, y - 24 * s], fill=kit, outline=(30, 20, 20), width=max(1, int(4 * s)))
+    f = ImageFont.truetype(BOLD, max(8, int(54 * s)))
+    d.text((x - d.textlength("7", font=f) / 2, y - 122 * s), "7", font=f, fill=WHITE)
+    # brazos
+    for side in (-1, 1):
+        ax0, ay0 = x + side * 58 * s, y - 120 * s
+        ang = math.radians(90 + side * (30 + 120 * arms_up))
+        ax1, ay1 = ax0 + side * abs(48 * s * math.cos(ang)), ay0 + 48 * s * math.sin(ang) * (1 - 2 * arms_up)
+        d.line([(ax0, ay0), (ax1, ay1)], fill=BROWN, width=max(2, int(20 * s)))
+        d.ellipse([ax1 - 12 * s, ay1 - 12 * s, ax1 + 12 * s, ay1 + 12 * s], fill=BROWN_D)
+    # cabeza
+    hx, hy, hr = x, y - 190 * s, 58 * s
+    for ex in (-1, 1):
+        d.ellipse([hx + ex * 40 * s - 14 * s, hy - 58 * s, hx + ex * 40 * s + 14 * s, hy - 30 * s], fill=BROWN_D)
+    d.ellipse([hx - hr, hy - hr, hx + hr, hy + hr * 0.95], fill=BROWN, outline=(60, 40, 22), width=max(1, int(3 * s)))
+    d.ellipse([hx - 36 * s, hy + 2 * s, hx + 36 * s, hy + 44 * s], fill=BELLY)
+    for ex in (-1, 1):
+        d.ellipse([hx + ex * 24 * s - 10 * s, hy - 26 * s, hx + ex * 24 * s + 10 * s, hy - 4 * s], fill=WHITE)
+        d.ellipse([hx + ex * 24 * s - 5 * s, hy - 20 * s, hx + ex * 24 * s + 5 * s, hy - 8 * s], fill=(15, 15, 20))
+    d.ellipse([hx - 12 * s, hy + 2 * s, hx + 12 * s, hy + 16 * s], fill=(40, 26, 20))
+    # paletas
+    tw, th = 15 * s, (30 + 10 * bite) * s
+    ty0 = hy + 26 * s
+    if bite > 0:
+        d.ellipse([hx - 22 * s, ty0 - 2 * s, hx + 22 * s, ty0 + th + 8 * s], fill=(60, 20, 20))
+    for side in (-1, 1):
+        x0 = hx + (0 if side > 0 else -tw) + side * 1 * s
+        d.rounded_rectangle([x0, ty0, x0 + tw, ty0 + th], 4 * s, fill=TOOTH, outline=(120, 70, 20), width=max(1, int(2 * s)))
+
+
 def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int, int, int]) -> None:
     """Dibuja la animación `kind` en el instante t (s desde el inicio de la escena)."""
     im = Image.new("RGB", (PW, PH))
@@ -254,6 +306,84 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
             sc = 1.8 - 0.8 * k
             st = st.resize((int(560 * sc), int(120 * sc)), Image.BILINEAR).rotate(-6, expand=True, resample=Image.BICUBIC)
             im.paste(st, (int(PW / 2 - st.width / 2), int(330 - st.height / 2)), st)
+    elif kind == "castor":
+        _pitch(im, t, run=0.6)
+        k = _ease(t / 0.5)
+        _beaver(im, PW / 2, PH - 30 + 200 * (1 - k), 1.2, tail=0.5 + 0.5 * math.sin(t * 3))
+    elif kind == "paletas":
+        for y in range(PH):
+            ImageDraw.Draw(im).line([(0, y), (PW, y)], fill=(255, 214 - y // 8, 10 + y // 6))
+        z = 1.6 + 0.6 * _ease(t / 0.8)
+        _beaver(im, PW / 2, PH / 2 + 160 * z, z, bite=0.3 * (1 + math.sin(t * 8)) if t > 1 else 0)
+        f = ImageFont.truetype(BOLD, 44)
+        if t > 1.2:
+            s1 = "Fe = HIERRO"
+            d = ImageDraw.Draw(im)
+            d.rounded_rectangle([20, 20, 40 + d.textlength(s1, font=f), 82], 16, fill=(10, 12, 20))
+            d.text((30, 24), s1, font=f, fill=TOOTH)
+    elif kind == "mordisco":
+        _pitch(im, t, run=0)
+        d = ImageDraw.Draw(im)
+        ex = PW / 2 - 40
+        hit = 0.9
+        if t < hit:
+            p = t / hit
+            bx, by = 40 + (ex + 40 - 40) * p, PH / 2 - 60 * math.sin(p * math.pi)
+            d.ellipse([bx - 22, by - 22, bx + 22, by + 22], fill=WHITE, outline=(20, 20, 20), width=3)
+        _beaver(im, ex + 70, PH - 20, 1.1, bite=1.0 if hit - 0.15 < t < hit + 0.4 else 0.0)
+        if t >= hit:
+            q = t - hit
+            d = ImageDraw.Draw(im)
+            rng = random.Random(4)
+            for _ in range(14):
+                a = rng.uniform(0, 6.28)
+                v = rng.uniform(120, 260)
+                x = ex - 10 + math.cos(a) * v * min(q, 1)
+                y = PH / 2 - 150 + math.sin(a) * v * min(q, 1) + 200 * q * q
+                d.polygon([(x, y), (x + 18, y + 4), (x + 6, y + 16)], fill=WHITE if rng.random() > 0.4 else (30, 30, 30))
+            if q < 1.2:
+                f = ImageFont.truetype(BOLD, 70)
+                d.text((60, 40), "¡ÑAM!", font=f, fill=(255, 214, 10))
+    elif kind == "presa":
+        _pitch(im, t, run=0)
+        d = ImageDraw.Draw(im)
+        gx = PW - 60
+        n = int(min(t / 0.18, 12))
+        for i in range(n):
+            row, col = divmod(i, 3)
+            y0 = PH / 2 - 120 + col * 85
+            x0 = gx - 70 - row * 34
+            d.rounded_rectangle([x0, y0, x0 + 30, y0 + 80], 12, fill=(120, 80, 44), outline=(70, 46, 26), width=3)
+            d.ellipse([x0 + 4, y0 + 2, x0 + 26, y0 + 18], fill=(196, 150, 104))
+        _beaver(im, gx - 230, PH - 30, 0.9, tail=0.5 + 0.5 * math.sin(t * 6))
+        if t > 2.4:
+            q = (t - 2.4) % 1.4
+            bx = 120 + 400 * min(q / 0.6, 1) - 300 * max(0.0, q - 0.6)
+            by = PH / 2 - 80 * math.sin(min(q, 1.4) * 2.2)
+            d = ImageDraw.Draw(im)
+            d.ellipse([bx - 18, by - 18, bx + 18, by + 18], fill=WHITE, outline=(20, 20, 20), width=3)
+    elif kind == "cola":
+        _pitch(im, t, run=0)
+        swing = math.sin(min(t / 0.6, 1) * math.pi)
+        _beaver(im, PW / 2 - 60, PH - 20, 1.1, tail=swing)
+        d = ImageDraw.Draw(im)
+        if t > 0.35:
+            q = t - 0.35
+            bx, by = PW / 2 + 40 + 700 * q, PH / 2 + 60 - 500 * q + 300 * q * q
+            d.ellipse([bx - 18, by - 18, bx + 18, by + 18], fill=WHITE, outline=(20, 20, 20), width=3)
+            if q < 0.6:
+                f = ImageFont.truetype(BOLD, 64)
+                d.text((PW - 360, 30), "¡PLAF!", font=f, fill=(255, 214, 10))
+    elif kind == "porteria_cero":
+        _pitch(im, 0, run=0)
+        im = Image.blend(im, Image.new("RGB", im.size, (10, 12, 20)), 0.5)
+        d = ImageDraw.Draw(im)
+        f = ImageFont.truetype(BOLD, 44)
+        s1 = "GOLES ENCAJADOS"
+        d.text((PW / 2 - d.textlength(s1, font=f) / 2, 26), s1, font=f, fill=WHITE)
+        f2 = ImageFont.truetype(BOLD, 150)
+        d.text((PW / 2 - d.textlength("0", font=f2) / 2 + 220, 90), "0", font=f2, fill=(255, 214, 10))
+        _beaver(im, PW / 2 - 120, PH - 20, 0.95, arms_up=min(1.0, t / 0.4), tail=0.5 + 0.5 * math.sin(t * 7))
     else:
         raise ValueError(f"anim desconocida: {kind}")
     x0, y0 = box[0] + shake[0], box[1] + shake[1]

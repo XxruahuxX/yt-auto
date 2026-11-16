@@ -512,6 +512,14 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 sfx.append((t + 0.9, "boom"))
             elif a == "crater":
                 sfx += [(t + 0.6 + k * 0.16, "tick") for k in range(11)]
+            elif a == "mordisco":
+                sfx.append((t + 0.9, "pop"))
+            elif a == "cola":
+                sfx.append((t + 0.35, "pop"))
+            elif a == "presa":
+                sfx += [(t + 0.15 + k * 0.18, "tick") for k in range(12)]
+            elif a == "porteria_cero":
+                sfx.append((t + 0.3, "ding"))
             elif a == "suspendido":
                 sfx.append((t + 0.55, "pop"))
             for name in sc.get("sfx", []):

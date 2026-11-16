@@ -1,0 +1,42 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si Pereira7, el Castor, fuera PORTERO? 🦫⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» con nuestro amigo Pereira7, el Castor. Datos reales de castores: sus paletas son naranjas por el hierro, pueden tumbar árboles a mordiscos, construyen presas, avisan con la cola y aguantan hasta 15 minutos bajo el agua.
+  #fútbol #quépasaríasi #pereira7 #castor #shorts
+tags: [pereira7, qué pasaría si, castor, fútbol, portero, curiosidades]
+hook: "¿Y si Pereira7, el Castor, se pasara al fútbol?"
+scenes:
+  - anim: castor
+    pose: piensa
+    say: "¿Qué pasaría si Pereira7, el Castor, cambiara el stream por el fútbol? Os lo digo: sería el mejor portero del mundo."
+    highlight: "Pereira7, portero"
+  - anim: paletas
+    pose: senala
+    say: "Su arma secreta: las paletas. Los castores las tienen naranjas porque llevan hierro. Son durísimas."
+    highlight: "paletas. hierro."
+  - anim: mordisco
+    pose: celebra
+    say: "Balón que le llega, balón que muerde. Si un castor tumba un árbol a mordiscos, un balón no tiene nada que hacer."
+    highlight: "muerde. árbol"
+  - anim: presa
+    pose: explica
+    say: "Y los castores construyen presas. Él haría una delante de su portería, y a ver quién marca."
+    highlight: "presas."
+  - anim: cola
+    pose: chuta
+    say: "¿Hay que despejar? Coletazo. Los castores golpean el agua con la cola para avisar de peligro."
+    highlight: "Coletazo. cola"
+  - emoji: "🌧️"
+    big: "15 MIN"
+    pose: salto
+    say: "¿Partido bajo el diluvio? Ni lo nota. Un castor aguanta hasta quince minutos bajo el agua."
+    highlight: "quince minutos"
+  - anim: porteria_cero
+    pose: celebra
+    say: "Resultado: portería a cero toda la temporada. Y el Balón de Oro, a la madriguera."
+    highlight: "cero madriguera."
+  - emoji: "🦫"
+    say: "Pereira7, el fútbol te espera. ¿Lo ficharíais para vuestro equipo? Os leo en comentarios."
+    highlight: "Pereira7, comentarios."
