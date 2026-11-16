@@ -25,7 +25,7 @@ def _ease(x: float) -> float:
     return 1 - (1 - x) ** 3
 
 
-def _pitch_v(im: Image.Image, t: float, run: float = 1.0) -> None:
+def _pitch_v(im: Image.Image, t: float, run: float = 1.0, players: bool = True) -> None:
     """Campo en vertical (pantalla completa): porterías arriba y abajo."""
     d = ImageDraw.Draw(im)
     for i in range(12):
@@ -39,6 +39,8 @@ def _pitch_v(im: Image.Image, t: float, run: float = 1.0) -> None:
     for y, s in ((y0, 1), (y1, -1)):
         d.rectangle([PW / 2 - 200, min(y, y + s * 130), PW / 2 + 200, max(y, y + s * 130)], outline=WHITE, width=lw)
         d.rectangle([PW / 2 - 50, min(y, y - s * 16), PW / 2 + 50, max(y, y - s * 16)], fill=WHITE)
+    if not players:
+        return
     rng = random.Random(3)
     for team, col in ((0, (230, 50, 60)), (1, (40, 110, 240))):
         for k in range(11):
@@ -53,9 +55,9 @@ def _pitch_v(im: Image.Image, t: float, run: float = 1.0) -> None:
     d.ellipse([bx - 9, by - 9, bx + 9, by + 9], fill=WHITE, outline=(20, 20, 20), width=2)
 
 
-def _pitch(im: Image.Image, t: float, run: float = 1.0, scale: float = 1.0) -> None:
+def _pitch(im: Image.Image, t: float, run: float = 1.0, scale: float = 1.0, players: bool = True) -> None:
     if PH > PW:
-        return _pitch_v(im, t, run)
+        return _pitch_v(im, t, run, players)
     d = ImageDraw.Draw(im)
     for i in range(12):
         d.rectangle([i * PW / 12, 0, (i + 1) * PW / 12, PH], fill=GRASS[i % 2])
@@ -217,6 +219,32 @@ def _label(d, x, y, text, size=46, col=(255, 214, 10), center=False):
         x -= w / 2 + 16
     d.rounded_rectangle([x, y, x + w + 32, y + size * 1.35], 16, fill=(10, 12, 20))
     d.text((x + 16, y + size * 0.12), text, font=f, fill=col)
+
+
+CYAN = (40, 230, 255)
+
+
+def _robot(d: ImageDraw.ImageDraw, x: float, y: float, s: float = 1.0, col=(40, 110, 240), kick: float = 0.0) -> None:
+    """Robot futbolista: (x, y) = pies."""
+    d.line([(x - 12 * s, y), (x - 10 * s, y - 40 * s)], fill=(150, 160, 175), width=int(11 * s))
+    d.line([(x + 10 * s, y - 40 * s), (x + 12 * s + 30 * s * kick, y - 14 * s * kick)], fill=(150, 160, 175), width=int(11 * s))
+    d.rounded_rectangle([x - 28 * s, y - 96 * s, x + 28 * s, y - 38 * s], 10 * s, fill=col, outline=(20, 24, 34), width=max(1, int(3 * s)))
+    d.rounded_rectangle([x - 24 * s, y - 136 * s, x + 24 * s, y - 100 * s], 8 * s, fill=(190, 198, 210), outline=(20, 24, 34), width=max(1, int(3 * s)))
+    d.rectangle([x - 16 * s, y - 126 * s, x + 16 * s, y - 112 * s], fill=(15, 20, 30))
+    d.ellipse([x - 12 * s, y - 123 * s, x - 4 * s, y - 115 * s], fill=CYAN)
+    d.ellipse([x + 4 * s, y - 123 * s, x + 12 * s, y - 115 * s], fill=CYAN)
+    d.line([(x, y - 136 * s), (x, y - 150 * s)], fill=(150, 160, 175), width=max(1, int(4 * s)))
+    d.ellipse([x - 5 * s, y - 156 * s, x + 5 * s, y - 146 * s], fill=(255, 80, 80))
+
+
+def _hud(im: Image.Image, alpha: int = 70) -> None:
+    lay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    for x in range(0, PW, 60):
+        d.line([(x, 0), (x, PH)], fill=CYAN + (alpha // 3,), width=1)
+    for y in range(0, PH, 60):
+        d.line([(0, y), (PW, y)], fill=CYAN + (alpha // 3,), width=1)
+    im.paste(lay, (0, 0), lay)
 
 
 def _feet() -> float:
@@ -542,6 +570,121 @@ def _render(kind: str, t: float, dur: float):
             d.rounded_rectangle([x - 18, lvl, x + 18, y1 - 10], 18, fill=col)
             d.ellipse([x - 56, y1 - 40, x + 56, y1 + 72], fill=col)
             _label(d, x, PH * 0.31, ("DÍA " if i == 0 else "NOCHE ") + txt, 40, col, center=True)
+    elif kind == "ia_campo":
+        _pitch(im, t, run=0, players=False)
+        im = Image.blend(im, Image.new("RGB", im.size, (8, 20, 30)), 0.35)
+        _hud(im)
+        d = ImageDraw.Draw(im)
+        rng = random.Random(8)
+        pos = []
+        for k in range(10):
+            bx, by = rng.uniform(0.15, 0.85) * PW, PH * rng.uniform(0.38, 0.72)
+            pos.append((bx + 14 * math.sin(t * 1.5 + k), by))
+        for i in range(len(pos) - 1):
+            if i % 2 == 0:
+                q = (t * 0.8 + i * 0.1) % 1
+                d.line([pos[i], pos[i + 2 if i + 2 < len(pos) else 0]], fill=CYAN, width=2)
+        for k, (x, y) in enumerate(pos):
+            _robot(d, x, y, 0.85, (40, 110, 240) if k % 2 else (230, 50, 60))
+        _label(d, 24, PH * 0.31, "MODO IA: ON", 40, CYAN)
+    elif kind == "ia_calculo":
+        _pitch(im, 0, run=0, players=False)
+        im = Image.blend(im, Image.new("RGB", im.size, (8, 20, 30)), 0.45)
+        _hud(im, 110)
+        d = ImageDraw.Draw(im)
+        bx, by = PW * 0.3, PH * 0.66
+        _robot(d, bx, by, 1.1, (230, 50, 60))
+        _ball(d, bx + 30, by - 6, 13)
+        mates = [(PW * 0.75, PH * 0.42, "12%"), (PW * 0.6, PH * 0.55, "87%"), (PW * 0.82, PH * 0.66, "41%")]
+        for i, (x, y, pct) in enumerate(mates):
+            if t < 0.3 + i * 0.35:
+                continue
+            best = pct == "87%"
+            col = (255, 214, 10) if best and t > 1.6 else CYAN
+            d.line([(bx + 30, by - 30), (x, y - 60)], fill=col, width=6 if best and t > 1.6 else 3)
+            _robot(d, x, y, 0.9, (230, 50, 60))
+            _label(d, x - 40, y - 190, pct, 38, col)
+        _label(d, 24, PH * 0.31, "Calculando pase…", 40, CYAN)
+    elif kind == "ia_ajedrez":
+        d.rectangle([0, 0, PW, PH], fill=(14, 18, 30))
+        n, sz = 8, 60
+        x0, y0 = (PW - n * sz) / 2, PH * 0.36
+        for r in range(n):
+            for c in range(n):
+                d.rectangle([x0 + c * sz, y0 + r * sz, x0 + (c + 1) * sz, y0 + (r + 1) * sz],
+                            fill=(232, 220, 196) if (r + c) % 2 == 0 else (120, 86, 60))
+        kx, ky = x0 + 4.5 * sz, y0 + 2.5 * sz
+        ang = min(1.0, max(0.0, (t - 1.0) / 0.5)) * 80
+        king = Image.new("RGBA", (120, 180), (0, 0, 0, 0))
+        kd = ImageDraw.Draw(king)
+        kd.polygon([(20, 170), (100, 170), (85, 70), (35, 70)], fill=(20, 20, 24))
+        kd.ellipse([30, 40, 90, 90], fill=(20, 20, 24))
+        kd.rectangle([55, 4, 65, 44], fill=(20, 20, 24))
+        kd.rectangle([42, 16, 78, 26], fill=(20, 20, 24))
+        king = king.rotate(-ang, expand=True, resample=Image.BICUBIC)
+        im.paste(king, (int(kx - king.width / 2), int(ky - king.height / 2)), king)
+        d = ImageDraw.Draw(im)
+        _label(d, PW / 2, PH * 0.3, "1997: la máquina gana", 40, CYAN, center=True)
+    elif kind == "robocup":
+        _pitch(im, t, run=0, players=False)
+        d = ImageDraw.Draw(im)
+        p = (t % 2.2) / 2.2
+        rx, ry = PW * 0.3, PH * 0.66
+        kick = max(0.0, 1 - abs(p - 0.3) / 0.1) if p < 0.4 else 0.0
+        _robot(d, rx, ry, 1.2, (230, 50, 60), kick=kick)
+        _robot(d, PW * 0.72, PH * 0.5, 1.0, (40, 110, 240))
+        bx = rx + 40 + (PW * 0.5) * max(0.0, p - 0.3) / 0.7
+        by = ry - 10 - (PH * 0.32) * max(0.0, p - 0.3) / 0.7
+        _ball(d, bx, by, 13)
+        _label(d, PW / 2, PH * 0.3, "RoboCup · meta: 2050", 42, (255, 214, 10), center=True)
+    elif kind == "fuera_juego":
+        _pitch(im, 0, run=0, players=False)
+        d = ImageDraw.Draw(im)
+        ly = PH * 0.47
+        _astro_like = [(PW * 0.3, ly + 40, (40, 110, 240)), (PW * 0.62, ly - 22, (230, 50, 60)), (PW * 0.75, ly + 70, (40, 110, 240))]
+        for x, y, c in _astro_like:
+            d.ellipse([x - 24, y - 24, x + 24, y + 24], fill=c, outline=(15, 15, 20), width=4)
+        if t > 0.5:
+            k = _ease((t - 0.5) / 0.4)
+            d.line([(0, ly + 40), (PW * k, ly + 40)], fill=CYAN, width=6)
+            d.line([(0, ly - 22), (PW * k, ly - 22)], fill=(255, 80, 80), width=6)
+        if t > 1.2:
+            _label(d, PW / 2, PH * 0.3, "FUERA DE JUEGO", 52, (255, 80, 80), center=True)
+    elif kind == "ia_corner":
+        _pitch(im, 0, run=0, players=False)
+        im = Image.blend(im, Image.new("RGB", im.size, (8, 20, 30)), 0.4)
+        _hud(im, 90)
+        d = ImageDraw.Draw(im)
+        cx, cy = PW - 50, 50
+        goal = (PW / 2, 60)
+        pts = [(PW * 0.4, PH * 0.22), (PW * 0.55, PH * 0.18), (PW * 0.6, PH * 0.27), (PW * 0.35, PH * 0.3)]
+        for i, (x, y) in enumerate(pts):
+            k = _ease((t - 0.3 * i) / 0.6)
+            if k <= 0:
+                continue
+            sx, sy = x - 120, y + 160
+            d.line([(sx, sy), (sx + (x - sx) * k, sy + (y - sy) * k)], fill=CYAN, width=4)
+            d.ellipse([sx + (x - sx) * k - 14, sy + (y - sy) * k - 14, sx + (x - sx) * k + 14, sy + (y - sy) * k + 14], fill=(230, 50, 60))
+        if t > 1.4:
+            d.line([(cx, cy), (PW * 0.55, PH * 0.18)], fill=(255, 214, 10), width=5)
+        _label(d, 24, PH * 0.42, "IA: así sacamos el córner", 38, CYAN)
+    elif kind == "ia_vs_humano":
+        _pitch(im, 0, run=0, players=False)
+        im = Image.blend(im, Image.new("RGB", im.size, (10, 12, 20)), 0.5)
+        d = ImageDraw.Draw(im)
+        _robot(d, PW * 0.28, PH * 0.7, 1.4, (90, 100, 120))
+        _astro_like = None
+        x, y = PW * 0.72, PH * 0.68
+        d.line([(x - 12, y), (x - 6, y - 50)], fill=(240, 220, 200), width=12)
+        d.line([(x + 12, y), (x + 6, y - 50)], fill=(240, 220, 200), width=12)
+        d.rounded_rectangle([x - 26, y - 112, x + 26, y - 46], 12, fill=(230, 50, 60))
+        f = ImageFont.truetype(BOLD, 40)
+        d.text((x - 12, y - 104), "10", font=f, fill=WHITE)
+        d.ellipse([x - 24, y - 162, x + 24, y - 114], fill=(240, 200, 160))
+        jy = 40 * abs(math.sin(t * 4)) if t > 1.2 else 0
+        _ball(d, x + 50, y - 20 - jy, 14)
+        _label(d, PW * 0.28, PH * 0.32, "Cálculo", 40, CYAN, center=True)
+        _label(d, PW * 0.72, PH * 0.32, "Magia", 40, (255, 214, 10), center=True)
     else:
         raise ValueError(f"anim desconocida: {kind}")
     return im, shake

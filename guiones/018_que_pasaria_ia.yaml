@@ -1,0 +1,41 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si la INTELIGENCIA ARTIFICIAL jugara al fútbol? 🤖⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» con robots. En 1997 Deep Blue ganó a Kasparov al ajedrez y ese mismo año nació la RoboCup, cuya meta es que en 2050 un equipo de robots gane al campeón del mundo. El fuera de juego semiautomático ya se usó en el Mundial de Catar 2022, y en 2024 DeepMind y el Liverpool presentaron TacticAI, una IA que propone cómo sacar los córners.
+  #fútbol #IA #inteligenciaartificial #robots #quépasaríasi #fyp #shorts
+tags: [qué pasaría si, inteligencia artificial, IA, robots, fútbol, RoboCup, tecnología]
+hook: "¿Y si la inteligencia artificial jugara al fútbol?"
+scenes:
+  - anim: ia_campo
+    pose: piensa
+    say: "¿Qué pasaría si la inteligencia artificial saltara al campo a jugar al fútbol?"
+    highlight: "inteligencia artificial"
+  - anim: ia_calculo
+    pose: senala
+    say: "Antes de cada pase, calcularía todas las opciones en milésimas de segundo. Y siempre elegiría la mejor."
+    highlight: "milésimas mejor."
+  - anim: ia_ajedrez
+    pose: explica
+    say: "En otros juegos ya pasó: en mil novecientos noventa y siete, el ordenador Deep Blue ganó al campeón del mundo de ajedrez, Kasparov."
+    highlight: "Deep Blue Kasparov."
+  - anim: robocup
+    pose: chuta
+    say: "Y ese mismo año nació la RoboCup, un mundial de robots futbolistas. Su meta: ganar al campeón del mundo en el año dos mil cincuenta."
+    highlight: "RoboCup, cincuenta."
+  - anim: fuera_juego
+    pose: senala
+    say: "Pero la IA ya está en el fútbol. En el Mundial de Catar se usó el fuera de juego semiautomático."
+    highlight: "fuera semiautomático."
+  - anim: ia_corner
+    pose: explica
+    say: "Y en dos mil veinticuatro, una IA de Google y el Liverpool aprendió a diseñar cómo sacar los córners."
+    highlight: "Liverpool córners."
+  - anim: ia_vs_humano
+    pose: celebra
+    say: "¿Entonces ganarían los robots? A lo mejor. Pero un regate que nadie espera, eso todavía no se calcula."
+    highlight: "regate calcula."
+  - emoji: "🤖"
+    say: "¿Tú quién ganaría, robots o humanos? Te leo en comentarios. Y síguenos para más."
+    highlight: "robots humanos? síguenos"
