@@ -1,17 +1,17 @@
 format: quepasaria
 style: karaoke
 experiment: que-pasaria
-title: "¿Y si Pereira7, el Castor, fuera PORTERO? 🦫⚽ #shorts"
+title: "¿Y si @peereira7, el Castor, fuera PORTERO? 🦫⚽ #shorts #peereira7"
 description: |
-  Un «¿qué pasaría si…?» con nuestro amigo Pereira7, el Castor. Datos reales de castores: sus paletas son naranjas por el hierro, pueden tumbar árboles a mordiscos, construyen presas, avisan con la cola y aguantan hasta 15 minutos bajo el agua.
+  Un «¿qué pasaría si…?» con nuestro amigo @peereira7, el Castor. 🦫🧤 Datos reales de castores: sus paletas son naranjas por el hierro, pueden tumbar árboles a mordiscos, construyen presas, avisan con la cola y aguantan hasta 15 minutos bajo el agua.
   #fútbol #quépasaríasi #pereira7 #castor #shorts
 tags: [pereira7, qué pasaría si, castor, fútbol, portero, curiosidades]
-hook: "¿Y si Pereira7, el Castor, se pasara al fútbol?"
+hook: "¿Y si Peereira7, el Castor, se pasara al fútbol?"
 scenes:
   - anim: castor
     pose: piensa
-    say: "¿Qué pasaría si Pereira7, el Castor, cambiara el stream por el fútbol? Os lo digo: sería el mejor portero del mundo."
-    highlight: "Pereira7, portero"
+    say: "¿Qué pasaría si Peereira7, el Castor, cambiara el stream por el fútbol? Os lo digo: sería el mejor portero del mundo."
+    highlight: "Peereira7, portero"
   - anim: paletas
     pose: senala
     say: "Su arma secreta: las paletas. Los castores las tienen naranjas porque llevan hierro. Son durísimas."
@@ -38,5 +38,5 @@ scenes:
     say: "Resultado: portería a cero toda la temporada. Y el Balón de Oro, a la madriguera."
     highlight: "cero madriguera."
   - emoji: "🦫"
-    say: "Pereira7, el fútbol te espera. ¿Lo ficharíais para vuestro equipo? Os leo en comentarios."
-    highlight: "Pereira7, comentarios."
+    say: "Peereira7, el fútbol te espera. ¿Lo ficharíais para vuestro equipo? Os leo en comentarios."
+    highlight: "Peereira7, comentarios."
