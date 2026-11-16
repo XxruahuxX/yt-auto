@@ -22,7 +22,7 @@ ENV = SECRETS / "tiktok.env"
 TOKEN = SECRETS / "tiktok_token.json"
 LOG = Path("data/tiktok_uploads.json")
 REDIRECT = "https://github.com/XxruahuxX/yt-auto"
-SCOPES = "user.info.basic,video.upload"
+SCOPES = "user.info.basic,video.upload,video.publish"
 API = "https://open.tiktokapis.com/v2"
 
 
@@ -67,6 +67,52 @@ def access_token() -> str:
     return tok["access_token"]
 
 
+def creator_info() -> dict | None:
+    """Devuelve info del creador si el token tiene video.publish; None si no."""
+    h = {"Authorization": f"Bearer {access_token()}", "Content-Type": "application/json; charset=UTF-8"}
+    r = requests.post(f"{API}/post/publish/creator_info/query/", headers=h, timeout=30).json()
+    return r["data"] if r.get("error", {}).get("code") == "ok" else None
+
+
+def upload(path: Path, title: str = "") -> tuple[str, str]:
+    """Publica directo en público si TikTok lo permite (app auditada); si no, borrador."""
+    info = creator_info()
+    if info and "PUBLIC_TO_EVERYONE" in info.get("privacy_level_options", []):
+        return direct_post(path, title), "publicado"
+    return upload_draft(path), "borrador"
+
+
+def _send(url: str, path: Path, size: int, chunk: int, n: int) -> None:
+    data = path.read_bytes()
+    for i in range(n):
+        a = i * chunk
+        b = size if i == n - 1 else a + chunk
+        u = requests.put(url, data=data[a:b], timeout=300, headers={
+            "Content-Type": "video/mp4", "Content-Range": f"bytes {a}-{b-1}/{size}"})
+        if u.status_code not in (200, 201, 206):
+            raise RuntimeError(f"chunk {i} falló: {u.status_code} {u.text[:200]}")
+
+
+def _chunks(size: int) -> tuple[int, int]:
+    chunk = size if size <= 64 * 1024 * 1024 else 10 * 1024 * 1024
+    return chunk, max(1, size // chunk)
+
+
+def direct_post(path: Path, title: str) -> str:
+    size = path.stat().st_size
+    chunk, n = _chunks(size)
+    h = {"Authorization": f"Bearer {access_token()}", "Content-Type": "application/json; charset=UTF-8"}
+    r = requests.post(f"{API}/post/publish/video/init/", headers=h, timeout=30, json={
+        "post_info": {"title": title[:2200], "privacy_level": "PUBLIC_TO_EVERYONE",
+                      "disable_comment": False, "disable_duet": False, "disable_stitch": False},
+        "source_info": {"source": "FILE_UPLOAD", "video_size": size,
+                        "chunk_size": chunk, "total_chunk_count": n}}).json()
+    if r.get("error", {}).get("code") != "ok":
+        raise RuntimeError(f"init falló: {r}")
+    _send(r["data"]["upload_url"], path, size, chunk, n)
+    return r["data"]["publish_id"]
+
+
 def upload_draft(path: Path) -> str:
     """Sube el vídeo a la bandeja de TikTok; el usuario lo publica desde la app."""
     size = path.stat().st_size
@@ -90,6 +136,16 @@ def upload_draft(path: Path) -> str:
     return pid
 
 
+def _title(stem: str) -> str:
+    g = Path("guiones") / f"{stem}.yaml"
+    if not g.exists():
+        return ""
+    import yaml
+    d = yaml.safe_load(g.read_text())
+    tags = " ".join("#" + t.replace(" ", "") for t in (d.get("tags") or [])[:5])
+    return f"{d.get('title', '')} {tags} #futbol #datocrack".strip()
+
+
 def main(argv: list[str]) -> None:
     cmd = argv[0] if argv else "url"
     if cmd == "url":
@@ -103,11 +159,11 @@ def main(argv: list[str]) -> None:
             p = Path(f)
             if p.stem in log:
                 print(p.stem, "ya subido:", log[p.stem]); continue
-            pid = upload_draft(p)
-            log[p.stem] = {"publish_id": pid, "at": int(time.time())}
+            pid, modo = upload(p, _title(p.stem))
+            log[p.stem] = {"publish_id": pid, "modo": modo, "at": int(time.time())}
             LOG.parent.mkdir(exist_ok=True)
             LOG.write_text(json.dumps(log, indent=2))
-            print(p.stem, "-> bandeja TikTok", pid)
+            print(p.stem, "->", modo, pid)
     else:
         raise SystemExit(__doc__)
 
