@@ -1,0 +1,35 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si tu ABUELA jugara la CHAMPIONS? 👵⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» con mucho cariño. El jugador más mayor de la historia de la Champions fue el portero Marco Ballotta, con 43 años (Lazio, 2007). Y Kazuyoshi Miura siguió jugando como profesional pasados los 55.
+  #fútbol #abuela #champions #quépasaríasi #humor #fyp #shorts
+tags: [qué pasaría si, abuela, champions, humor fútbol, curiosidades]
+hook: "¿Y si tu abuela jugara la Champions?"
+scenes:
+  - anim: x_ab_entra
+    pose: celebra
+    say: "¿Qué pasaría si tu abuela fichara por un equipo de Champions? Bastón, gafas, y mucha experiencia."
+    highlight: "abuela Champions?"
+    sfx: [ding]
+  - anim: x_ab_regate
+    pose: salto
+    say: "Primer partido: el defensa se confía. Error. Caño con bastón, y al suelo."
+    highlight: "Caño bastón,"
+  - anim: x_ab_record
+    pose: explica
+    say: "¿Lo tendría difícil? El jugador más mayor de la historia de la Champions fue el portero Marco Ballotta, con cuarenta y tres años."
+    highlight: "Ballotta, cuarenta tres"
+  - emoji: "🇯🇵"
+    big: "+55"
+    pose: senala
+    say: "Y en Japón, Kazuyoshi Miura siguió jugando como profesional con más de cincuenta y cinco años. Así que nunca digas nunca."
+    highlight: "Miura cincuenta cinco"
+  - anim: x_ab_croquetas
+    pose: celebra
+    say: "Eso sí, en el descanso, croquetas para todo el vestuario. Y el que no se las coma, al banquillo."
+    highlight: "croquetas banquillo."
+  - emoji: "👵"
+    say: "¿Tu abuela jugaría de portera o de delantera? Te leo en comentarios. Y síguenos para más."
+    highlight: "portera delantera? síguenos"

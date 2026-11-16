@@ -1,0 +1,35 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si el VAR fuera TU MADRE? 📺😤 #shorts"
+description: |
+  Un «¿qué pasaría si…?» que todos entendemos. El VAR debutó en un Mundial en Rusia 2018. Pero imagina que quien revisa la jugada es tu madre…
+  #fútbol #VAR #madre #quépasaríasi #humor #fyp #shorts
+tags: [qué pasaría si, VAR, madre, humor fútbol, árbitro]
+hook: "¿Y si el VAR fuera tu madre?"
+scenes:
+  - anim: x_var_jugada
+    pose: piensa
+    say: "Minuto noventa. Te tiras en el área, y el árbitro se lleva la mano a la oreja: revisión del VAR."
+    highlight: "VAR."
+  - emoji: "📺"
+    big: "2018"
+    pose: explica
+    say: "El VAR se estrenó en un Mundial en Rusia, en dos mil dieciocho. Pero este VAR es distinto."
+    highlight: "Rusia, distinto."
+  - anim: x_var_monitor
+    pose: agacha
+    say: "Porque en la sala del VAR está tu madre. Y no está mirando la jugada. Te está mirando a ti."
+    highlight: "madre. ti."
+  - anim: x_var_veredicto
+    pose: piensa
+    say: "Veredicto: no es penalti. Y además, ¿has recogido tu cuarto?"
+    highlight: "cuarto?"
+  - anim: x_var_tarjeta
+    pose: agacha
+    say: "Tarjeta roja directa. Y lo peor no es la expulsión: hoy te vas a la cama sin cenar."
+    highlight: "roja cenar."
+    sfx: [boom]
+  - emoji: "😤"
+    say: "¿Qué te diría tu madre si fuera el VAR? Te leo en comentarios. Y síguenos para más."
+    highlight: "madre comentarios. síguenos"

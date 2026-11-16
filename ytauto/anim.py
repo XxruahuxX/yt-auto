@@ -304,6 +304,9 @@ def _render(kind: str, t: float, dur: float):
     if kind.startswith("r_"):
         from . import anim_robot
         return anim_robot.render(kind, t, dur), (0, 0)
+    if kind.startswith("x_"):
+        from . import anim_extra
+        return anim_extra.render(kind, t, dur), (0, 0)
     im = Image.new("RGB", (PW, PH))
     d = ImageDraw.Draw(im)
     shake = (0, 0)
@@ -705,7 +708,7 @@ def draw(img: Image.Image, kind: str, t: float, dur: float, box: tuple[int, int,
     """
     global PW, PH
     W, H = img.size
-    if full and kind.startswith("r_"):  # escena con cámara: ocupa la pantalla entera, sin bandas
+    if full and kind.startswith(("r_", "x_")):  # escena con cámara: ocupa la pantalla entera, sin bandas
         PW, PH = 860, round(860 * H / W)
         try:
             im, _ = _render(kind, t, dur)

@@ -1,0 +1,33 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si el campo de fútbol fuera REDONDO? ⭕⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» geométrico. La Regla 1 del fútbol dice que el terreno de juego tiene que ser rectangular, de entre 90 y 120 metros de largo. ¿Y si fuera redondo? Sin esquinas no hay córners…
+  #fútbol #quépasaríasi #reglas #curiosidades #fyp #shorts
+tags: [qué pasaría si, campo redondo, reglas del fútbol, curiosidades fútbol]
+hook: "¿Y si el campo de fútbol fuera redondo?"
+scenes:
+  - anim: x_red_cambio
+    pose: piensa
+    say: "¿Qué pasaría si el campo de fútbol, en vez de rectangular, fuera completamente redondo?"
+    highlight: "redondo?"
+  - anim: x_red_regla
+    pose: senala
+    say: "Primero: estaría prohibido. La regla número uno del fútbol dice que el campo tiene que ser rectangular."
+    highlight: "prohibido. rectangular."
+  - anim: x_red_corner
+    pose: agacha
+    say: "Pero imagina que se cambia. Sin esquinas, adiós a los córners. ¿Desde dónde los sacas?"
+    highlight: "córners."
+  - anim: x_red_carrera
+    pose: chuta
+    say: "Y sin esquinas donde acorralar a nadie, la banda sería una pista de carreras infinita. Los extremos acabarían agotados."
+    highlight: "infinita. agotados."
+  - anim: x_red_medidas
+    pose: explica
+    say: "Para las porterías no cambia nada: hoy el campo mide entre noventa y ciento veinte metros de largo. Redondo, ese sería su diámetro."
+    highlight: "noventa ciento veinte"
+  - emoji: "⭕"
+    say: "¿Jugarías en un campo redondo? Te leo en comentarios. Y síguenos para más."
+    highlight: "redondo? síguenos"

@@ -1,0 +1,35 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si MESSI y CRISTIANO jugaran en el MISMO equipo? 🐐⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» con los dos mejores de su generación. Nunca coincidieron en un club: durante nueve temporadas se enfrentaron en LaLiga, uno en el Barça y otro en el Real Madrid. Juntos suman 9 Champions: 4 de Messi y 5 de Cristiano.
+  #messi #cristianoronaldo #cr7 #fútbol #quépasaríasi #fyp #shorts
+tags: [messi, cristiano ronaldo, cr7, qué pasaría si, fútbol, champions]
+hook: "¿Y si Messi y Cristiano jugaran en el mismo equipo?"
+scenes:
+  - anim: x_mc_presenta
+    pose: piensa
+    say: "¿Qué pasaría si Messi y Cristiano jugaran juntos, en el mismo equipo?"
+    highlight: "Messi Cristiano"
+  - anim: x_mc_champions
+    pose: senala
+    say: "Nunca coincidieron en un club. Pero juntos suman nueve Champions: cuatro de Messi y cinco de Cristiano."
+    highlight: "nueve cuatro cinco"
+    sfx: [ding]
+  - anim: x_mc_falta
+    pose: piensa
+    say: "Primer problema: la primera falta al borde del área. ¿Quién la tira?"
+    highlight: "¿Quién"
+  - anim: x_mc_rival
+    pose: agacha
+    say: "Mientras discuten, la barrera rival no para de temblar. Porque saben que la tire quien la tire, va dentro."
+    highlight: "temblar. dentro."
+  - anim: x_mc_gol
+    pose: celebra
+    say: "Gol. Uno grita siuuu, el otro mira al cielo. Y el estadio, sin saber a quién aplaudir."
+    highlight: "siuuu, cielo."
+    sfx: [ding]
+  - emoji: "🐐"
+    say: "¿Quién tiraría la falta, Messi o Cristiano? Te leo en comentarios. Y síguenos para más."
+    highlight: "Messi Cristiano? síguenos"

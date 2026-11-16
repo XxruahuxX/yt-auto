@@ -1,0 +1,346 @@
+"""Animaciones de personajes a pantalla completa: Messi y Cristiano, campo redondo, la abuela y el VAR madre."""
+from __future__ import annotations
+
+import math
+import random
+
+from PIL import Image, ImageDraw, ImageFont
+
+from . import anim as A
+from .anim_robot import ball, cam, player, SKINS
+
+BOLD = A.BOLD
+WHITE, INK = (255, 255, 255), (10, 12, 20)
+YEL, CYAN = (255, 214, 10), (40, 230, 255)
+BLAU, RED, MAD = (20, 60, 150), (220, 45, 55), (245, 245, 245)
+
+
+def _e(x):
+    return A._ease(x)
+
+
+def font(n):
+    return ImageFont.truetype(BOLD, int(n))
+
+
+def stripes(im, cols=((34, 120, 62), (40, 134, 70))):
+    d = ImageDraw.Draw(im)
+    for i in range(12):
+        d.rectangle([i * A.PW / 12, 0, (i + 1) * A.PW / 12, A.PH], fill=cols[i % 2])
+    return d
+
+
+def person(d, x, y, s, shirt, skin, hair="corto", hair_col=(40, 28, 20), num="", name="", phase=0.0, run=0.0,
+           pose="", glasses=False, shorts=(30, 30, 40), legs=None, skirt=False, mouth="sonrisa", arm_up=0.0):
+    """Personaje de dibujo grande (cabeza grande). (x, y) = pies."""
+    sw = math.sin(phase) * run
+    d.ellipse([x - 40 * s, y - 8 * s, x + 40 * s, y + 8 * s], fill=(0, 0, 0) if False else (24, 80, 40))
+    lc = legs or skin
+    hip = (x, y - 70 * s)
+    for sg in (1, -1):
+        knee = (x + sg * (8 + sw * 18) * s, y - 36 * s)
+        foot = (x + sg * (10 + sw * 28) * s, y - max(0, sg * sw) * 14 * s)
+        d.line([(x + sg * 9 * s, hip[1]), knee, foot], fill=lc, width=int(15 * s), joint="curve")
+        d.ellipse([foot[0] - 12 * s, foot[1] - 7 * s, foot[0] + 14 * s, foot[1] + 6 * s], fill=(25, 25, 30))
+    if skirt:
+        d.polygon([(x - 34 * s, y - 50 * s), (x + 34 * s, y - 50 * s), (x + 24 * s, y - 92 * s), (x - 24 * s, y - 92 * s)], fill=shorts)
+    else:
+        d.rounded_rectangle([x - 26 * s, y - 92 * s, x + 26 * s, y - 62 * s], 8 * s, fill=shorts)
+    d.rounded_rectangle([x - 30 * s, y - 150 * s, x + 30 * s, y - 86 * s], 14 * s, fill=shirt)
+    for sg in (1, -1):
+        sh = (x + sg * 27 * s, y - 142 * s)
+        up = arm_up if sg == 1 else 0
+        if pose == "brazos_cruzados":
+            hand = (x - sg * 14 * s, y - 116 * s)
+        elif pose == "senala" and sg == 1:
+            hand = (x + 70 * s, y - 170 * s)
+        elif pose == "cielo" and sg == 1:
+            hand = (x + 22 * s, y - 250 * s)
+        elif pose == "siu":
+            hand = (x + sg * 62 * s, y - 112 * s)
+        else:
+            hand = (x + sg * (36 - 10 * sw * sg) * s, y - (102 + 120 * up) * s - sg * sw * 18 * s)
+        d.line([sh, hand], fill=skin, width=int(13 * s))
+        d.ellipse([hand[0] - 9 * s, hand[1] - 9 * s, hand[0] + 9 * s, hand[1] + 9 * s], fill=skin)
+    if num:
+        f = font(34 * s)
+        d.text((x - d.textlength(num, font=f) / 2, y - 144 * s), num, font=f, fill=WHITE)
+    # cabeza
+    hx, hy, hr = x, y - 188 * s, 40 * s
+    if hair == "melena":
+        d.ellipse([hx - hr * 1.15, hy - hr * 1.15, hx + hr * 1.15, hy + hr * 0.5], fill=hair_col)
+        for sg in (-1, 1):
+            d.rounded_rectangle(sorted([hx + sg * hr * 1.18, hx + sg * hr * 0.7]) and [min(hx + sg * hr * 1.18, hx + sg * hr * 0.7), hy - hr * 0.3, max(hx + sg * hr * 1.18, hx + sg * hr * 0.7), hy + hr * 1.35], 10 * s, fill=hair_col)
+    d.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=skin)
+    if hair == "corto":
+        d.chord([hx - hr, hy - hr * 1.08, hx + hr, hy + hr * 0.5], 180, 360, fill=hair_col)
+    elif hair == "tupe":
+        d.chord([hx - hr, hy - hr * 1.15, hx + hr, hy + hr * 0.4], 180, 360, fill=hair_col)
+        d.ellipse([hx - hr * 0.2, hy - hr * 1.35, hx + hr * 0.9, hy - hr * 0.6], fill=hair_col)
+    elif hair == "barba":
+        d.chord([hx - hr, hy - hr * 1.08, hx + hr, hy + hr * 0.5], 180, 360, fill=hair_col)
+        d.chord([hx - hr * 0.9, hy - hr * 0.2, hx + hr * 0.9, hy + hr * 1.02], 0, 180, fill=hair_col)
+    elif hair == "mono":
+        d.chord([hx - hr, hy - hr * 1.05, hx + hr, hy + hr * 0.3], 180, 360, fill=hair_col)
+        d.ellipse([hx - hr * 0.45, hy - hr * 1.55, hx + hr * 0.45, hy - hr * 0.75], fill=hair_col)
+    elif hair == "melena":
+        d.chord([hx - hr * 1.05, hy - hr * 1.12, hx + hr * 1.05, hy + hr * 0.2], 180, 360, fill=hair_col)
+    for sg in (-1, 1):
+        d.ellipse([hx + sg * 14 * s - 5 * s, hy - 6 * s, hx + sg * 14 * s + 5 * s, hy + 6 * s], fill=INK)
+    if glasses:
+        for sg in (-1, 1):
+            d.ellipse([hx + sg * 15 * s - 12 * s, hy - 11 * s, hx + sg * 15 * s + 12 * s, hy + 11 * s], outline=INK, width=max(1, int(3 * s)))
+        d.line([(hx - 4 * s, hy), (hx + 4 * s, hy)], fill=INK, width=max(1, int(3 * s)))
+    if mouth == "sonrisa":
+        d.arc([hx - 14 * s, hy + 4 * s, hx + 14 * s, hy + 24 * s], 20, 160, fill=INK, width=max(1, int(4 * s)))
+    elif mouth == "abierta":
+        d.ellipse([hx - 11 * s, hy + 10 * s, hx + 11 * s, hy + 28 * s], fill=(120, 30, 30))
+    elif mouth == "enfado":
+        d.arc([hx - 12 * s, hy + 16 * s, hx + 12 * s, hy + 30 * s], 200, 340, fill=INK, width=max(1, int(4 * s)))
+        for sg in (-1, 1):
+            d.line([(hx + sg * 22 * s, hy - 16 * s), (hx + sg * 6 * s, hy - 10 * s)], fill=INK, width=max(1, int(4 * s)))
+    if name:
+        A._label(d, x, y + 16 * s, name, 30 * min(s, 1.4), YEL, center=True)
+
+
+def bubble(d, x, y, text, size=48, col=WHITE, fg=INK):
+    f = font(size)
+    w = d.textlength(text, font=f)
+    d.rounded_rectangle([x - w / 2 - 22, y - size * 0.75, x + w / 2 + 22, y + size * 0.75], 26, fill=col, outline=INK, width=4)
+    d.polygon([(x - 14, y + size * 0.72), (x + 14, y + size * 0.72), (x, y + size * 1.3)], fill=col)
+    d.text((x - w / 2, y - size * 0.62), text, font=f, fill=fg)
+
+
+def stamp(im, text, cx, cy, t0, t, bg=YEL, fg=INK, size=70, rot=-5):
+    if t < t0:
+        return
+    k = _e((t - t0) / 0.25)
+    f = font(size)
+    w = int(ImageDraw.Draw(im).textlength(text, font=f)) + 60
+    st = Image.new("RGBA", (w, int(size * 1.7)), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(st)
+    sd.rounded_rectangle([0, 0, w - 1, st.height - 1], 18, fill=bg, outline=INK, width=6)
+    sd.text((30, size * 0.2), text, font=f, fill=fg)
+    sc = 1.6 - 0.6 * k
+    st = st.resize((max(1, int(st.width * sc)), max(1, int(st.height * sc)))).rotate(rot, expand=True, resample=Image.BICUBIC)
+    im.paste(st, (int(cx - st.width / 2), int(cy - st.height / 2)), st)
+
+
+def trophy(d, x, y, s, col=(230, 190, 60)):
+    d.polygon([(x - 30 * s, y - 120 * s), (x + 30 * s, y - 120 * s), (x + 18 * s, y - 60 * s), (x - 18 * s, y - 60 * s)], fill=col)
+    for sg in (-1, 1):
+        d.arc([x + sg * 30 * s - 22 * s, y - 116 * s, x + sg * 30 * s + 22 * s, y - 80 * s], 90 if sg > 0 else 270, 270 if sg > 0 else 90, fill=col, width=int(7 * s))
+    d.rectangle([x - 6 * s, y - 60 * s, x + 6 * s, y - 30 * s], fill=col)
+    d.rounded_rectangle([x - 26 * s, y - 32 * s, x + 26 * s, y], 6 * s, fill=(70, 50, 30))
+
+
+def round_pitch(im, t, k=1.0, players=True):
+    """Campo que pasa de rectangular (k=0) a redondo (k=1)."""
+    PW, PH = A.PW, A.PH
+    d = stripes(im)
+    cx, cy = PW / 2, PH * 0.5
+    hw, hh = PW * 0.42, PH * 0.3
+    r = min(hw, hh) * 0 + (hw if hw < hh else hh)
+    rad = k * hw
+    d.rounded_rectangle([cx - hw, cy - hh, cx + hw, cy + hh], int(rad), outline=WHITE, width=6)
+    d.line([(cx - hw, cy), (cx + hw, cy)], fill=WHITE, width=5)
+    d.ellipse([cx - 70, cy - 70, cx + 70, cy + 70], outline=WHITE, width=5)
+    for sg in (-1, 1):
+        y0 = cy + sg * hh
+        d.rectangle([cx - 140, min(y0, y0 - sg * 100), cx + 140, max(y0, y0 - sg * 100)], outline=WHITE, width=5)
+        d.rectangle([cx - 50, min(y0, y0 + sg * 14), cx + 50, max(y0, y0 + sg * 14)], fill=WHITE)
+    return d, (cx, cy, hw, hh)
+
+
+def render(kind, t, dur):
+    PW, PH = A.PW, A.PH
+    im = Image.new("RGB", (PW, PH))
+    # ---------- Messi y Cristiano ----------
+    if kind == "x_mc_presenta":
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, PW, PH], fill=(14, 18, 34))
+        for i in range(14):
+            a = i / 14 * 2 * math.pi + t * 0.3
+            d.polygon([(PW / 2, PH * 0.5), (PW / 2 + 1400 * math.cos(a), PH * 0.5 + 1400 * math.sin(a)),
+                       (PW / 2 + 1400 * math.cos(a + 0.12), PH * 0.5 + 1400 * math.sin(a + 0.12))], fill=(24, 30, 56))
+        k = _e(t / 0.6)
+        person(d, PW / 2 - 150 - 300 * (1 - k), PH * 0.66, 1.5, (100, 170, 230), SKINS[0], "barba", (90, 60, 30), "10", "MESSI", pose="brazos_cruzados")
+        person(d, PW / 2 + 150 + 300 * (1 - k), PH * 0.66, 1.5, (100, 170, 230), SKINS[0], "tupe", (30, 22, 16), "7", "CRISTIANO", pose="brazos_cruzados")
+        stamp(im, "MISMO EQUIPO", PW / 2, PH * 0.3, 1.0, t)
+    elif kind == "x_mc_champions":
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, PW, PH], fill=(10, 16, 40))
+        rng = random.Random(4)
+        for _ in range(60):
+            x, y = rng.uniform(0, PW), rng.uniform(0, PH)
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(200, 210, 255))
+        n = min(9, int(t / 0.3) + 1)
+        for i in range(n):
+            row, col = (0, i) if i < 4 else (1, i - 4)
+            x = PW / 2 + (col - (1.5 if row == 0 else 2)) * 150
+            y = PH * (0.48 if row == 0 else 0.66)
+            trophy(d, x, y, 1.1, (230, 190, 60))
+        A._label(d, 40, PH * 0.3, "MESSI: 4", 44, (100, 170, 230))
+        A._label(d, PW - 300, PH * 0.3, "CR7: 5", 44, (255, 120, 120))
+        if n == 9:
+            stamp(im, "9 CHAMPIONS", PW / 2, PH * 0.78, 9 * 0.3, t)
+    elif kind == "x_mc_falta":
+        d = stripes(im)
+        bx, by = PW / 2, PH * 0.6
+        k = _e(t / 1.0)
+        person(d, bx - 260 + 130 * k, by + 40, 1.3, (100, 170, 230), SKINS[0], "barba", (90, 60, 30), "10", phase=t * 8, run=1 - k)
+        person(d, bx + 260 - 130 * k, by + 40, 1.3, (100, 170, 230), SKINS[0], "tupe", (30, 22, 16), "7", phase=t * 8 + 1, run=1 - k)
+        ball(d, bx, by + 30, 16)
+        if t > 1.0:
+            bubble(d, bx - 170, by - 330, "¡MÍA!", 50)
+        if t > 1.5:
+            bubble(d, bx + 170, by - 330, "¡NO, MÍA!", 50)
+        im = cam(im, bx, by - 120, 1.1 + 0.15 * _e((t - 1) / 2))
+    elif kind == "x_mc_rival":
+        d = stripes(im)
+        for i in range(4):
+            x = PW / 2 + (i - 1.5) * 150
+            y = PH * 0.62
+            shake = 6 * math.sin(t * 40 + i)
+            person(d, x + shake, y, 1.0, (40, 40, 40), SKINS[i], "corto", (30, 20, 10), str(i + 2), pose="brazos_cruzados", mouth="abierta")
+            for j in range(2):
+                q = (t * 1.5 + j * 0.5 + i * 0.2) % 1
+                dx, dy = x + 30 + shake, y - 230 + 60 * q
+                d.ellipse([dx - 6, dy - 9, dx + 6, dy + 9], fill=(120, 200, 255))
+        A._label(d, PW / 2, PH * 0.3, "La barrera… temblando", 44, WHITE, center=True)
+    elif kind == "x_mc_gol":
+        d = stripes(im)
+        j = abs(math.sin(t * 3)) * 80
+        person(d, PW / 2 + 150, PH * 0.66 - j, 1.4, (100, 170, 230), SKINS[0], "tupe", (30, 22, 16), "7", pose="siu", mouth="abierta")
+        person(d, PW / 2 - 150, PH * 0.66, 1.4, (100, 170, 230), SKINS[0], "barba", (90, 60, 30), "10", pose="cielo")
+        if t > 0.4:
+            f = font(110)
+            d.text((PW / 2 - 230, PH * 0.3), "¡SIUUU!", font=f, fill=YEL, stroke_width=8, stroke_fill=INK)
+        stamp(im, "¡GOL!", PW / 2, PH * 0.84, 0.2, t)
+    # ---------- Campo redondo ----------
+    elif kind == "x_red_cambio":
+        k = _e((t - 0.6) / 1.4)
+        d, (cx, cy, hw, hh) = round_pitch(im, t, k)
+        A._label(d, PW / 2, PH * 0.27, "Rectangular  →  Redondo", 40, YEL, center=True)
+    elif kind == "x_red_regla":
+        d, _ = round_pitch(im, t, 0)
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle([PW * 0.12, PH * 0.32, PW * 0.88, PH * 0.6], 30, fill=(245, 240, 225), outline=INK, width=6)
+        f = font(48)
+        d.text((PW * 0.17, PH * 0.35), "REGLA 1", font=f, fill=RED)
+        f2 = font(40)
+        for i, l in enumerate(["«El terreno de juego", "será rectangular»"]):
+            d.text((PW * 0.17, PH * 0.42 + i * 56), l, font=f2, fill=INK)
+    elif kind == "x_red_corner":
+        d, (cx, cy, hw, hh) = round_pitch(im, t, 1)
+        p = min(t / 1.2, 1)
+        bx, by = cx + (hw - 10) * math.cos(-0.7) * p + 0, cy - hh * 0.9 * p
+        ball(d, cx + hw * 0.7 * p, cy - hh * 0.75 * p, 14)
+        person(d, cx + hw * 0.55, cy - hh * 0.2, 0.9, RED, SKINS[2], "corto", (20, 10, 5), "9", mouth="abierta")
+        if t > 1.2:
+            bubble(d, cx + hw * 0.55, cy - hh * 0.2 - 260, "¿Córner? ¿Dónde?", 40)
+    elif kind == "x_red_carrera":
+        d, (cx, cy, hw, hh) = round_pitch(im, t, 1)
+        for i in range(8):
+            a = t * 1.4 + i * 2 * math.pi / 8
+            x, y = cx + hw * 0.9 * math.cos(a), cy + hh * 0.9 * math.sin(a)
+            person(d, x, y + 40, 0.55, RED if i % 2 else BLAU, SKINS[i % 4], "corto", (30, 20, 10), str(i + 2), phase=t * 10 + i, run=1)
+        A._label(d, PW / 2, PH * 0.27, "Sin esquinas: carrera infinita", 38, YEL, center=True)
+    elif kind == "x_red_medidas":
+        d, (cx, cy, hw, hh) = round_pitch(im, t, 1)
+        k = _e(t / 0.8)
+        d.line([(cx, cy - hh), (cx, cy - hh + 2 * hh * k)], fill=YEL, width=8)
+        if k >= 1:
+            A._label(d, cx + 30, cy - 30, "90-120 m", 50, YEL)
+    # ---------- La abuela ----------
+    elif kind.startswith("x_ab_"):
+        d = stripes(im)
+        gx, gy = PW / 2, PH * 0.66
+        abu = dict(shirt=(110, 60, 140), skin=SKINS[0], hair="mono", hair_col=(200, 200, 205), glasses=True, shorts=(60, 40, 80), skirt=True, legs=(220, 190, 170))
+        if kind == "x_ab_entra":
+            d.rectangle([0, 0, PW, PH * 0.3], fill=(10, 16, 50))
+            for i in range(8):
+                a = i / 8 * 2 * math.pi
+                sx, sy = PW / 2 + 140 * math.cos(a), PH * 0.15 + 90 * math.sin(a)
+                d.regular_polygon((sx, sy, 22), 5, rotation=t * 30, fill=WHITE)
+            x = PW * 0.1 + PW * 0.4 * _e(t / 2.2)
+            person(d, x, gy, 1.5, run=0.6, phase=t * 4, **abu)
+            d.line([(x + 50, gy - 160), (x + 70, gy)], fill=(120, 80, 40), width=10)
+            stamp(im, "FICHAJE: LA ABUELA", PW / 2, PH * 0.38, 1.4, t, size=56)
+        elif kind == "x_ab_regate":
+            p = min(t / 2.0, 1)
+            x = PW * 0.25 + PW * 0.5 * p
+            fall = _e((t - 1.0) / 0.4)
+            lay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+            person(ImageDraw.Draw(lay), PW * 0.55, gy, 1.2, BLAU, SKINS[2], "corto", (20, 10, 5), "5", mouth="abierta")
+            lay = lay.rotate(-80 * fall, center=(PW * 0.55, gy), resample=Image.BICUBIC)
+            im.paste(lay, (0, 0), lay)
+            d = ImageDraw.Draw(im)
+            person(d, x, gy, 1.4, run=0.8, phase=t * 6, **abu)
+            d.line([(x + 50, gy - 150), (x + 90, gy - 6)], fill=(120, 80, 40), width=10)
+            ball(d, x + 100, gy - 4, 14)
+            if t > 1.3:
+                f = font(64)
+                d.text((PW * 0.08, PH * 0.32), "¡CAÑO CON BASTÓN!", font=f, fill=YEL, stroke_width=6, stroke_fill=INK)
+        elif kind == "x_ab_record":
+            person(d, gx - 200, gy, 1.3, (230, 230, 240), SKINS[0], "corto", (150, 150, 150), "1", pose="brazos_cruzados")
+            f = font(260)
+            n = int(43 * _e(t / 0.8))
+            d.text((gx - 80, PH * 0.32), str(n), font=f, fill=YEL, stroke_width=10, stroke_fill=INK)
+            A._label(d, PW / 2, PH * 0.27, "43 años en la Champions", 40, WHITE, center=True)
+        elif kind == "x_ab_croquetas":
+            d.rectangle([0, 0, PW, PH], fill=(60, 44, 34))
+            d.rectangle([0, PH * 0.6, PW, PH], fill=(120, 84, 50))
+            person(d, gx, gy, 1.6, pose="", arm_up=0.6, **abu)
+            tx, ty = gx + 200, gy - 250 - 20 * math.sin(t * 3)
+            d.rounded_rectangle([tx - 90, ty - 40, tx + 90, ty + 30], 14, fill=(200, 230, 255), outline=INK, width=4)
+            for i in range(5):
+                d.ellipse([tx - 70 + i * 30, ty - 25, tx - 44 + i * 30, ty + 10], fill=(200, 130, 50), outline=(120, 70, 20), width=2)
+            stamp(im, "DESCANSO: CROQUETAS", PW / 2, PH * 0.3, 0.6, t, size=56)
+        else:
+            return None
+    # ---------- El VAR es tu madre ----------
+    elif kind.startswith("x_var_"):
+        mama = dict(shirt=(200, 60, 110), skin=SKINS[1], hair="melena", hair_col=(60, 34, 20), shorts=(40, 40, 70), legs=(40, 40, 70))
+        if kind == "x_var_jugada":
+            d = stripes(im)
+            fall = _e((t - 0.6) / 0.4)
+            lay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+            person(ImageDraw.Draw(lay), PW * 0.45, PH * 0.66, 1.3, RED, SKINS[0], "corto", (40, 20, 10), "9", mouth="abierta", phase=t * 8, run=1 - fall)
+            lay = lay.rotate(70 * fall, center=(PW * 0.45, PH * 0.66), resample=Image.BICUBIC)
+            im.paste(lay, (0, 0), lay)
+            d = ImageDraw.Draw(im)
+            person(d, PW * 0.78, PH * 0.66, 1.2, (20, 20, 24), SKINS[3], "corto", (20, 10, 5), arm_up=0.5 * _e((t - 1.2) / 0.3))
+            if t > 1.4:
+                bubble(d, PW * 0.72, PH * 0.32, "Revisa el VAR…", 42)
+        elif kind == "x_var_monitor":
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 0, PW, PH], fill=(16, 18, 26))
+            mx0, my0, mx1, my1 = PW * 0.08, PH * 0.3, PW * 0.92, PH * 0.66
+            d.rounded_rectangle([mx0, my0, mx1, my1], 24, fill=(30, 34, 46), outline=(90, 96, 110), width=10)
+            d.rectangle([mx0 + 20, my0 + 20, mx1 - 20, my1 - 20], fill=(80, 140, 200))
+            person(d, PW / 2, my1 + 120, 2.4, mouth="enfado", **mama)
+            d = ImageDraw.Draw(im)
+            d.rectangle([mx0, my1, mx1, PH], fill=(16, 18, 26))
+            d.rounded_rectangle([mx0, my0, mx1, my1], 24, outline=(90, 96, 110), width=10)
+            if int(t * 2) % 2 == 0:
+                d.ellipse([mx0 + 40, my0 + 40, mx0 + 70, my0 + 70], fill=(255, 50, 50))
+            A._label(d, mx0 + 90, my0 + 34, "VAR · REVISANDO", 40, WHITE)
+        elif kind == "x_var_veredicto":
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 0, PW, PH], fill=(200, 210, 230))
+            person(d, PW / 2, PH * 0.72, 2.2, mouth="enfado", pose="senala", **mama)
+            bubble(d, PW / 2, PH * 0.27, "¿Has recogido tu cuarto?", 46)
+        elif kind == "x_var_tarjeta":
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 0, PW, PH], fill=(200, 210, 230))
+            person(d, PW / 2 - 60, PH * 0.72, 2.2, mouth="enfado", arm_up=1.0, **mama)
+            k = _e((t - 0.4) / 0.3)
+            cx, cy = PW / 2 + 20, PH * 0.72 - 2.2 * 222 - 40 * k
+            d.rounded_rectangle([cx - 50, cy - 75, cx + 50, cy + 75], 10, fill=(230, 30, 40), outline=WHITE, width=4)
+            stamp(im, "SIN CENAR", PW / 2, PH * 0.82, 0.9, t, bg=(230, 30, 40), fg=WHITE)
+        else:
+            return None
+    else:
+        return None
+    return im
