@@ -1,0 +1,39 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si un ROBOT se colara en un partido de fútbol? 🤖⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?»: un robot se mezcla con los jugadores en un partido normal. Analiza a todos los rivales, no se cansa y marca… pero el reglamento solo permite jugar a futbolistas inscritos, y en la RoboCup (el mundial de robots, que existe desde 1997) los robots todavía se caen a menudo.
+  #fútbol #robot #IA #quépasaríasi #humor #fyp #shorts
+tags: [qué pasaría si, robot, fútbol, inteligencia artificial, RoboCup, humor fútbol]
+hook: "¿Y si un robot se colara en un partido normal?"
+scenes:
+  - anim: r_partido
+    pose: piensa
+    say: "Partido normal, once contra once. Pero hay un jugador que no es como los demás. Mírale bien."
+    highlight: "no es como"
+  - anim: r_scan
+    pose: senala
+    say: "Es un robot. Y lo primero que hace es analizar a todos los rivales: posición, velocidad, hacia dónde van a correr."
+    highlight: "robot. analizar"
+  - anim: r_sprint
+    pose: celebra
+    say: "Los futbolistas más rápidos rondan los treinta y seis kilómetros por hora en un sprint. Pero este no se cansa nunca. Ni en el minuto noventa."
+    highlight: "treinta y seis nunca."
+  - anim: r_gol
+    pose: salto
+    say: "Llega al área, calcula el ángulo exacto, y dispara a la escuadra. Gol."
+    highlight: "escuadra. Gol."
+    sfx: [ding]
+  - anim: r_roja
+    pose: agacha
+    say: "Pero el árbitro lo tiene claro: solo pueden jugar futbolistas inscritos en el acta. Y el robot no lo está. Fuera."
+    highlight: "acta. Fuera."
+  - anim: r_caida
+    pose: piensa
+    say: "Y en la vida real, aún no es tan fácil: en la RoboCup, el mundial de robots, todavía se caen al intentar chutar."
+    highlight: "RoboCup, caen"
+    sfx: [boom]
+  - emoji: "🤖"
+    say: "¿Ficharías a un robot para tu equipo? Te leo en comentarios. Y síguenos para más."
+    highlight: "robot comentarios. síguenos"
