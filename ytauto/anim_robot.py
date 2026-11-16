@@ -110,7 +110,47 @@ def render(kind, t, dur):
     """Devuelve la imagen (PW x PH) o None si `kind` no es de este módulo."""
     PW, PH = A.PW, A.PH
     im = Image.new("RGB", (PW, PH))
-    if kind == "r_partido":
+    if kind == "r_fichaje":
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, PW, PH], fill=(16, 40, 110))
+        f = ImageFont.truetype(BOLD, 34)
+        for yy in range(0, PH, 90):
+            for xx in range(-40 + (yy // 90 % 2) * 70, PW, 140):
+                d.text((xx, yy), "DC", font=f, fill=(30, 62, 150))
+        d.rectangle([0, PH * 0.66, PW, PH], fill=(22, 24, 34))
+        rx, ry = PW / 2, PH * 0.66
+        lift = _e((t - 0.8) / 0.6)
+        robot(d, rx, ry, 1.5, 0, run=0)
+        jx, jy = rx, ry - 340 - 50 * lift
+        d.polygon([(jx - 70, jy), (jx - 40, jy - 22), (jx + 40, jy - 22), (jx + 70, jy), (jx + 50, jy + 22),
+                   (jx + 40, jy + 10), (jx + 40, jy + 110), (jx - 40, jy + 110), (jx - 40, jy + 10), (jx - 50, jy + 22)],
+                  fill=RED, outline=WHITE)
+        f2 = ImageFont.truetype(BOLD, 60)
+        d.text((jx - d.textlength("0", font=f2) / 2, jy + 12), "0", font=f2, fill=WHITE)
+        for sg in (1, -1):
+            d.line([(rx + sg * 28, ry - 124), (jx + sg * 40, jy + 100)], fill=(150, 158, 172), width=12)
+        rng = random.Random(int(t * 6))
+        lay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        ld = ImageDraw.Draw(lay)
+        for _ in range(3):
+            x, y = rng.choice([rng.uniform(20, PW * 0.3), rng.uniform(PW * 0.7, PW - 20)]), rng.uniform(PH * 0.35, PH * 0.62)
+            r = rng.uniform(14, 30)
+            ld.ellipse([x - r, y - r, x + r, y + r], fill=(255, 255, 255, 255))
+            ld.ellipse([x - r * 1.7, y - r * 1.7, x + r * 1.7, y + r * 1.7], fill=(255, 255, 255, 90))
+        bl = lay.filter(ImageFilter.GaussianBlur(4))
+        im.paste(bl, (0, 0), bl)
+        im = cam(im, rx, ry - 230, 1.2 + 0.2 * _e(t / 3))
+        if t > 1.3:
+            k = _e((t - 1.3) / 0.25)
+            st = Image.new("RGBA", (640, 120), (0, 0, 0, 0))
+            sd = ImageDraw.Draw(st)
+            sd.rounded_rectangle([0, 0, 639, 119], 18, fill=(255, 214, 10), outline=(10, 12, 20), width=6)
+            f3 = ImageFont.truetype(BOLD, 64)
+            sd.text((320 - sd.textlength("¡FICHAJE OFICIAL!", font=f3) / 2, 18), "¡FICHAJE OFICIAL!", font=f3, fill=(10, 12, 20))
+            sc = 1.6 - 0.6 * k
+            st = st.resize((int(640 * sc), int(120 * sc))).rotate(-5, expand=True, resample=Image.BICUBIC)
+            im.paste(st, (int(PW / 2 - st.width / 2), int(PH * 0.28 - st.height / 2)), st)
+    elif kind == "r_partido":
         _field(im)
         d = ImageDraw.Draw(im)
         bxy = (PW / 2 + 120 * math.sin(t * 0.7), PH * 0.5 + 60 * math.sin(t * 1.1))
@@ -124,7 +164,7 @@ def render(kind, t, dur):
         im = cam(im, rx * (z > 1.05) + PW / 2 * (z <= 1.05), ry - 40, z)
         if t > 1.8:
             d = ImageDraw.Draw(im)
-            A._label(d, PW / 2, PH * 0.31, "¿Y ese quién es?", 44, CYAN, center=True)
+            A._label(d, PW / 2, PH * 0.31, "Debut del n.º 0", 44, CYAN, center=True)
     elif kind == "r_scan":
         _field(im)
         d = ImageDraw.Draw(im)
