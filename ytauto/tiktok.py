@@ -22,7 +22,7 @@ ENV = SECRETS / "tiktok.env"
 TOKEN = SECRETS / "tiktok_token.json"
 LOG = Path("data/tiktok_uploads.json")
 REDIRECT = "https://github.com/XxruahuxX/yt-auto"
-SCOPES = "user.info.basic,video.upload,video.publish"
+SCOPES = "user.info.basic,user.info.stats,video.list,video.upload,video.publish"
 API = "https://open.tiktokapis.com/v2"
 
 
@@ -146,6 +146,21 @@ def _title(stem: str) -> str:
     return f"{d.get('title', '')} {tags} #futbol #datocrack".strip()
 
 
+def stats() -> None:
+    """Seguidores y vistas por vídeo (scopes user.info.stats y video.list)."""
+    h = {"Authorization": f"Bearer {access_token()}"}
+    u = requests.get(f"{API}/user/info/", headers=h, timeout=30, params={
+        "fields": "display_name,follower_count,likes_count,video_count"}).json()
+    print("Cuenta:", u.get("data", {}).get("user") or u.get("error"))
+    v = requests.post(f"{API}/video/list/", headers={**h, "Content-Type": "application/json"}, timeout=30,
+                      params={"fields": "title,create_time,view_count,like_count,comment_count,share_count"},
+                      json={"max_count": 20}).json()
+    for x in v.get("data", {}).get("videos", []):
+        print(f"{x.get('view_count', 0):>7} vistas  {x.get('like_count', 0):>5} likes  {x.get('comment_count', 0):>4} com  {x.get('share_count', 0):>4} comp  {x.get('title', '')[:50]}")
+    if "data" not in v or v.get("error", {}).get("code") != "ok":
+        print(v.get("error"))
+
+
 def main(argv: list[str]) -> None:
     cmd = argv[0] if argv else "url"
     if cmd == "url":
@@ -164,6 +179,8 @@ def main(argv: list[str]) -> None:
             LOG.parent.mkdir(exist_ok=True)
             LOG.write_text(json.dumps(log, indent=2))
             print(p.stem, "->", modo, pid)
+    elif cmd == "stats":
+        stats()
     else:
         raise SystemExit(__doc__)
 
