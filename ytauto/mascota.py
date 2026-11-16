@@ -30,6 +30,7 @@ POSES = {
     "chuta_atras": dict(spine=-96, lth=96, lsh=92, rth=118, rsh=165, lua=190, lfa=172, rua=40, rfa=70, lift=0),
     "explica": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=112, lfa=98, rua=35, rfa=-25, lift=0, tilt=5),
     "senala": dict(spine=-94, lth=100, lsh=96, rth=80, rsh=84, lua=115, lfa=100, rua=-62, rfa=-78, lift=0, tilt=-12),
+    "saluda": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=112, lfa=98, rua=-35, rfa=-95, lift=0, tilt=6),
     "chuta": dict(spine=-100, lth=98, lsh=96, rth=30, rsh=46, lua=200, lfa=188, rua=30, rfa=60, lift=0),
 }
 

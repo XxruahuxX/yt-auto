@@ -342,7 +342,7 @@ class KScene:
             r = r.rotate(rot, expand=True, resample=Image.BICUBIC)
         img.paste(r, (int(cx - r.width / 2), int(cy - r.height / 2)), r)
 
-    def draw(self, img: Image.Image, t: float) -> None:
+    def draw(self, img: Image.Image, t: float, captions: bool = True) -> None:
         d = ImageDraw.Draw(img)
         cy = PANEL_CY
         # panel fijo para el visual: todo el vídeo usa las mismas zonas
@@ -372,6 +372,11 @@ class KScene:
             ey = cy - 120 if (self.tiles or self.big) else cy
             s = _ease_out_back((t - 0.05) / 0.35) if t > 0.05 else 0
             self._paste_scaled(img, self.emoji, W / 2, ey + 14 * math.sin(t * 4), s, 6 * math.sin(t * 3))
+        if captions:
+            self.draw_caption(img, t)
+
+    def draw_caption(self, img: Image.Image, t: float) -> None:
+        d = ImageDraw.Draw(img)
         # subtítulo karaoke
         cur = max([i for i, t0 in enumerate(self.times) if t >= t0] or [0])
         chunk = next(c for c in self.chunks if cur in c or c[-1] >= cur)
@@ -418,6 +423,9 @@ def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float
     if cur in ("explica", "quieto"):  # gesticula con la mano mientras habla
         pose["rfa"] += 22 * level * math.sin(now * 5)
         pose["rua"] += 10 * level * math.sin(now * 5 + 0.6)
+    if cur == "saluda":
+        pose["rfa"] += 28 * math.sin(now * 7)
+        pose["rua"] += 6 * math.sin(now * 7 + 0.8)
     if cur == "senala":
         pose["rfa"] += 6 * math.sin(now * 6)
     if cur == "celebra" and local < 0.5:  # saltito al celebrar
@@ -502,13 +510,24 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             start, scene = next((s, sc) for s, sc in reversed(scenes) if s <= now)
             local = now - start
             img = bg.frame(now)
-            scene.draw(img, local)
+            idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
+            closing = karaoke and idx == len(scenes) - 1 and len(scenes) > 1
+            if not closing:  # en el cierre solo quedan fondo, mascota y subtítulo
+                scene.draw(img, local)
             if karaoke and spec.get("mascot", True):
-                idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
-                cur = _mascot_pose(spec["scenes"][idx])
+                cur = "saluda" if closing and not spec["scenes"][idx].get("pose") else _mascot_pose(spec["scenes"][idx])
                 prev = _mascot_pose(spec["scenes"][idx - 1]) if idx else "quieto"
                 _draw_mascot(img, prev, cur, local, now, float(env[f]))
-            if karaoke and spec.get("hook"):
+            if closing:
+                # cierre: la cámara se acerca a la mascota y los subtítulos quedan fijos encima
+                z = 1 + 0.75 * (1 - (1 - min(local / 0.7, 1.0)) ** 3)
+                cw, ch = W / z, H / z
+                cx, cyz = W / 2, MASCOT_FEET - (1250 - H / 2) / z  # pies justo encima del subtítulo
+                x0 = min(max(cx - cw / 2, 0), W - cw)
+                y0 = min(max(cyz - ch / 2, 0), H - ch)
+                img = img.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize((W, H), Image.BICUBIC)
+                scene.draw_caption(img, local)
+            elif karaoke and spec.get("hook"):
                 _hook_bar(img, spec["hook"], now, hookf)
             d = ImageDraw.Draw(img)
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
