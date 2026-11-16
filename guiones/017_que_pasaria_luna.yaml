@@ -1,0 +1,42 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si se jugara un partido en la LUNA? 🌕⚽ #shorts"
+description: |
+  Un «¿qué pasaría si…?» futbolero en la Luna. La gravedad lunar es unas 6 veces menor que la de la Tierra: el balón llega mucho más lejos y los saltos son enormes. Sin aire no hay efecto en los tiros ni sonido. De día se pasa de 120 °C y de noche baja a unos -170 °C. Y en 1971 Alan Shepard ya practicó deporte allí: golpeó dos bolas de golf en el Apolo 14.
+  #fútbol #quépasaríasi #luna #espacio #curiosidades #fyp #shorts
+tags: [qué pasaría si, luna, fútbol, espacio, curiosidades fútbol, gravedad]
+hook: "¿Y si se jugara un partido de fútbol en la Luna?"
+scenes:
+  - anim: luna
+    pose: piensa
+    say: "¿Qué pasaría si se jugara un partido de fútbol en la Luna?"
+    highlight: "Luna?"
+  - anim: luna_salto
+    pose: salto
+    say: "Primero, los saltos. La gravedad de la Luna es unas seis veces menor. Un cabezazo se convertiría en un vuelo."
+    highlight: "seis veces vuelo."
+  - anim: luna_chut
+    pose: chuta
+    say: "Y el balón: un saque de portería podría cruzar el campo entero y salir por el otro lado."
+    highlight: "campo entero"
+  - anim: sin_efecto
+    pose: senala
+    say: "Pero olvídate de las faltas con rosca. Sin aire, el balón no hace efecto: va siempre recto."
+    highlight: "rosca. recto."
+  - anim: silencio
+    pose: piensa
+    say: "Y el árbitro tendría un problema: sin aire no se transmite el sonido. El silbato no lo oiría nadie."
+    highlight: "silbato nadie."
+  - anim: temperatura
+    pose: agacha
+    say: "Mejor no jugar a cualquier hora: de día se pasa de ciento veinte grados, y de noche baja a menos ciento setenta."
+    highlight: "ciento veinte menos"
+  - emoji: "🏌️"
+    big: "1971"
+    pose: explica
+    say: "Y esto es real: en mil novecientos setenta y uno, el astronauta Alan Shepard golpeó dos bolas de golf en la Luna."
+    highlight: "Shepard golf"
+  - emoji: "🌕"
+    say: "¿A quién ficharías para jugar en la Luna? Te leo en comentarios. Y síguenos para más."
+    highlight: "comentarios. síguenos"

@@ -171,6 +171,54 @@ BROWN, BROWN_D, BELLY = (140, 92, 52), (96, 62, 34), (196, 150, 104)
 TOOTH = (255, 170, 60)
 
 
+def _moon(im: Image.Image, t: float, lines: bool = True) -> None:
+    """Suelo lunar gris con cráteres, cielo negro y la Tierra al fondo."""
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, PW, PH], fill=(6, 8, 14))
+    rng = random.Random(11)
+    for _ in range(90):
+        x, y = rng.uniform(0, PW), rng.uniform(0, PH * 0.3)
+        d.ellipse([x - 1.5, y - 1.5, x + 1.5, y + 1.5], fill=(200, 200, 210))
+    ex, ey, er = PW * 0.78, PH * 0.12, 54
+    d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=(40, 110, 200))
+    d.pieslice([ex - er, ey - er, ex + er, ey + er], 200, 320, fill=(60, 160, 80))
+    d.ellipse([ex - er * 0.5, ey + er * 0.2, ex + er * 0.2, ey + er * 0.7], fill=(70, 170, 90))
+    gy = PH * 0.3
+    d.rectangle([0, gy, PW, PH], fill=(150, 150, 156))
+    for _ in range(26):
+        x, y = rng.uniform(0, PW), rng.uniform(gy + 20, PH)
+        r = rng.uniform(10, 46) * (0.5 + (y - gy) / (PH - gy))
+        d.ellipse([x - r, y - r * 0.45, x + r, y + r * 0.45], fill=(120, 120, 126))
+        d.ellipse([x - r * 0.8, y - r * 0.32, x + r * 0.8, y + r * 0.4], fill=(104, 104, 110))
+    if lines:
+        x0, x1, y0, y1 = 60, PW - 60, gy + 40, PH - 40
+        d.rectangle([x0, y0, x1, y1], outline=(235, 235, 240), width=5)
+        d.line([(x0, (y0 + y1) / 2), (x1, (y0 + y1) / 2)], fill=(235, 235, 240), width=5)
+        d.ellipse([PW / 2 - 70, (y0 + y1) / 2 - 40, PW / 2 + 70, (y0 + y1) / 2 + 40], outline=(235, 235, 240), width=5)
+
+
+def _astro(d: ImageDraw.ImageDraw, x: float, y: float, s: float = 1.0, col=(230, 50, 60)) -> None:
+    """Jugador-astronauta: (x, y) = pies."""
+    d.line([(x - 12 * s, y), (x - 6 * s, y - 40 * s)], fill=(240, 240, 245), width=int(12 * s))
+    d.line([(x + 12 * s, y), (x + 6 * s, y - 40 * s)], fill=(240, 240, 245), width=int(12 * s))
+    d.rounded_rectangle([x - 24 * s, y - 92 * s, x + 24 * s, y - 36 * s], 12 * s, fill=col)
+    d.ellipse([x - 26 * s, y - 140 * s, x + 26 * s, y - 88 * s], fill=(240, 240, 245))
+    d.ellipse([x - 17 * s, y - 128 * s, x + 17 * s, y - 104 * s], fill=(40, 60, 110))
+
+
+def _ball(d, x, y, r=16):
+    d.ellipse([x - r, y - r, x + r, y + r], fill=WHITE, outline=(20, 20, 20), width=3)
+
+
+def _label(d, x, y, text, size=46, col=(255, 214, 10), center=False):
+    f = ImageFont.truetype(BOLD, size)
+    w = d.textlength(text, font=f)
+    if center:
+        x -= w / 2 + 16
+    d.rounded_rectangle([x, y, x + w + 32, y + size * 1.35], 16, fill=(10, 12, 20))
+    d.text((x + 16, y + size * 0.12), text, font=f, fill=col)
+
+
 def _feet() -> float:
     """Altura de los pies del castor: en pantalla completa, por encima de los subtítulos."""
     return min(PH - 30, PH * 0.78)
@@ -419,6 +467,81 @@ def _render(kind: str, t: float, dur: float):
         f2 = ImageFont.truetype(BOLD, 150)
         d.text((PW / 2 - d.textlength("0", font=f2) / 2 + 220, 90), "0", font=f2, fill=(255, 214, 10))
         _beaver(im, PW / 2 - 120, _feet(), 0.95, arms_up=min(1.0, t / 0.4), tail=0.5 + 0.5 * math.sin(t * 7))
+    elif kind == "luna":
+        _moon(im, t)
+        d = ImageDraw.Draw(im)
+        gy = PH * 0.3
+        rng = random.Random(2)
+        for k in range(8):
+            bx, by = rng.uniform(0.12, 0.78) * PW, PH * rng.uniform(0.45, 0.72)
+            hop = abs(math.sin(t * 1.2 + k)) * 60
+            _astro(d, bx, by - hop, 0.7, (230, 50, 60) if k % 2 else (40, 110, 240))
+        _ball(d, PW / 2 + 160 * math.sin(t), PH * 0.6 - abs(math.sin(t * 1.3)) * 140)
+    elif kind == "luna_salto":
+        _moon(im, t, lines=False)
+        d = ImageDraw.Draw(im)
+        gy = PH * 0.72
+        d.line([(PW / 2, PH * 0.32), (PW / 2, PH * 0.74)], fill=(40, 40, 50), width=4)
+        ph = (t % 2.0) / 2.0
+        j = math.sin(ph * math.pi)
+        _astro(d, PW * 0.27, gy - 60 * j, 0.9, (40, 110, 240))
+        _astro(d, PW * 0.73, gy - 240 * j, 0.9, (230, 50, 60))
+        _label(d, PW * 0.27, PH * 0.33, "TIERRA", 40, WHITE, center=True)
+        _label(d, PW * 0.73, PH * 0.33, "LUNA x6", 40, center=True)
+    elif kind == "luna_chut":
+        _moon(im, t, lines=False)
+        d = ImageDraw.Draw(im)
+        gy = PH * 0.7
+        x0 = 90
+        _astro(d, x0, gy, 0.8)
+        p = min(t / 2.4, 1)
+        for i, (span, hgt, col) in enumerate(((PW * 0.22, 90, (120, 170, 255)), (PW - 160, 300, (255, 214, 10)))):
+            pts = [(x0 + 20 + span * q, gy - 20 - hgt * 4 * q * (1 - q)) for q in [k / 40 * p for k in range(41)]]
+            d.line(pts, fill=col, width=5)
+            _ball(d, *pts[-1], r=14)
+        _label(d, PW * 0.08, gy - 160, "Tierra", 36, (120, 170, 255))
+        if p >= 1:
+            _label(d, PW / 2, PH * 0.31, "¡6 veces más lejos!", 44, center=True)
+    elif kind == "sin_efecto":
+        _moon(im, t, lines=False)
+        d = ImageDraw.Draw(im)
+        gy = PH * 0.7
+        gx0, gx1 = PW * 0.58, PW * 0.92
+        d.rectangle([gx0, gy - 200, gx1, gy], outline=WHITE, width=8)
+        sx, sy = 90, gy - 20
+        p = min(t / 1.6, 1)
+        tx, ty = (gx0 + gx1) / 2, gy - 90
+        curve = [(sx + (tx - sx) * q, sy + (ty - sy) * q - 260 * math.sin(q * math.pi)) for q in [k / 40 * p for k in range(41)]]
+        straight = [(sx + (gx0 - 40 - sx) * q, sy + (gy - 330 - sy) * q) for q in [k / 40 * p for k in range(41)]]
+        for i in range(0, 40, 3):
+            d.line(curve[i:i + 2], fill=(120, 170, 255), width=5)
+        d.line(straight, fill=(255, 214, 10), width=6)
+        _ball(d, *straight[-1])
+        _label(d, 30, PH * 0.34, "- - Tierra (con efecto)", 34, (120, 170, 255))
+        _label(d, 30, PH * 0.34 + 62, "— Luna (sin aire, recto)", 34)
+    elif kind == "silencio":
+        _moon(im, t)
+        d = ImageDraw.Draw(im)
+        cx, cy = PW / 2, PH * 0.52
+        for k in range(3):
+            r = 70 + 50 * k + 20 * ((t * 2) % 1)
+            d.arc([cx - r, cy - r, cx + r, cy + r], -50, 50, fill=(255, 214, 10), width=8)
+            d.arc([cx - r, cy - r, cx + r, cy + r], 130, 230, fill=(255, 214, 10), width=8)
+        d.ellipse([cx - 60, cy - 36, cx + 60, cy + 36], fill=(60, 60, 70), outline=WHITE, width=4)
+        d.rectangle([cx + 40, cy - 14, cx + 110, cy + 14], fill=(60, 60, 70), outline=WHITE, width=4)
+        if t > 0.8:
+            d.line([(cx - 230, cy - 230), (cx + 230, cy + 230)], fill=(220, 40, 50), width=22)
+            _label(d, PW / 2, PH * 0.31, "Sin aire no hay sonido", 44, WHITE, center=True)
+    elif kind == "temperatura":
+        _moon(im, t, lines=False)
+        d = ImageDraw.Draw(im)
+        for i, (x, top, txt, col) in enumerate(((PW * 0.3, 0.9, "+120 °C", (240, 70, 40)), (PW * 0.7, 0.15, "-170 °C", (90, 170, 255)))):
+            y0, y1 = PH * 0.42, PH * 0.66
+            d.rounded_rectangle([x - 34, y0, x + 34, y1], 34, fill=(235, 235, 240))
+            lvl = min(y1 - 12, y1 - (y1 - y0 - 30) * top * _ease(t / 1.0))
+            d.rounded_rectangle([x - 18, lvl, x + 18, y1 - 10], 18, fill=col)
+            d.ellipse([x - 56, y1 - 40, x + 56, y1 + 72], fill=col)
+            _label(d, x, PH * 0.31, ("DÍA " if i == 0 else "NOCHE ") + txt, 40, col, center=True)
     else:
         raise ValueError(f"anim desconocida: {kind}")
     return im, shake
