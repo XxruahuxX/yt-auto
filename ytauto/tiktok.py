@@ -78,7 +78,11 @@ def upload(path: Path, title: str = "") -> tuple[str, str]:
     """Publica directo en público si TikTok lo permite (app auditada); si no, borrador."""
     info = creator_info()
     if info and "PUBLIC_TO_EVERYONE" in info.get("privacy_level_options", []):
-        return direct_post(path, title), "publicado"
+        try:
+            return direct_post(path, title), "publicado"
+        except RuntimeError as e:  # app sin auditar: TikTok no deja publicar en público
+            if "unaudited" not in str(e):
+                raise
     return upload_draft(path), "borrador"
 
 
