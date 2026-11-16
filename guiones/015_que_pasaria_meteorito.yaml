@@ -1,0 +1,46 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Qué pasaría si cae un METEORITO en mitad de un partido? ☄️ #shorts"
+description: |
+  Un «¿qué pasaría si…?» futbolero. Los meteoritos entran en la atmósfera a más de 40.000 km/h. Uno de roca de unos 20 metros explotó sobre Cheliábinsk (Rusia) en 2013 sin tocar el suelo. Uno de hierro de unos 50 metros hizo el cráter de Arizona, de 1,2 km: más de 11 campos de fútbol en fila. Y el reglamento permite al árbitro suspender un partido por causas externas.
+  #fútbol #quépasaríasi #meteorito #curiosidades #shorts
+tags: [qué pasaría si, meteorito, fútbol, curiosidades, ciencia y fútbol]
+hook: "¿Y si cae un meteorito en mitad de un partido?"
+scenes:
+  - anim: campo
+    pose: piensa
+    say: "¿Qué pasaría si cae un meteorito en mitad de un partido de fútbol?"
+    highlight: "meteorito"
+  - anim: aviso
+    pose: senala
+    say: "Minuto setenta, empate a uno. De repente, alguien en la grada señala una luz en el cielo."
+    highlight: "luz"
+  - anim: meteorito
+    pose: agacha
+    say: "Es una roca espacial. Entra en la atmósfera a más de cuarenta mil kilómetros por hora y se pone al rojo vivo."
+    highlight: "cuarenta mil"
+  - anim: airburst
+    pose: salto
+    say: "Si es de piedra y mide como un edificio de seis pisos, lo normal es que explote en el aire, antes de llegar al campo."
+    highlight: "explote aire,"
+  - emoji: "🇷🇺"
+    big: "2013"
+    pose: explica
+    say: "Pasó de verdad en Cheliábinsk, Rusia. La onda expansiva rompió las ventanas de miles de edificios."
+    highlight: "Cheliábinsk, ventanas"
+  - anim: impacto
+    pose: agacha
+    say: "Pero si fuera de hierro y más del doble de grande, sí llegaría al suelo. Justo en el círculo central."
+    highlight: "hierro suelo."
+  - anim: crater
+    pose: senala
+    say: "Uno así hizo el cráter de Arizona: mide más de un kilómetro. Más de once campos de fútbol en fila."
+    highlight: "once campos"
+  - anim: suspendido
+    pose: explica
+    say: "¿Y el partido? El reglamento deja al árbitro suspenderlo por causas externas. Esta, desde luego, lo es."
+    highlight: "suspenderlo"
+  - emoji: "☄️"
+    say: "¿Tú qué harías en la grada? Te leo en comentarios. Y síguenos para más."
+    highlight: "comentarios. síguenos"

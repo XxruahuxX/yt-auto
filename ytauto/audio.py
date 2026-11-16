@@ -85,7 +85,23 @@ def music(seconds: float, bpm: int = 104) -> np.ndarray:
     return out[: int(seconds * SR)]
 
 
-SFX = {"whoosh": whoosh, "pop": pop, "tick": tick, "ding": ding}
+def boom() -> np.ndarray:
+    n = int(1.6 * SR)
+    t = np.arange(n) / SR
+    noise = np.convolve(_rng.standard_normal(n), np.ones(60) / 60, mode="same") * 6
+    sub = np.sin(2 * np.pi * (55 * np.exp(-1.5 * t) + 30) * t)
+    return (noise * 0.6 + sub) * _env(n, 0.004, 2.5) * 0.7
+
+
+def fall() -> np.ndarray:
+    n = int(1.0 * SR)
+    t = np.arange(n) / SR
+    f = 1800 * np.exp(-1.6 * t) + 200
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.25 + 0.15 * _rng.standard_normal(n)
+    return x * np.clip(t / 0.3, 0, 1) * 0.4
+
+
+SFX = {"whoosh": whoosh, "pop": pop, "tick": tick, "ding": ding, "boom": boom, "fall": fall}
 
 
 def read_wav(path: Path) -> np.ndarray:

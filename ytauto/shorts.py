@@ -351,6 +351,9 @@ class KScene:
             pw, ph = (PANEL[2] - PANEL[0]) / 2 * min(k, 1.04), (PANEL[3] - PANEL[1]) / 2 * min(k, 1.04)
             d.rounded_rectangle([W / 2 - pw, cy - ph, W / 2 + pw, cy + ph], 44, fill=(22, 32, 58),
                                 outline=(46, 64, 104), width=4)
+        if self.sc.get("anim") and k > 0.6:
+            from . import anim
+            anim.draw(img, self.sc["anim"], t, self.dur, (PANEL[0], PANEL[1], PANEL[2], PANEL[3]))
         if self.tiles:
             n, step = len(self.tiles), self.ts + 14
             x0 = (W - step * n) / 2 + step / 2
@@ -500,6 +503,17 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 n = len(sc["tiles"])
                 span = max(min(speech * 0.6, 0.12 * n), 0.3)
                 sfx += [(t + 0.15 + span * k / n, "tick") for k in range(n)]
+            a = sc.get("anim")
+            if a == "meteorito":
+                sfx.append((t + 0.15, "fall"))
+            elif a == "impacto":
+                sfx += [(t, "fall"), (t + 1.0, "boom")]
+            elif a == "airburst":
+                sfx.append((t + 0.9, "boom"))
+            elif a == "crater":
+                sfx += [(t + 0.6 + k * 0.16, "tick") for k in range(11)]
+            elif a == "suspendido":
+                sfx.append((t + 0.55, "pop"))
             for name in sc.get("sfx", []):
                 if name == "countdown":
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
