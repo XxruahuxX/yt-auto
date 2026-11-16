@@ -438,10 +438,35 @@ def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float
     img.paste(lay, (int(W / 2 - 500 * scale), int(MASCOT_FEET - m.GROUND * scale)), lay)
 
 
+_HOOK_CACHE: dict = {}
+
+
+def _hook_layout(hook: str, font):
+    """Ajusta el tamaño para que el gancho quepa en 2 líneas (no invade el panel)."""
+    if hook in _HOOK_CACHE:
+        return _HOOK_CACHE[hook]
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    for size in range(font.size, 38, -2):
+        f = ImageFont.truetype(BOLD, size)
+        words, lines, cur = hook.split(), [], ""
+        for w in words:
+            test = f"{cur} {w}".strip()
+            if probe.textlength(test, font=f) <= W - 200:
+                cur = test
+            else:
+                lines.append(cur)
+                cur = w
+        lines.append(cur)
+        if len(lines) <= 2:
+            break
+    _HOOK_CACHE[hook] = (f, lines)
+    return f, lines
+
+
 def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
     """Pregunta gancho fija arriba durante todo el vídeo."""
     d = ImageDraw.Draw(img)
-    lines = textwrap.wrap(hook, 26)
+    font, lines = _hook_layout(hook, font)
     lh = font.size * 1.2
     h = lh * len(lines) + 50
     k = _ease_out_back(t / 0.4)

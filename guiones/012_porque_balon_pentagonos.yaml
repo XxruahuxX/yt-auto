@@ -1,0 +1,44 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué el balón tiene pentágonos NEGROS? 🤯 Por la tele #shorts"
+description: |
+  El balón blanco y negro clásico nació en el Mundial de México 1970: el Adidas Telstar. 12 pentágonos negros y 20 hexágonos blancos para que se viera bien en las teles en blanco y negro. Su nombre mezcla «televisión» y «estrella».
+  #fútbol #curiosidades #historia #mundial #shorts
+tags: [curiosidades fútbol, balón, telstar, mundial 1970, por qué]
+hook: "¿Sabías que el balón clásico se diseñó para la tele?"
+scenes:
+  - emoji: "⚽"
+    say: "¿Por qué el balón de toda la vida tiene manchas negras? No es por estética. Es por la tele."
+    highlight: "tele."
+  - emoji: "📺"
+    big: "1970"
+    say: "Mundial de México, mil novecientos setenta. Es el primero que se emite en directo por medio mundo."
+    highlight: "directo"
+  - emoji: "⬛⬜"
+    say: "Pero casi todo el mundo lo veía en una tele en blanco y negro. Y un balón todo blanco se perdía en la pantalla."
+    highlight: "blanco negro."
+  - emoji: "💡"
+    pose: senala
+    say: "La solución: un balón con doce pentágonos negros y veinte hexágonos blancos."
+    highlight: "doce veinte"
+  - big: "32"
+    emoji: "🧩"
+    say: "Treinta y dos piezas en total. Así se veía girar y se distinguía en cualquier tele."
+    highlight: "girar"
+  - tiles: [T, E, L, S, T, A, R]
+    tiles_hl: [0, 1, 2]
+    pose: piensa
+    say: "Y su nombre lo dice todo: Telstar. Tele, de televisión..."
+    highlight: "Telstar."
+  - tiles: [S, T, A, R]
+    tiles_hl: [0, 1, 2, 3]
+    say: "y star, estrella. La estrella de la televisión."
+    highlight: "estrella."
+    sfx: [ding]
+  - emoji: "🏆"
+    say: "Ese diseño gustó tanto que se convirtió en el dibujo de balón que todos tenemos en la cabeza."
+    highlight: "todos"
+  - emoji: "💬"
+    say: "¿Tú habías jugado con uno así? Te leo en comentarios. Y síguenos para más porqués."
+    highlight: "comentarios."

@@ -1,0 +1,42 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué se llama HAT-TRICK? 🎩 No viene del fútbol #shorts"
+description: |
+  «Hat-trick» viene del críquet inglés. En 1858, el jugador H. H. Stephenson eliminó a tres bateadores con tres lanzamientos seguidos y le regalaron un sombrero comprado con una colecta. De ahí, «el truco del sombrero».
+  #fútbol #curiosidades #historia #shorts
+tags: [curiosidades fútbol, hat-trick, historia del fútbol, críquet, por qué]
+hook: "¿Sabías que «hat-trick» no viene del fútbol?"
+scenes:
+  - emoji: "🎩"
+    say: "¿Por qué a marcar tres goles se le llama hat-trick? La palabra no viene del fútbol."
+    highlight: "hat-trick?"
+  - tiles: [H, A, T]
+    tiles_hl: [0, 1, 2]
+    pose: senala
+    say: "Hat, en inglés, significa sombrero."
+    highlight: "sombrero."
+  - tiles: [T, R, I, C, K]
+    say: "Y trick, truco. El truco del sombrero."
+    highlight: "truco."
+  - emoji: "🏏"
+    say: "Viene del críquet, un deporte muy popular en Inglaterra, con bate y pelota."
+    highlight: "críquet,"
+  - emoji: "📜"
+    big: "1858"
+    say: "En mil ochocientos cincuenta y ocho, un jugador llamado Stephenson hizo algo rarísimo."
+    highlight: "Stephenson"
+  - emoji: "🎯"
+    pose: piensa
+    say: "Eliminó a tres rivales con tres lanzamientos seguidos. Tres de tres."
+    highlight: "seguidos."
+  - emoji: "🎩"
+    say: "Para celebrarlo, hicieron una colecta y le regalaron... un sombrero."
+    highlight: "sombrero."
+    sfx: [ding]
+  - emoji: "⚽"
+    say: "La expresión pasó a otros deportes, y en el fútbol se quedó para los tres goles de un mismo jugador."
+    highlight: "tres goles"
+  - emoji: "💬"
+    say: "¿Cuál es el mejor hat-trick que has visto? Te leo en comentarios. Y síguenos."
+    highlight: "comentarios."

@@ -1,0 +1,41 @@
+format: dato
+experiment: base
+title: "El PRIMER Mundial de la historia 🏆 ¿Sabes quién lo ganó? #shorts"
+description: |
+  El primer Mundial se jugó en Uruguay en 1930. Solo participaron 13 selecciones y la final fue Uruguay 4-2 Argentina en el Estadio Centenario de Montevideo.
+  #fútbol #mundial #historia #curiosidades #shorts
+tags: [primer mundial, mundial 1930, uruguay, historia del fútbol, curiosidades fútbol]
+label: "¿SABÍAS QUE...?"
+scenes:
+  - emoji: "🏆"
+    text: "¿Sabes quién ganó el primer Mundial de la historia?"
+    highlight: "primer"
+    say: "¿Sabes quién ganó el primer Mundial de la historia?"
+  - big: "1930"
+    emoji: "⏳"
+    text: "Se jugó en 1930, hace casi 100 años"
+    say: "Se jugó en mil novecientos treinta."
+  - emoji: "🇺🇾"
+    text: "El país anfitrión fue Uruguay"
+    highlight: "Uruguay"
+    say: "El país anfitrión fue Uruguay."
+  - big: "13"
+    emoji: "🌍"
+    text: "Solo jugaron 13 selecciones. Hoy son muchas más"
+    highlight: "13"
+    say: "Solo jugaron trece selecciones."
+  - emoji: "🔥"
+    text: "La final: Uruguay contra Argentina, en Montevideo"
+    highlight: "Argentina"
+    say: "La final fue Uruguay contra Argentina, en Montevideo."
+  - big: "4-2"
+    emoji: "🥇"
+    sfx: [ding]
+    text: "Ganó Uruguay 4 a 2 y fue el primer campeón del mundo"
+    highlight: "Uruguay"
+    say: "Ganó Uruguay, cuatro a dos. El primer campeón del mundo."
+  - label: "TU TURNO"
+    emoji: "💬"
+    text: "¿Sabías que fue Uruguay? Dímelo en comentarios"
+    say: "¿Lo sabías? Dímelo en comentarios."
+    pause: 0.6
