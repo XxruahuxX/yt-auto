@@ -22,7 +22,7 @@ ENV = SECRETS / "tiktok.env"
 TOKEN = SECRETS / "tiktok_token.json"
 LOG = Path("data/tiktok_uploads.json")
 REDIRECT = "https://github.com/XxruahuxX/yt-auto"
-SCOPES = "user.info.basic,video.upload,video.publish"
+SCOPES = "user.info.basic,video.upload"
 API = "https://open.tiktokapis.com/v2"
 
 
