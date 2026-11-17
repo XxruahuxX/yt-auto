@@ -121,7 +121,7 @@ def _place(track: np.ndarray, start: float, sig: np.ndarray) -> None:
 
 
 def mix(total: float, voices: list[tuple[float, np.ndarray]], sfx: list[tuple[float, str]],
-        out: Path, music_gain: float = 0.22) -> None:
+        out: Path, music_gain: float = 0.15) -> None:
     n = int(total * SR)
     voice, fx = np.zeros(n), np.zeros(n)
     for start, data in voices:
@@ -131,7 +131,7 @@ def mix(total: float, voices: list[tuple[float, np.ndarray]], sfx: list[tuple[fl
     bed = music(total)
     # ducking: baja la música mientras habla la voz
     env = np.convolve(np.abs(voice), np.ones(2205) / 2205, mode="same")
-    duck = np.convolve(np.where(env > 0.01, 0.45, 1.0), np.ones(4410) / 4410, mode="same")
+    duck = np.convolve(np.where(env > 0.01, 0.3, 1.0), np.ones(4410) / 4410, mode="same")
     fade = np.ones(n)
     k = int(0.4 * SR)
     fade[:k] = np.linspace(0, 1, k)

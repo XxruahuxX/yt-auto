@@ -61,7 +61,9 @@ def tts_kokoro(text: str, out: Path) -> float:
     raw = out.with_suffix(".raw.wav")
     sf.write(str(raw), samples, sr)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
-                    "silenceremove=start_periods=1:start_threshold=-45dB,aresample=44100", str(out)],
+                    "silenceremove=start_periods=1:start_threshold=-45dB,aresample=44100,"
+                    "highpass=f=90,lowpass=f=11000,equalizer=f=250:t=q:w=1:g=-3,"
+                    "acompressor=threshold=-18dB:ratio=3:attack=5:release=80", str(out)],
                    check=True)
     with wave.open(str(out)) as w:
         return w.getnframes() / w.getframerate()
