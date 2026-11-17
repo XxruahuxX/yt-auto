@@ -1,0 +1,41 @@
+format: serie
+style: karaoke
+experiment: serie-robot-fc
+title: "ROBOT FC · Episodio 1 🤖 TÚ eliges el próximo fichaje #shorts"
+description: |
+  Empieza la serie Robot FC. Un equipo de robots con un solo jugador, R-01, tiene que llegar a vencer a Los Titanes del Volcán, el equipo más chetado del universo. Cada episodio fichamos al jugador del comentario con más likes. ¿Quién entra en el episodio 2?
+  #fútbol #robotfc #serie #animación #tueliges #fyp #shorts
+tags: [robot fc, serie fútbol, animación fútbol, tú eliges, fichajes, robots]
+hook: "Robot FC · Episodio 1"
+scenes:
+  - anim: x_rb_lab
+    pose: agacha
+    say: "En un laboratorio secreto, alguien acaba de encender al primer jugador robot de la historia. Se llama R-01."
+    highlight: "R-01."
+    sfx: [ding]
+  - anim: x_rb_escudo
+    pose: celebra
+    say: "Y su equipo tiene nombre: Robot FC. Un único objetivo: ganar al equipo más chetado del universo."
+    highlight: "Robot FC. chetado"
+    sfx: [pop]
+  - anim: x_rb_titanes
+    pose: agacha
+    say: "Los Titanes del Volcán. Cinco gigantes que nunca han perdido un partido. Ni uno."
+    highlight: "Titanes Volcán."
+    sfx: [boom]
+  - anim: x_rb_disparo
+    pose: senala
+    say: "R-01 los reta. Primer tiro: el Tiro Volcán. R-01 se tira al lado contrario. Cero a diez. Solo, no puede."
+    highlight: "Tiro Volcán. diez."
+    sfx: [fall]
+  - anim: x_rb_plantilla
+    pose: piensa
+    say: "Robot FC necesita diez jugadores más. Y aquí entras tú."
+    highlight: "diez tú."
+  - anim: x_rb_votar
+    pose: explica
+    say: "Escribe en comentarios qué jugador ficharías. El comentario con más likes entra en el equipo en el episodio dos. Cuanto más loco, mejor."
+    highlight: "comentarios. más likes episodio dos."
+  - emoji: "🤖"
+    say: "¿Quién ficha Robot FC? Comenta, dale like al que más te guste, y síguenos para ver el episodio dos."
+    highlight: "Comenta, like síguenos"

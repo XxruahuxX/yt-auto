@@ -154,6 +154,9 @@ def round_pitch(im, t, k=1.0, players=True):
 
 def render(kind, t, dur):
     PW, PH = A.PW, A.PH
+    if kind.startswith("x_rb_"):
+        from .anim_serie import render as rs
+        return rs(kind, t, dur)
     im = Image.new("RGB", (PW, PH))
     # ---------- Messi y Cristiano ----------
     if kind == "x_mc_presenta":
