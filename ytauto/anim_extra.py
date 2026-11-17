@@ -341,6 +341,60 @@ def render(kind, t, dur):
             stamp(im, "SIN CENAR", PW / 2, PH * 0.82, 0.9, t, bg=(230, 30, 40), fg=WHITE)
         else:
             return None
+    # ---------- Partido sin árbitro ----------
+    elif kind.startswith("x_sa_"):
+        refe = dict(shirt=(250, 210, 30), skin=SKINS[0], hair="corto", hair_col=(30, 22, 16), shorts=(20, 20, 24))
+        gy = PH * 0.66
+        if kind == "x_sa_salida":
+            d = stripes(im)
+            x = PW * 0.5 + PW * 0.75 * _e((t - 0.5) / 2.2)
+            person(d, x, gy, 1.4, run=0.6 if t > 0.5 else 0.0, phase=t * 5, arm_up=0.0 if t > 0.5 else 0.8, **refe)
+            d.ellipse([x + 46, gy - 260, x + 74, gy - 240], fill=(200, 200, 210), outline=INK, width=3)
+            stamp(im, "SIN ÁRBITRO", PW / 2, PH * 0.32, 0.9, t, bg=RED, fg=WHITE)
+        elif kind == "x_sa_caos":
+            d = stripes(im)
+            txt = ["¡Era falta!", "¡Que no!", "¡Penalti!", "¡Fuera!"]
+            for i in range(4):
+                x = PW * (0.14 + 0.19 * i)
+                sh = 10 * math.sin(t * 30 + i * 2)
+                col = RED if i % 2 == 0 else BLAU
+                person(d, x + sh, gy + (i % 2) * 60, 1.2, col, SKINS[i], "corto", (30, 20, 10), str(4 + i * 2), mouth="enfado", pose="senala")
+                if t > 0.3 + i * 0.35:
+                    bubble(d, x, PH * (0.30 + 0.07 * (i % 2)), txt[i], 36)
+        elif kind == "x_sa_piscina":
+            d = stripes(im)
+            fall = _e((t - 0.6) / 0.5)
+            lay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+            person(ImageDraw.Draw(lay), PW * 0.3, gy, 1.4, RED, SKINS[1], "tupe", (30, 20, 10), "11", mouth="abierta", arm_up=fall)
+            lay = lay.rotate(-90 * fall, center=(PW * 0.3, gy), resample=Image.BICUBIC)
+            im.paste(lay, (0, 0), lay)
+            d = ImageDraw.Draw(im)
+            for i in range(6):
+                q = ((t - 1.0) * 1.2 + i / 6) % 1 if t > 1.0 else 0
+                if t > 1.0:
+                    dx, dy = PW * 0.4 + 200 * math.cos(i) * q, gy - 40 - 160 * q
+                    d.ellipse([dx - 10, dy - 14, dx + 10, dy + 14], fill=(120, 200, 255))
+            stamp(im, "NADIE PITA", PW / 2, PH * 0.32, 1.4, t)
+        elif kind == "x_sa_1891":
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 0, PW, PH], fill=(14, 18, 34))
+            n = int(1800 + 91 * _e(t / 1.0))
+            f = font(220)
+            w = d.textlength(str(n), font=f)
+            d.text((PW / 2 - w / 2, PH * 0.30), str(n), font=f, fill=YEL, stroke_width=10, stroke_fill=INK)
+            person(d, PW / 2, PH * 0.80, 1.3, arm_up=1.0 if t > 1.2 else 0.0, **refe)
+            A._label(d, PW / 2, PH * 0.27, "El árbitro entra al campo", 40, WHITE, center=True)
+        elif kind == "x_sa_pachanga":
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 0, PW, PH], fill=(150, 150, 160))
+            d.rectangle([0, PH * 0.55, PW, PH], fill=(120, 110, 100))
+            person(d, PW * 0.3, gy, 1.2, (60, 160, 90), SKINS[2], "corto", (20, 10, 5), "", mouth="enfado")
+            person(d, PW * 0.68, gy - 20 * abs(math.sin(t * 4)), 1.4, (240, 140, 30), SKINS[0], "corto", (90, 50, 20), "", mouth="sonrisa", arm_up=1.0)
+            ball(d, PW * 0.68 + 60, gy - 330 - 20 * abs(math.sin(t * 4)), 34)
+            if t > 0.5:
+                bubble(d, PW * 0.62, PH * 0.29, "Mi balón, mis reglas", 42)
+        else:
+            return None
     else:
         return None
     return im

@@ -1,0 +1,39 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si un partido se jugara SIN ÁRBITRO? 🟨❌ #shorts"
+description: |
+  Un «¿qué pasaría si…?» sobre el árbitro. Dato real: hasta 1891 el árbitro no pisaba el campo; cada equipo ponía un juez y el árbitro solo resolvía desde la banda cuando no se ponían de acuerdo. En 1891 entró al terreno de juego.
+  #fútbol #árbitro #quépasaríasi #reglas #curiosidades #fyp #shorts
+tags: [qué pasaría si, árbitro, reglas del fútbol, historia del fútbol, curiosidades fútbol]
+hook: "¿Y si un partido se jugara sin árbitro?"
+scenes:
+  - anim: x_sa_salida
+    pose: saluda
+    say: "¿Qué pasaría si, en mitad de un partido, el árbitro se fuera a casa? Silbato al bolsillo, y adiós."
+    highlight: "árbitro casa?"
+    sfx: [pop]
+  - anim: x_sa_caos
+    pose: piensa
+    say: "Primer minuto sin él. Una entrada fuerte, y veintidós jugadores dando su opinión a la vez."
+    highlight: "veintidós opinión"
+  - anim: x_sa_piscina
+    pose: agacha
+    say: "El delantero se tira en el área. Rueda, grita, se agarra la pierna. Y nadie pita nada."
+    highlight: "nadie pita"
+    sfx: [ding]
+  - anim: x_sa_1891
+    pose: explica
+    say: "Lo curioso es que el fútbol empezó casi así. Hasta mil ochocientos noventa y uno, el árbitro ni siquiera pisaba el campo."
+    highlight: "ochocientos noventa uno,"
+  - emoji: "🧑‍⚖️"
+    pose: senala
+    say: "Cada equipo ponía su propio juez, y el árbitro miraba desde la banda. Solo intervenía cuando los dos jueces no se ponían de acuerdo."
+    highlight: "propio juez,"
+  - anim: x_sa_pachanga
+    pose: celebra
+    say: "Hoy, sin árbitro, mandaría la regla de siempre en las pachangas: el dueño del balón decide."
+    highlight: "dueño balón"
+  - emoji: "🟨"
+    say: "¿Tú quién serías en un partido sin árbitro: el que protesta o el que se tira? Te leo en comentarios. Y síguenos."
+    highlight: "protesta tira? síguenos."

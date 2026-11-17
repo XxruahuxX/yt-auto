@@ -1,0 +1,39 @@
+format: dato
+experiment: base
+title: "El Mundial que se jugó BAJO TECHO 🏟️ ¿Sabes cuál fue? #shorts"
+description: |
+  En el Mundial de Estados Unidos 1994 se jugaron partidos en el Pontiac Silverdome, cerca de Detroit: el primer estadio cubierto de la historia de los Mundiales. Como allí no crece la hierba, cultivaron césped natural fuera y lo montaron dentro en bandejas hexagonales.
+  #fútbol #mundial #historia #curiosidades #shorts
+tags: [mundial 1994, pontiac silverdome, estadio cubierto, historia del fútbol, curiosidades fútbol]
+label: "¿SABÍAS QUE...?"
+scenes:
+  - emoji: "🏟️"
+    text: "Hubo un Mundial con partidos bajo techo"
+    highlight: "techo"
+    say: "¿Sabías que hubo un Mundial con partidos bajo techo?"
+  - big: "1994"
+    emoji: "🇺🇸"
+    text: "Mundial de Estados Unidos, 1994"
+    say: "Fue en el Mundial de Estados Unidos, en mil novecientos noventa y cuatro."
+  - emoji: "🏠"
+    text: "Estadio: Pontiac Silverdome, cerca de Detroit"
+    highlight: "Silverdome"
+    say: "El estadio era el Pontiac Silverdome, cerca de Detroit. Totalmente cubierto."
+  - emoji: "🌱"
+    text: "Problema: bajo techo no crece la hierba"
+    highlight: "hierba"
+    say: "El problema: bajo techo, la hierba no crece. Y la FIFA quería césped natural."
+  - emoji: "⬡"
+    text: "Cultivaron el césped fuera, en bandejas hexagonales"
+    highlight: "hexagonales"
+    say: "La solución: cultivar el césped fuera, en bandejas hexagonales, y montarlo dentro como un puzle."
+    sfx: [ding]
+  - emoji: "🥇"
+    text: "Fue el primer estadio cubierto de la historia de los Mundiales"
+    highlight: "primer"
+    say: "Fue el primer estadio cubierto de la historia de los Mundiales."
+  - label: "TU TURNO"
+    emoji: "💬"
+    text: "¿Jugarías en un estadio con techo? Dímelo en comentarios"
+    say: "¿Te gustaría ver un Mundial con techo? Dímelo en comentarios."
+    pause: 0.6

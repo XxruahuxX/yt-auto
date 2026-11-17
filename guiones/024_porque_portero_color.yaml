@@ -1,0 +1,38 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué el PORTERO viste de otro color? 🧤 La razón es una regla #shorts"
+description: |
+  El reglamento obliga al portero a vestir colores distintos a los del resto de jugadores y del árbitro. El motivo: es el único que puede tocar el balón con la mano dentro de su área, y el árbitro tiene que distinguirlo al instante. Antes de 1912, el portero podía usar las manos en toda su mitad del campo.
+  #fútbol #curiosidades #reglas #portero #shorts
+tags: [curiosidades fútbol, portero, reglas del fútbol, por qué, porteros]
+hook: "¿Por qué el portero viste de otro color?"
+scenes:
+  - emoji: "🧤"
+    say: "¿Por qué el portero siempre viste de un color distinto al de sus compañeros? No es por moda."
+    highlight: "color distinto"
+  - emoji: "📖"
+    pose: senala
+    say: "Lo dice el reglamento. El portero tiene que llevar colores que lo distingan de todos los demás jugadores, y también del árbitro."
+    highlight: "reglamento."
+  - emoji: "✋"
+    say: "La razón es sencilla. Es el único que puede tocar el balón con la mano."
+    highlight: "mano."
+  - emoji: "👀"
+    pose: piensa
+    say: "Si una mano toca el balón dentro del área, el árbitro tiene que saber al instante si ha sido el portero o un defensa."
+    highlight: "portero defensa."
+  - emoji: "⚖️"
+    say: "Si es el portero, no pasa nada. Si es un defensa, es penalti. Por eso tiene que verse a kilómetros."
+    highlight: "penalti."
+    sfx: [ding]
+  - emoji: "📜"
+    big: "1912"
+    say: "Y hay más. Hasta mil novecientos doce, el portero podía coger el balón con la mano en toda su mitad del campo."
+    highlight: "toda mitad"
+  - emoji: "🥅"
+    say: "Desde entonces, solo dentro de su área. Y su camiseta es la señal para saber quién puede usar las manos."
+    highlight: "área."
+  - emoji: "💬"
+    say: "¿Cuál es la camiseta de portero más rara que has visto? Te leo en comentarios. Y síguenos."
+    highlight: "comentarios. síguenos."
