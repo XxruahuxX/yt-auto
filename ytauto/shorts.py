@@ -59,6 +59,7 @@ def tts_chatterbox(text: str, out: Path) -> float:
     import json as _json
     if _cb is None:
         env = dict(os.environ, HF_HUB_DISABLE_XET="1")
+        env.setdefault("CB_REF", str(Path(__file__).resolve().parent.parent / "assets" / "voz_ref_davefx.wav"))
         _cb = subprocess.Popen([CHATTERBOX_PY, str(Path(__file__).with_name("tts_chatterbox_worker.py"))],
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=env)
         while (_cb.stdout.readline() or "ready").strip() != "ready":
@@ -70,7 +71,7 @@ def tts_chatterbox(text: str, out: Path) -> float:
         raise RuntimeError("Chatterbox falló")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
                     "silenceremove=start_periods=1:start_threshold=-45dB,aresample=44100,"
-                    "atempo=1.08,highpass=f=80,acompressor=threshold=-18dB:ratio=3:attack=5:release=80", str(out)],
+                    "highpass=f=80,acompressor=threshold=-18dB:ratio=3:attack=5:release=80", str(out)],
                    check=True)
     with wave.open(str(out)) as w:
         return w.getnframes() / w.getframerate()
