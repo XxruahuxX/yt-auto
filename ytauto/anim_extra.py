@@ -398,6 +398,115 @@ def render(kind, t, dur):
                 bubble(d, PW * 0.62, PH * 0.29, "Mi balón, mis reglas", 42)
         else:
             return None
+    # ---------- Drenaje del césped ----------
+    elif kind.startswith("x_dr_"):
+        d = ImageDraw.Draw(im)
+        top = PH * 0.34
+        layers = [("CÉSPED", (40, 140, 60), 50), ("ARENA", (222, 196, 130), 230), ("GRAVA", (140, 140, 150), 180)]
+        def section(d, cut=True):
+            d.rectangle([0, 0, PW, top], fill=(70, 90, 120))
+            y = top
+            for name, col, h in layers:
+                d.rectangle([0, y, PW, y + h], fill=col)
+                if name == "GRAVA":
+                    rnd = random.Random(2)
+                    for _ in range(120):
+                        gx, gy2, r = rnd.uniform(0, PW), rnd.uniform(y, y + h), rnd.uniform(5, 12)
+                        d.ellipse([gx - r, gy2 - r, gx + r, gy2 + r], fill=(110, 110, 120), outline=(90, 90, 100))
+                elif name == "ARENA":
+                    rnd = random.Random(1)
+                    for _ in range(400):
+                        gx, gy2 = rnd.uniform(0, PW), rnd.uniform(y, y + h)
+                        d.point((gx, gy2), fill=(190, 160, 100))
+                else:
+                    for gx in range(0, int(PW), 14):
+                        d.polygon([(gx, y), (gx + 7, y - 22), (gx + 14, y)], fill=(50, 170, 70))
+                y += h
+            d.rectangle([0, y, PW, PH], fill=(90, 60, 40))
+            return y
+        if kind == "x_dr_lluvia":
+            bot = section(d)
+            rnd = random.Random(5)
+            for _ in range(140):
+                x0, ph = rnd.uniform(0, PW), rnd.random()
+                yy = (t * 900 + ph * top) % top
+                d.line([(x0, yy), (x0 - 6, yy + 24)], fill=(170, 200, 255), width=3)
+            stamp(im, "DILUVIO", PW / 2, PH * 0.30, 0.3, t, bg=(40, 90, 200), fg=WHITE)
+        elif kind in ("x_dr_capas", "x_dr_tubos"):
+            bot = section(d)
+            y = top
+            for name, col, h in layers:
+                A._label(d, PW * 0.05, y + h / 2 - 20, name, 36, WHITE)
+                y += h
+            # tubos perforados en la grava
+            ty = top + 50 + 230 + 100
+            for tx in (PW * 0.3, PW * 0.7):
+                d.ellipse([tx - 34, ty - 34, tx + 34, ty + 34], fill=(60, 60, 70), outline=WHITE, width=4)
+                d.ellipse([tx - 20, ty - 20, tx + 20, ty + 20], fill=(30, 30, 40))
+            rnd = random.Random(7)
+            for i in range(50):
+                x0, ph = rnd.uniform(PW * 0.15, PW * 0.85), rnd.random()
+                q = (t * 0.5 + ph) % 1
+                yy = top - 10 + (ty - top + 10) * q
+                xx = x0 + ((PW * 0.3 if x0 < PW / 2 else PW * 0.7) - x0) * max(0, (q - 0.6) / 0.4)
+                d.ellipse([xx - 7, yy - 9, xx + 7, yy + 9], fill=(70, 150, 255), outline=(30, 80, 200))
+            if kind == "x_dr_tubos":
+                k = (t * 300) % 200
+                for tx in (PW * 0.3, PW * 0.7):
+                    d.line([(tx, ty), (tx + (PW - tx) * 0.9, ty)], fill=(70, 150, 255), width=10)
+                    for j in range(4):
+                        ax = tx + 60 + (k + j * 200) % (PW - tx)
+                        d.polygon([(ax, ty - 14), (ax + 22, ty), (ax, ty + 14)], fill=WHITE)
+                A._label(d, PW / 2, PH * 0.285, "Tubos con agujeros", 42, WHITE, center=True)
+            else:
+                A._label(d, PW / 2, PH * 0.285, "El agua baja capa a capa", 42, WHITE, center=True)
+        elif kind == "x_dr_maceta":
+            d.rectangle([0, 0, PW, PH], fill=(30, 40, 60))
+            cx, cy = PW / 2, PH * 0.50
+            d.polygon([(cx - 200, cy - 150), (cx + 200, cy - 150), (cx + 150, cy + 170), (cx - 150, cy + 170)], fill=(200, 100, 60), outline=INK)
+            d.rectangle([cx - 210, cy - 180, cx + 210, cy - 150], fill=(220, 120, 70), outline=INK)
+            d.rectangle([cx - 190, cy - 150, cx + 190, cy - 110], fill=(60, 160, 70))
+            for i in range(-2, 3):
+                hx = cx + i * 50
+                d.ellipse([hx - 10, cy + 160, hx + 10, cy + 176], fill=INK)
+                q = (t * 1.2 + (i + 2) * 0.2) % 1
+                d.ellipse([hx - 9, cy + 180 + q * 160, hx + 9, cy + 200 + q * 160], fill=(70, 150, 255))
+            A._label(d, cx, PH * 0.29, "Como una maceta gigante", 42, YEL, center=True)
+        else:
+            return None
+    # ---------- Portería gigante ----------
+    elif kind.startswith("x_pg_"):
+        d = stripes(im)
+        gy = PH * 0.62
+        k = {"x_pg_crece": 1 + _e((t - 0.6) / 1.2), "x_pg_portero": 2.0, "x_pg_goles": 2.0}[kind]
+        gw, gh = 200 * k, 133 * k
+        for xx in range(int(PW / 2 - gw), int(PW / 2 + gw) + 1, 26):
+            d.line([(xx, gy - gh), (xx, gy)], fill=(220, 220, 220), width=2)
+        for yy in range(int(gy - gh), int(gy) + 1, 26):
+            d.line([(PW / 2 - gw, yy), (PW / 2 + gw, yy)], fill=(220, 220, 220), width=2)
+        d.line([(PW / 2 - gw, gy), (PW / 2 - gw, gy - gh), (PW / 2 + gw, gy - gh), (PW / 2 + gw, gy)], fill=WHITE, width=12)
+        d.line([(0, gy), (PW, gy)], fill=WHITE, width=4)
+        if kind == "x_pg_crece":
+            A._label(d, PW / 2, PH * 0.29, "7,32 m  →  14,64 m", 46, YEL, center=True)
+            person(d, PW / 2, gy + 4, 0.85, (240, 200, 40), SKINS[0], "corto", (30, 20, 10), "1", mouth="abierta")
+        elif kind == "x_pg_portero":
+            x = PW / 2 + (gw - 40) * math.sin(t * 4)
+            person(d, x, gy + 4, 0.85, (240, 200, 40), SKINS[0], "corto", (30, 20, 10), "1", mouth="abierta", run=1.0, phase=t * 10)
+            for i in range(4):
+                q = (t * 1.5 + i * 0.25) % 1
+                sx, sy = x + 40, gy - 150 - q * 60
+                d.ellipse([sx - 5, sy - 8, sx + 5, sy + 8], fill=(120, 200, 255))
+            stamp(im, "IMPOSIBLE CUBRIRLA", PW / 2, PH * 0.30, 0.5, t, size=52)
+        else:
+            person(d, PW / 2 - gw + 60, gy + 4, 0.85, (240, 200, 40), SKINS[0], "corto", (30, 20, 10), "1", mouth="abierta")
+            for i in range(5):
+                q = min(max((t - i * 0.4) / 0.5, 0), 1)
+                bx = PW * 0.5 + (gw - 60 - i * 40) * q
+                by = PH * 0.9 - (PH * 0.9 - gy + 60 + i * 20) * q
+                ball(d, bx, by, 14)
+            n = min(7, int(t * 2.5))
+            A._label(d, PW / 2, PH * 0.29, f"9 - {n}", 70, WHITE, center=True)
+        return im
     else:
         return None
     return im

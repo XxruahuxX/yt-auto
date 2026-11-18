@@ -1,0 +1,40 @@
+format: dato
+experiment: base
+title: "Las TARJETAS no existían hasta 1970 🟨🟥 ¿Sabes de dónde salieron? #shorts"
+description: |
+  Las tarjetas amarilla y roja se usaron por primera vez en un Mundial en México 1970. La idea fue del árbitro inglés Ken Aston, que se inspiró en un semáforo. En ese Mundial no se expulsó a nadie: la primera roja de la historia de los Mundiales llegó en 1974, para el chileno Carlos Caszely.
+  #fútbol #mundial #historia #curiosidades #shorts
+tags: [tarjeta roja, tarjeta amarilla, ken aston, mundial 1970, historia del fútbol]
+label: "¿SABÍAS QUE...?"
+scenes:
+  - emoji: "🟨"
+    text: "Las tarjetas no siempre existieron"
+    highlight: "tarjetas"
+    say: "¿Sabías que las tarjetas no siempre existieron?"
+  - big: "1970"
+    emoji: "🇲🇽"
+    text: "Se estrenaron en un Mundial en México 1970"
+    say: "Se estrenaron en un Mundial en México, en mil novecientos setenta."
+  - emoji: "🚦"
+    text: "La idea: un semáforo"
+    highlight: "semáforo"
+    say: "La idea fue del árbitro inglés Ken Aston. Se le ocurrió parado en un semáforo."
+  - emoji: "🗣️"
+    text: "Así se entendían jugadores de distintos idiomas"
+    highlight: "idiomas"
+    say: "Amarillo, cuidado. Rojo, fuera. Así lo entendía cualquiera, hablara el idioma que hablara."
+  - emoji: "😇"
+    text: "En aquel Mundial no se expulsó a nadie"
+    highlight: "nadie"
+    say: "Curiosidad: en aquel Mundial no expulsaron a nadie."
+  - big: "1974"
+    emoji: "🟥"
+    sfx: [ding]
+    text: "La primera roja: Carlos Caszely, Chile, 1974"
+    highlight: "Caszely"
+    say: "La primera roja de la historia de los Mundiales llegó en mil novecientos setenta y cuatro, para el chileno Carlos Caszely."
+  - label: "TU TURNO"
+    emoji: "💬"
+    text: "¿Cuál es la roja más injusta que has visto?"
+    say: "¿Cuál es la roja más injusta que has visto? Dímelo en comentarios."
+    pause: 0.6

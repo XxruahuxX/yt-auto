@@ -1,0 +1,36 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si la PORTERÍA fuera el DOBLE de grande? 🥅😱 #shorts"
+description: |
+  Un «¿qué pasaría si…?». La portería reglamentaria mide 7,32 metros de ancho y 2,44 de alto: 8 yardas por 8 pies, porque el reglamento nació en Inglaterra. ¿Qué pasaría si fuera el doble?
+  #fútbol #portero #quépasaríasi #reglas #curiosidades #fyp #shorts
+tags: [qué pasaría si, portería, portero, reglas del fútbol, curiosidades fútbol]
+hook: "¿Y si la portería fuera el doble de grande?"
+scenes:
+  - anim: x_pg_crece
+    pose: agacha
+    say: "La portería mide siete metros treinta y dos de ancho. ¿Qué pasaría si mañana midiera el doble?"
+    highlight: "doble?"
+    sfx: [whoosh]
+  - tiles: ["8", "8"]
+    tiles_hl: [0, 1]
+    pose: explica
+    say: "Esas medidas raras tienen explicación: son ocho yardas de ancho por ocho pies de alto. El reglamento nació en Inglaterra."
+    highlight: "yardas pies Inglaterra."
+  - anim: x_pg_portero
+    pose: piensa
+    say: "Con el doble de ancho, el portero tendría que cubrir más de catorce metros. Ni con la mejor estirada llega a los dos palos."
+    highlight: "catorce metros."
+  - anim: x_pg_goles
+    pose: celebra
+    say: "Resultado: lluvia de goles. Cualquier disparo desde fuera del área sería medio gol. Los partidos acabarían nueve a siete."
+    highlight: "lluvia goles."
+    sfx: [ding]
+  - emoji: "🧤"
+    pose: senala
+    say: "¿Y quién ganaría? Los equipos fichan porteros gigantes, y los defensas no dejan chutar a nadie. El fútbol cambiaría por completo."
+    highlight: "porteros gigantes,"
+  - emoji: "💬"
+    say: "¿Te gustaría ver partidos así o te parece un desastre? Te leo en comentarios. Y síguenos."
+    highlight: "comentarios. síguenos."
