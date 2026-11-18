@@ -524,7 +524,7 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
         for i, sc in enumerate(spec["scenes"]):
             wav = tmp / f"{i}.wav"
             speech = tts(sc.get("say") or sc["text"], wav)
-            dur = speech + sc.get("pause", 0.15) + 0.15
+            dur = speech + sc.get("pause", 0.05 if karaoke else 0.15) + 0.15
             voices.append((t + 0.15, audio.read_wav(wav)))
             sfx.append((max(0.0, t - 0.1), "whoosh"))
             if sc.get("big"):
@@ -560,8 +560,16 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             scenes.append((t, KScene(sc, speech, dur) if karaoke else Scene(sc, default_label, speech, dur)))
             t += dur
         total = t
+        # retención: golpe de zoom + sonido en cada palabra clave (máx. uno cada 0,7 s)
+        punches = []
+        if karaoke:
+            for st, scn in scenes:
+                for w, t0 in zip(scn.words, scn.times):
+                    if w.strip(".,¿?¡!:;…").lower() in scn.hl and (not punches or st + t0 - punches[-1] > 0.7):
+                        punches.append(st + t0)
+            sfx += [(p, "hit") for p in punches]
         mixwav = tmp / "mix.wav"
-        audio.mix(total, voices, sfx, mixwav)
+        audio.mix(total, voices, sfx, mixwav, bpm=124 if karaoke else 104)
 
         # volumen de la voz por fotograma (para la boca de la mascota)
         import numpy as np
@@ -611,6 +619,17 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 scene.draw_caption(img, local)
             elif karaoke and spec.get("hook"):
                 _hook_bar(img, spec["hook"], now, hookf)
+            if punches:
+                lp = max([p for p in punches if p <= now] or [-9])
+                a = now - lp
+                if a < 0.3:
+                    z = 1 + 0.075 * (1 - a / 0.3) ** 2
+                    sh = int(8 * (1 - a / 0.12)) if a < 0.12 else 0
+                    zw, zh = int(W * z), int(H * z)
+                    ox, oy = (zw - W) // 2 + (sh if f % 2 else -sh), (zh - H) // 2
+                    img = img.resize((zw, zh), Image.BILINEAR).crop((ox, oy, ox + W, oy + H))
+            if karaoke and now < 0.12:
+                img = Image.blend(img, Image.new("RGB", (W, H), (255, 255, 255)), 0.8 * (1 - now / 0.12))
             d = ImageDraw.Draw(img)
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
             d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf,

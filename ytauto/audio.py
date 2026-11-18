@@ -101,7 +101,16 @@ def fall() -> np.ndarray:
     return x * np.clip(t / 0.3, 0, 1) * 0.4
 
 
-SFX = {"whoosh": whoosh, "pop": pop, "tick": tick, "ding": ding, "boom": boom, "fall": fall}
+def hit() -> np.ndarray:
+    """Golpe corto para palabras clave: bombo grave + chasquido."""
+    n = int(0.18 * SR)
+    t = np.arange(n) / SR
+    body = np.sin(2 * np.pi * np.cumsum(45 + 110 * np.exp(-30 * t)) / SR) * _env(n, 0.001, 18)
+    click = _rng.standard_normal(n) * _env(n, 0.0005, 120) * 0.25
+    return (body * 0.55 + click) * 0.7
+
+
+SFX = {"hit": hit, "whoosh": whoosh, "pop": pop, "tick": tick, "ding": ding, "boom": boom, "fall": fall}
 
 
 def read_wav(path: Path) -> np.ndarray:
@@ -121,14 +130,14 @@ def _place(track: np.ndarray, start: float, sig: np.ndarray) -> None:
 
 
 def mix(total: float, voices: list[tuple[float, np.ndarray]], sfx: list[tuple[float, str]],
-        out: Path, music_gain: float = 0.15) -> None:
+        out: Path, music_gain: float = 0.15, bpm: int = 104) -> None:
     n = int(total * SR)
     voice, fx = np.zeros(n), np.zeros(n)
     for start, data in voices:
         _place(voice, start, data)
     for start, name in sfx:
         _place(fx, start, SFX[name]())
-    bed = music(total)
+    bed = music(total, bpm=bpm)
     # ducking: baja la música mientras habla la voz
     env = np.convolve(np.abs(voice), np.ones(2205) / 2205, mode="same")
     duck = np.convolve(np.where(env > 0.01, 0.3, 1.0), np.ones(4410) / 4410, mode="same")
