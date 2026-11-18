@@ -304,4 +304,118 @@ def render(kind, t, dur):
         if t > 2.4:
             stamp(im, "EL MÁS VOTADO JUEGA", cx, PH * 0.255, 2.4, t, size=52)
         return im
+    if kind == "x_rb_comentario":
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, PW, PH], fill=(12, 12, 18))
+        for i in range(16):
+            a = i / 16 * 2 * math.pi + t * 0.4
+            d.polygon([(cx, PH * 0.47), (cx + 1500 * math.cos(a), PH * 0.47 + 1500 * math.sin(a)),
+                       (cx + 1500 * math.cos(a + 0.12), PH * 0.47 + 1500 * math.sin(a + 0.12))], fill=(26, 26, 40))
+        from pathlib import Path
+        src = Path(__file__).resolve().parent.parent / "assets" / "robotfc" / "comentario_ep2.png"
+        c = Image.open(src).convert("RGB")
+        box = (12, 30, 72, 92)  # avatar: pixelado
+        av = c.crop(box).resize((6, 6)).resize((box[2] - box[0], box[3] - box[1]), Image.NEAREST)
+        c.paste(av, box[:2])
+        k = _e(t / 0.5)
+        w = int((PW - 60) * (0.6 + 0.4 * k))
+        c = c.resize((w, int(w * c.height / c.width)), Image.BICUBIC)
+        y = int(PH * 0.42 + 300 * (1 - k))
+        im = _glow(im, lambda g: g.rounded_rectangle([cx - w / 2 - 10, y - 10, cx + w / 2 + 10, y + c.height + 10], 20, fill=(30, 110, 235)), 30)
+        im.paste(c, (int(cx - w / 2), y))
+        ImageDraw.Draw(im).rounded_rectangle([cx - w / 2 - 6, y - 6, cx + w / 2 + 6, y + c.height + 6], 18, outline=CYAN, width=5)
+        stamp(im, "EL MÁS VOTADO", cx, PH * 0.32, 0.6, t, size=60)
+        return im
+    if kind in ("x_rb_fichaje", "x_rb_ultra"):
+        from .anim_extra import person
+        d = _lab(im, t)
+        py = PH * 0.64
+        ultra = kind == "x_rb_ultra"
+        k = _e(t / 0.8) if not ultra else 1.0
+        pw = _e((t - 0.3) / 1.2) if ultra else 0.0
+        if not ultra:
+            r = 260 * k
+            im = _glow(im, lambda g: g.ellipse([cx - r, PH * 0.47 - r * 1.3, cx + r, PH * 0.47 + r * 1.3], outline=CYAN, width=30), 25)
+            d = ImageDraw.Draw(im)
+        else:
+            fl = 0.7 + 0.3 * math.sin(t * 25)
+            def aura(g):
+                for i in range(3):
+                    rr = (150 + 40 * i) * pw * fl
+                    g.ellipse([cx - rr, py - 380 - rr * 1.2, cx + rr, py + 20], fill=(int(120 * pw), int(200 * pw), int(255 * pw)))
+            im = _glow(im, aura, 35)
+            d = ImageDraw.Draw(im)
+            rnd = random.Random(int(t * 15))
+            for _ in range(int(6 * pw)):
+                x0 = cx + rnd.uniform(-220, 220)
+                pts = [(x0, PH * 0.28)]
+                for j in range(5):
+                    pts.append((pts[-1][0] + rnd.uniform(-40, 40), pts[-1][1] + PH * 0.07))
+                d.line(pts, fill=(220, 240, 255), width=4)
+        person(d, cx, py + 30 * (1 - k), 2.0, (30, 110, 235), (224, 172, 125), "tupe", (30, 22, 16), "7",
+               pose="brazos_cruzados" if not ultra else "", arm_up=pw, mouth="sonrisa" if not ultra else "abierta")
+        if ultra:
+            for sg in (-1, 1):
+                ex = cx + sg * 26
+                d.ellipse([ex - 9, py - 2.0 * 205 - 9, ex + 9, py - 2.0 * 205 + 9], fill=(200, 240, 255))
+        if not ultra:
+            stamp(im, "FICHAJE: CR7 2008", cx, PH * 0.30, 0.8, t, size=58)
+        elif t > 1.0:
+            text_c(ImageDraw.Draw(im), cx, PH * 0.27, "MODO ULTRA", 90, (200, 240, 255), 10)
+        return im
+    if kind == "x_rb_golazo":
+        d = _lava_sky(im, t)
+        for i, dx in enumerate((-260, 0, 260)):
+            titan(d, cx + dx, PH * 0.62, 0.65, t, i)
+        T = max(dur * 0.62, 0.9)
+        p = min(t / T, 1)
+        bx, by = PW * 0.1 + PW * 0.8 * p, PH * 0.66 - PH * 0.30 * p
+        def beam(g):
+            g.line([(PW * 0.1, PH * 0.66), (bx, by)], fill=(150, 220, 255), width=40)
+        im = _glow(im, beam, 20)
+        d = ImageDraw.Draw(im)
+        d.line([(PW * 0.1, PH * 0.66), (bx, by)], fill=WHITE, width=10)
+        ball(d, bx, by, 26)
+        if t > T:
+            if t < T + 0.25:
+                im = Image.blend(im, Image.new("RGB", im.size, (220, 240, 255)), 0.8 * (1 - (t - T) / 0.25))
+                d = ImageDraw.Draw(im)
+            text_c(d, cx, PH * 0.30, "¡GOL!", 150, YEL, 12)
+            text_c(d, cx, PH * 0.45, "1 - 0", 110, WHITE, 10)
+        return im
+    if kind == "x_rb_remontada":
+        d = _lava_sky(im, t)
+        for i, dx in enumerate((-300, -150, 0, 150, 300)):
+            titan(d, cx + dx, PH * 0.66, 0.75 + 0.1 * (i == 2), t, i)
+        n = 1 + min(4, int(max(t - 0.3, 0) * 3))
+        d.rounded_rectangle([cx - 260, PH * 0.27, cx + 260, PH * 0.27 + 130], 20, fill=INK)
+        text_c(d, cx - 180, PH * 0.27 + 40, "ROB", 40, (150, 190, 255), 0)
+        text_c(d, cx + 180, PH * 0.27 + 40, "TIT", 40, (255, 140, 100), 0)
+        text_c(d, cx, PH * 0.27 + 14, f"1-{n}", 96, YEL, 0)
+        stamp(im, "TODAVÍA NO BASTA", cx, PH * 0.40, 1.9, t, bg=RED, fg=WHITE, size=56)
+        return im
+    if kind == "x_rb_plantilla2":
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, PW, PH], fill=(22, 70, 40))
+        x0, y0, x1, y1 = 50, PH * 0.28, PW - 160, PH * 0.64
+        d.rounded_rectangle([x0, y0, x1, y1], 20, outline=WHITE, width=5)
+        d.line([(x0, (y0 + y1) / 2), (x1, (y0 + y1) / 2)], fill=WHITE, width=4)
+        rows = [[0.5], [0.15, 0.38, 0.62, 0.85], [0.25, 0.5, 0.75], [0.3, 0.7], [0.5]]
+        ys = [0.92, 0.74, 0.52, 0.3, 0.1]
+        i = 0
+        for row, yy in zip(rows, ys):
+            for xx in row:
+                px, py = x0 + (x1 - x0) * xx, y0 + (y1 - y0) * yy
+                if i == 0 or (i == 9 and t > 0.4):
+                    s2 = 1 if i == 0 else _e((t - 0.4) / 0.3)
+                    r = 44 * s2
+                    d.ellipse([px - r, py - r, px + r, py + r], fill=(30, 110, 235), outline=WHITE, width=4)
+                    d.text((px - 30, py - 20), "R-01" if i == 0 else "CR7", font=font(26), fill=WHITE)
+                else:
+                    r = 34 * (1 + 0.12 * math.sin(t * 5 + i))
+                    d.ellipse([px - r, py - r, px + r, py + r], fill=(40, 40, 50), outline=YEL, width=3)
+                    d.text((px - 12, py - 26), "?", font=font(40), fill=YEL)
+                i += 1
+        stamp(im, "FALTAN 9", cx, PH * 0.47, 1.0, t, size=70)
+        return im
     return None
