@@ -40,6 +40,8 @@ def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
     """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
+    if os.environ.get("TTS_ENGINE", "chatterbox") == "chatterbox" and Path(CHATTERBOX_PY).exists():
+        return tts_chatterbox(text, out)
     if (MODELS / "kokoro-v1.0.onnx").exists():
         return tts_kokoro(text, out)
     return tts_piper(text, out, length_scale)
@@ -47,6 +49,31 @@ def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
 
 MODELS = Path(__file__).resolve().parent.parent / "models"
 _kokoro = None
+CHATTERBOX_PY = os.environ.get("CHATTERBOX_PY", "/home/user/tts-venv/bin/python")
+_cb = None
+
+
+def tts_chatterbox(text: str, out: Path) -> float:
+    """Chatterbox Multilingual (MIT), voz por defecto. Corre en un venv aparte (worker persistente)."""
+    global _cb
+    import json as _json
+    if _cb is None:
+        env = dict(os.environ, HF_HUB_DISABLE_XET="1")
+        _cb = subprocess.Popen([CHATTERBOX_PY, str(Path(__file__).with_name("tts_chatterbox_worker.py"))],
+                               stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=env)
+        while (_cb.stdout.readline() or "ready").strip() != "ready":
+            pass
+    raw = out.with_suffix(".raw.wav")
+    _cb.stdin.write(_json.dumps({"text": text, "out": str(raw)}) + "\n")
+    _cb.stdin.flush()
+    if not _cb.stdout.readline().startswith("ok"):
+        raise RuntimeError("Chatterbox falló")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
+                    "silenceremove=start_periods=1:start_threshold=-45dB,aresample=44100,"
+                    "atempo=1.08,highpass=f=80,acompressor=threshold=-18dB:ratio=3:attack=5:release=80", str(out)],
+                   check=True)
+    with wave.open(str(out)) as w:
+        return w.getnframes() / w.getframerate()
 
 
 def tts_kokoro(text: str, out: Path) -> float:
@@ -388,18 +415,18 @@ class KScene:
         line = " ".join(self.words[i] for i in chunk)
         lw = d.textlength(line, font=self.cf)
         y = 1300
-        pop = 1 + 0.06 * max(0.0, 1 - (t - self.times[chunk[0]]) / 0.12)
-        pad = 34
-        d.rounded_rectangle([(W - lw) / 2 - pad * pop, y - 22, (W + lw) / 2 + pad * pop, y + 118], 36,
-                            fill=(8, 10, 18))
         x = (W - lw) / 2
         for i in chunk:
             w = self.words[i]
             key = w.strip(".,¿?¡!:;…").lower()
             col = YELLOW if i == cur else (ORANGE if key in self.hl else WHITE)
             if i > cur:
-                col = (150, 156, 170)
-            d.text((x, y), w, font=self.cf, fill=col)
+                col = (205, 210, 220)
+            if i == cur:
+                bump = 10 * max(0.0, 1 - (t - self.times[i]) / 0.15)
+                d.text((x, y - bump), w, font=self.cf, fill=col, stroke_width=10, stroke_fill=(5, 6, 12))
+            else:
+                d.text((x, y), w, font=self.cf, fill=col, stroke_width=9, stroke_fill=(5, 6, 12))
             x += d.textlength(w + " ", font=self.cf)
 
 
@@ -554,6 +581,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
              "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
              "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out_path)],
             stdin=subprocess.PIPE)
+        last_prev = last_frame = None
+        last_idx = 0
         for f in range(int(total * FPS)):
             now = f / FPS
             start, scene = next((s, sc) for s, sc in reversed(scenes) if s <= now)
@@ -585,12 +614,26 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
             d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf,
                    fill=(170, 210, 185))
-            # transición: pequeño zoom de entrada en cada escena
-            if local < 0.2:
+            # transición: barrido lateral con desenfoque de movimiento entre escenas
+            if karaoke and idx != last_idx:
+                last_prev, last_idx = last_frame, idx
+            if karaoke and idx > 0 and local < 0.28 and last_prev is not None:
+                p = 1 - (1 - local / 0.28) ** 3
+                off = int(W * p)
+                comp = Image.new("RGB", (W, H))
+                comp.paste(last_prev, (-off, 0))
+                comp.paste(img, (W - off, 0))
+                if p < 0.9:
+                    sm = comp.resize((W // 6, H), Image.BILINEAR).resize((W, H), Image.BILINEAR)
+                    comp = Image.blend(comp, sm, 0.55 * (1 - p))
+                img = comp
+            elif not karaoke and local < 0.2:
                 z = 1.06 - 0.06 * (local / 0.2)
                 zw, zh = int(W * z), int(H * z)
                 img = img.resize((zw, zh), Image.BILINEAR).crop(
                     ((zw - W) // 2, (zh - H) // 2, (zw - W) // 2 + W, (zh - H) // 2 + H))
+            if karaoke:
+                last_frame = img
             proc.stdin.write(img.tobytes())
         proc.stdin.close()
         if proc.wait() != 0:

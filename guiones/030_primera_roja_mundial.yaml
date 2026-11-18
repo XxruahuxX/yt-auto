@@ -1,40 +1,36 @@
 format: dato
+style: karaoke
 experiment: base
 title: "Las TARJETAS no existían hasta 1970 🟨🟥 ¿Sabes de dónde salieron? #shorts"
 description: |
   Las tarjetas amarilla y roja se usaron por primera vez en un Mundial en México 1970. La idea fue del árbitro inglés Ken Aston, que se inspiró en un semáforo. En ese Mundial no se expulsó a nadie: la primera roja de la historia de los Mundiales llegó en 1974, para el chileno Carlos Caszely.
   #fútbol #mundial #historia #curiosidades #shorts
 tags: [tarjeta roja, tarjeta amarilla, ken aston, mundial 1970, historia del fútbol]
-label: "¿SABÍAS QUE...?"
+hook: "Las tarjetas no existían hasta 1970"
 scenes:
   - emoji: "🟨"
-    text: "Las tarjetas no siempre existieron"
-    highlight: "tarjetas"
-    say: "¿Sabías que las tarjetas no siempre existieron?"
-  - big: "1970"
-    emoji: "🇲🇽"
-    text: "Se estrenaron en un Mundial en México 1970"
-    say: "Se estrenaron en un Mundial en México, en mil novecientos setenta."
-  - emoji: "🚦"
-    text: "La idea: un semáforo"
-    highlight: "semáforo"
-    say: "La idea fue del árbitro inglés Ken Aston. Se le ocurrió parado en un semáforo."
-  - emoji: "🗣️"
-    text: "Así se entendían jugadores de distintos idiomas"
-    highlight: "idiomas"
-    say: "Amarillo, cuidado. Rojo, fuera. Así lo entendía cualquiera, hablara el idioma que hablara."
+    big: "1970"
+    pose: senala
+    say: "¿Sabías que las tarjetas no siempre existieron? Se estrenaron en un Mundial en México, en mil novecientos setenta."
+    highlight: "tarjetas setenta."
+    sfx: [whoosh]
+  - anim: x_tj_semaforo
+    pose: piensa
+    say: "La idea fue del árbitro inglés Ken Aston. Se le ocurrió parado en un semáforo. Amarillo, cuidado. Rojo, fuera."
+    highlight: "semáforo. Amarillo, Rojo,"
+  - anim: x_tj_idiomas
+    pose: explica
+    say: "El problema que resolvía: en un Mundial, jugadores y árbitros no hablan el mismo idioma. Un color lo entiende cualquiera."
+    highlight: "idioma. color"
   - emoji: "😇"
-    text: "En aquel Mundial no se expulsó a nadie"
-    highlight: "nadie"
+    pose: celebra
     say: "Curiosidad: en aquel Mundial no expulsaron a nadie."
-  - big: "1974"
-    emoji: "🟥"
-    sfx: [ding]
-    text: "La primera roja: Carlos Caszely, Chile, 1974"
-    highlight: "Caszely"
+    highlight: "nadie."
+  - anim: x_tj_1974
+    pose: senala
     say: "La primera roja de la historia de los Mundiales llegó en mil novecientos setenta y cuatro, para el chileno Carlos Caszely."
-  - label: "TU TURNO"
-    emoji: "💬"
-    text: "¿Cuál es la roja más injusta que has visto?"
-    say: "¿Cuál es la roja más injusta que has visto? Dímelo en comentarios."
-    pause: 0.6
+    highlight: "primera Caszely."
+    sfx: [ding]
+  - emoji: "💬"
+    say: "¿Cuál es la roja más injusta que has visto? Dímelo en comentarios. Y síguenos."
+    highlight: "injusta síguenos."
