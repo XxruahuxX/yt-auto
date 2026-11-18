@@ -1,31 +1,40 @@
 format: dato
 style: karaoke
 experiment: base
-title: "El Mundial que se jugó BAJO TECHO 🏟️ ¿Sabes cuál fue? #shorts"
-description: |
-  En el Mundial de Estados Unidos 1994 se jugaron partidos en el Pontiac Silverdome, cerca de Detroit: el primer estadio cubierto de la historia de los Mundiales. Como allí no crece la hierba, cultivaron césped natural fuera y lo montaron dentro en bandejas hexagonales.
+title: 'El Mundial que se jugó BAJO TECHO 🏟️ ¿Sabes cuál fue? #shorts'
+description: 'En el Mundial de Estados Unidos 1994 se jugaron partidos en el Pontiac Silverdome, cerca de Detroit: el primer estadio cubierto de la historia de los Mundiales. Como allí no crece la hierba, cultivaron césped natural fuera y lo montaron dentro en bandejas hexagonales.
+
   #fútbol #mundial #historia #curiosidades #shorts
-tags: [mundial 1994, pontiac silverdome, estadio cubierto, historia del fútbol, curiosidades fútbol]
-hook: "El Mundial que se jugó bajo techo"
+
+  '
+tags:
+- mundial 1994
+- pontiac silverdome
+- estadio cubierto
+- historia del fútbol
+- curiosidades fútbol
+hook: El Mundial que se jugó bajo techo
 scenes:
-  - anim: x_sd_domo
-    pose: senala
-    say: "¿Sabías que hubo un Mundial con partidos bajo techo? Fue en Estados Unidos, en mil novecientos noventa y cuatro, en el Pontiac Silverdome."
-    highlight: "techo? Silverdome."
-    sfx: [whoosh]
-  - anim: x_sd_hierba
-    pose: piensa
-    say: "Problema: bajo un techo no entra el sol, y sin sol la hierba no crece. Pero la FIFA quería césped natural."
-    highlight: "sol, natural."
-  - anim: x_sd_hex
-    pose: explica
-    say: "La solución: cultivar el césped fuera, en bandejas hexagonales, y montarlo dentro pieza a pieza, como un puzle gigante."
-    highlight: "hexagonales, puzle"
-    sfx: [ding]
-  - anim: x_sd_domo
-    pose: celebra
-    say: "Así se convirtió en el primer estadio cubierto de la historia de los Mundiales."
-    highlight: "primer cubierto"
-  - emoji: "💬"
-    say: "¿Te gustaría ver un Mundial con techo? Dímelo en comentarios. Y síguenos."
-    highlight: "comentarios. síguenos."
+- anim: x_sd_domo
+  pose: senala
+  say: 'Un Mundial jugado bajo techo, donde la hierba no podía crecer. Pasó de verdad: Estados Unidos, mil novecientos noventa y cuatro, Pontiac Silverdome.'
+  highlight: techo, hierba Silverdome.
+  sfx:
+  - whoosh
+- anim: x_sd_hierba
+  pose: piensa
+  say: 'Problema: bajo un techo no entra el sol, y sin sol la hierba no crece. Pero la FIFA quería césped natural.'
+  highlight: sol, natural.
+- anim: x_sd_hex
+  pose: explica
+  say: 'La solución: cultivar el césped fuera, en bandejas hexagonales, y montarlo dentro pieza a pieza, como un puzle gigante.'
+  highlight: hexagonales, puzle
+  sfx:
+  - ding
+- anim: x_sd_domo
+  pose: celebra
+  say: Así se convirtió en el primer estadio cubierto de la historia de los Mundiales.
+  highlight: primer cubierto
+- emoji: 💬
+  say: ¿Te gustaría ver un Mundial con techo? Dímelo en comentarios. Y síguenos.
+  highlight: comentarios. síguenos.

@@ -1,39 +1,48 @@
 format: porque
 style: karaoke
 experiment: estilo-porquemetro
-title: "¿Por qué el césped del estadio NO se encharca aunque diluvie? 🌧️ #shorts"
-description: |
-  Debajo del césped de un estadio moderno no hay tierra normal: hay una capa de arena, debajo grava y, entre la grava, tubos con agujeros que se llevan el agua. Funciona como una maceta gigante. Algunos estadios incluso tienen bombas que aspiran el agua desde abajo.
+title: '¿Por qué el césped del estadio NO se encharca aunque diluvie? 🌧️ #shorts'
+description: 'Debajo del césped de un estadio moderno no hay tierra normal: hay una capa de arena, debajo grava y, entre la grava, tubos con agujeros que se llevan el agua. Funciona como una maceta gigante. Algunos estadios incluso tienen bombas que aspiran el agua desde abajo.
+
   #fútbol #curiosidades #estadios #césped #shorts
-tags: [curiosidades fútbol, césped, estadios, drenaje, por qué]
-hook: "¿Por qué el césped no se encharca aunque diluvie?"
+
+  '
+tags:
+- curiosidades fútbol
+- césped
+- estadios
+- drenaje
+- por qué
+hook: ¿Por qué el césped no se encharca aunque diluvie?
 scenes:
-  - anim: x_dr_lluvia
-    pose: agacha
-    say: "Diluvia en mitad del partido. En el parque de tu barrio ya habría charcos. Pero en el estadio, el balón sigue rodando. ¿Por qué?"
-    highlight: "charcos. rodando."
-    sfx: [whoosh]
-  - emoji: "🟫"
-    pose: piensa
-    say: "Primer problema: la tierra normal tiene mucha arcilla. Y la arcilla casi no deja pasar el agua. Se queda arriba, y se forma barro."
-    highlight: "arcilla barro."
-  - anim: x_dr_capas
-    pose: explica
-    say: "La solución: quitar la tierra. Bajo el césped ponen una capa gruesa de arena, que deja pasar el agua muy rápido. Y debajo, grava."
-    highlight: "arena, grava."
-  - anim: x_dr_maceta
-    pose: senala
-    say: "Es como una maceta gigante. El agua entra por arriba, atraviesa las capas, y sale por abajo."
-    highlight: "maceta gigante."
-    sfx: [ding]
-  - anim: x_dr_tubos
-    pose: senala
-    say: "Segundo problema: ¿y adónde va tanta agua? Entre la grava hay tubos con agujeros que la recogen y la sacan fuera del campo."
-    highlight: "tubos agujeros"
-  - emoji: "🌀"
-    pose: celebra
-    say: "Y algunos estadios van más allá: tienen bombas que aspiran el agua desde abajo, como una aspiradora gigante bajo el césped."
-    highlight: "aspiradora gigante"
-  - emoji: "💬"
-    say: "¿En qué campo has jugado tú con más barro? Te leo en comentarios. Y síguenos."
-    highlight: "barro? síguenos."
+- anim: x_dr_lluvia
+  pose: agacha
+  say: Puede caer un diluvio en mitad del partido, y el césped del estadio no se encharca. Nunca. En el parque de tu barrio ya habría charcos. ¿Por qué?
+  highlight: diluvio Nunca. charcos.
+  sfx:
+  - whoosh
+- emoji: 🟫
+  pose: piensa
+  say: 'Primer problema: la tierra normal tiene mucha arcilla. Y la arcilla casi no deja pasar el agua. Se queda arriba, y se forma barro.'
+  highlight: arcilla barro.
+- anim: x_dr_capas
+  pose: explica
+  say: 'La solución: quitar la tierra. Bajo el césped ponen una capa gruesa de arena, que deja pasar el agua muy rápido. Y debajo, grava.'
+  highlight: arena, grava.
+- anim: x_dr_maceta
+  pose: senala
+  say: Es como una maceta gigante. El agua entra por arriba, atraviesa las capas, y sale por abajo.
+  highlight: maceta gigante.
+  sfx:
+  - ding
+- anim: x_dr_tubos
+  pose: senala
+  say: 'Segundo problema: ¿y adónde va tanta agua? Entre la grava hay tubos con agujeros que la recogen y la sacan fuera del campo.'
+  highlight: tubos agujeros
+- emoji: 🌀
+  pose: celebra
+  say: 'Y algunos estadios van más allá: tienen bombas que aspiran el agua desde abajo, como una aspiradora gigante bajo el césped.'
+  highlight: aspiradora gigante
+- emoji: 💬
+  say: ¿En qué campo has jugado tú con más barro? Te leo en comentarios. Y síguenos.
+  highlight: barro? síguenos.

@@ -15,8 +15,8 @@ tags:
 - porteros
 hook: ¿Por qué el portero viste de otro color?
 scenes:
-- say: ¿Por qué el portero siempre viste de un color distinto al de sus compañeros? No es por moda.
-  highlight: color distinto
+- say: Si el portero llevara la misma camiseta que sus compañeros, habría penaltis que nadie pitaría. Por eso viste de otro color. Y no es por moda.
+  highlight: penaltis nadie moda.
   anim: x_gk_kits
 - pose: senala
   say: Lo dice el reglamento. El portero tiene que llevar colores que lo distingan de todos los demás jugadores, y también del árbitro.
