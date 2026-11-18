@@ -567,7 +567,6 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 for w, t0 in zip(scn.words, scn.times):
                     if w.strip(".,¿?¡!:;…").lower() in scn.hl and (not punches or st + t0 - punches[-1] > 0.7):
                         punches.append(st + t0)
-            sfx += [(p, "hit") for p in punches]
         mixwav = tmp / "mix.wav"
         audio.mix(total, voices, sfx, mixwav, bpm=124 if karaoke else 104)
 

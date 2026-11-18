@@ -149,6 +149,8 @@ def _lava_sky(im, t):
 
 # ---------------------------------------------------------------- escenas
 def render(kind, t, dur):
+    if kind.startswith("x_rb_match_"):
+        return render_match(kind, t, dur)
     PW, PH = A.PW, A.PH
     im = Image.new("RGB", (PW, PH))
     cx = PW / 2
@@ -417,5 +419,174 @@ def render(kind, t, dur):
                     d.text((px - 12, py - 26), "?", font=font(40), fill=YEL)
                 i += 1
         stamp(im, "FALTAN 9", cx, PH * 0.47, 1.0, t, size=70)
+        return im
+    return None
+
+# ---------------------------------------------------------------- partido (cámara de retransmisión)
+WW = 2600
+
+
+def _world(t, PH):
+    """Campo visto de lado, ancho WW, con gradas, vallas de publicidad y porterías."""
+    im = Image.new("RGB", (WW, PH))
+    d = ImageDraw.Draw(im)
+    gt, gb = PH * 0.40, PH * 0.74
+    for i in range(20):
+        k = i / 19
+        d.rectangle([0, PH * 0.12 + (gt - PH * 0.12) * i / 20, WW, PH * 0.12 + (gt - PH * 0.12) * (i + 1) / 20 + 1],
+                    fill=(int(14 + 16 * k), int(16 + 18 * k), int(30 + 22 * k)))
+    rnd = random.Random(11)
+    for _ in range(2600):
+        x, y = rnd.uniform(0, WW), rnd.uniform(PH * 0.16, gt - 40)
+        c = rnd.choice([(200, 60, 60), (60, 110, 220), (230, 230, 230), (120, 120, 140), (255, 200, 40)])
+        jump = 3 * math.sin(t * 9 + x * 0.05) if rnd.random() < 0.3 else 0
+        d.ellipse([x - 4, y - 4 - jump, x + 4, y + 4 - jump], fill=c)
+    for fx in range(200, WW, 600):
+        d.rectangle([fx - 50, PH * 0.06, fx + 50, PH * 0.09], fill=(255, 255, 235))
+    d.rectangle([0, gt - 40, WW, gt], fill=(20, 24, 40))
+    for i, txt in enumerate(["ROBOT FC", "DATOCRACK", "TITANES", "ROBOT FC", "DATOCRACK", "TITANES", "ROBOT FC"]):
+        d.text((60 + i * 380, gt - 36), txt, font=font(28), fill=(255, 214, 10) if i % 2 else (120, 200, 255))
+    for i in range(26):
+        d.rectangle([i * 100, gt, i * 100 + 100, gb], fill=(40, 138, 70) if i % 2 else (48, 152, 78))
+    d.rectangle([0, gb, WW, PH], fill=(30, 100, 52))
+    d.line([(WW / 2, gt), (WW / 2, gb)], fill=(235, 245, 235), width=5)
+    d.ellipse([WW / 2 - 160, gt + 30, WW / 2 + 160, gb - 30], outline=(235, 245, 235), width=5)
+    for gx, sg in ((140, 1), (WW - 140, -1)):
+        d.line([(gx + sg * 260, gt), (gx + sg * 320, gb)], fill=(235, 245, 235), width=5)
+    return im, d, gt, gb
+
+
+def _goal(d, gx, sg, gt, gb, bulge=0.0):
+    """Portería vista de lado. sg=1 izquierda, -1 derecha."""
+    top, base = gt - 150, gb - 70
+    back = gx - sg * 90
+    for k in range(9):
+        y = top + (base - top) * k / 8
+        d.line([(gx, y), (back - sg * bulge * math.sin(math.pi * k / 8), y + 20)], fill=(220, 220, 225), width=2)
+    for k in range(5):
+        x = gx + (back - gx) * k / 4
+        d.line([(x, top), (x - sg * bulge * 0.5, base + 20)], fill=(220, 220, 225), width=2)
+    d.line([(gx, base + 30), (gx, top), (back, top + 20)], fill=WHITE, width=12)
+
+
+def _hud(d, PW, PH, a, b, minute):
+    x0, y0 = 40, PH * 0.27
+    d.rounded_rectangle([x0, y0, x0 + 360, y0 + 64], 12, fill=(10, 12, 22))
+    d.rectangle([x0, y0, x0 + 12, y0 + 64], fill=(30, 110, 235))
+    d.text((x0 + 26, y0 + 12), "ROB", font=font(34), fill=WHITE)
+    d.rounded_rectangle([x0 + 118, y0 + 8, x0 + 228, y0 + 56], 8, fill=YEL)
+    sc = f"{a}-{b}"
+    d.text((x0 + 173 - d.textlength(sc, font=font(38)) / 2, y0 + 10), sc, font=font(38), fill=INK)
+    d.text((x0 + 242, y0 + 12), "TIT", font=font(34), fill=(255, 150, 110))
+    d.rounded_rectangle([x0 + 370, y0 + 10, x0 + 470, y0 + 54], 8, fill=(30, 110, 235))
+    d.text((x0 + 385, y0 + 14), f"{minute}'", font=font(30), fill=WHITE)
+
+
+def _view(world, cx_w, PW, PH, z=1.0):
+    vw = PW / z
+    x0 = min(max(cx_w - vw / 2, 0), WW - vw)
+    vh = PH / z
+    y0 = (PH - vh) * 0.55
+    v = world.crop((int(x0), int(y0), int(x0 + vw), int(y0 + vh)))
+    return v.resize((PW, PH), Image.BICUBIC) if z != 1.0 else v, x0
+
+
+def render_match(kind, t, dur):
+    from .anim_extra import person
+    PW, PH = A.PW, A.PH
+    world, d, gt, gb = _world(t, PH)
+    cr7 = dict(shirt=(30, 110, 235), skin=(224, 172, 125), hair="tupe", hair_col=(30, 22, 16), num="7")
+    if kind == "x_rb_match_gol":
+        T = max(dur, 4.0)
+        u = t / T
+        gx = WW - 140
+        run_u = min(u / 0.62, 1)
+        x = 1250 + (gx - 520 - 1250) * _e(run_u)
+        y = PH * 0.64
+        titans = [(1650, PH * 0.60), (1980, PH * 0.66)]
+        hop = 0
+        for tx, ty in titans:
+            dist = abs(x - tx)
+            if dist < 140 and run_u < 1:
+                hop = max(hop, 90 * math.cos(dist / 140 * math.pi / 2))
+        for i, (tx, ty) in enumerate(titans):
+            beaten = x > tx + 60
+            titan(d, tx + (40 if beaten else 0), ty, 0.62, t, i)
+            if beaten and x - tx < 260:
+                d.text((tx - 30, ty - 260), "?!", font=font(48), fill=YEL)
+        _goal(d, gx, -1, gt, gb, bulge=40 * max(0.0, min((u - 0.75) / 0.1, 1)) if u > 0.75 else 0)
+        r01(d, 260, PH * 0.66, 0.5, t)
+        _goal(d, 140, 1, gt, gb)
+        shoot = u > 0.62
+        celebrate = u > 0.78
+        person(d, x, y - hop, 1.15, run=0 if shoot else 1.0, phase=t * 14, pose="siu" if celebrate else "",
+               mouth="abierta" if shoot else "sonrisa", **cr7)
+        if not shoot:
+            ball(d, x + 70, y - abs(math.sin(t * 12)) * 30, 18)
+        elif u < 0.75:
+            q = (u - 0.62) / 0.13
+            bx, by = x + 70 + (gx - 60 - x - 70) * q, y - 20 - (y - gt + 40) * q
+            def beam(g):
+                g.line([(x + 70, y - 20), (bx, by)], fill=(150, 220, 255), width=34)
+            world = _glow(world, beam, 18)
+            d = ImageDraw.Draw(world)
+            d.line([(x + 70, y - 20), (bx, by)], fill=WHITE, width=8)
+            ball(d, bx, by, 20)
+        else:
+            ball(d, gx - 70, gt - 40, 18)
+        camx = x + 120 if u < 0.62 else x + 120 + (gx - 200 - x - 120) * _e((u - 0.62) / 0.15)
+        z = 1.0 if u < 0.75 else 1 + 0.25 * _e((u - 0.75) / 0.12)
+        im, _ = _view(world, camx, PW, PH, z)
+        if 0.75 < u < 0.8:
+            im = Image.blend(im, Image.new("RGB", im.size, (230, 245, 255)), 0.8 * (1 - (u - 0.75) / 0.05))
+        dd = ImageDraw.Draw(im)
+        _hud(dd, PW, PH, 1 if u > 0.75 else 0, 0, 1 + int(t * 3))
+        if u > 0.77:
+            text_c(dd, PW / 2, PH * 0.36, "¡GOOOL!", 130, YEL, 12)
+        return im
+    if kind == "x_rb_match_remontada":
+        n = 5
+        T = max(dur, 6.0)
+        c = min(int(t / T * n), n - 1)
+        v = (t / T * n) - c
+        tx = 1700 - 1300 * _e(min(v / 0.6, 1))
+        ty = PH * (0.60 + 0.04 * (c % 2))
+        _goal(d, WW - 140, -1, gt, gb)
+        scored = v > 0.72
+        _goal(d, 140, 1, gt, gb, bulge=35 if scored and v < 0.9 else 0)
+        dive = _e((v - 0.55) / 0.2)
+        lay = Image.new("RGBA", world.size, (0, 0, 0, 0))
+        r01(ImageDraw.Draw(lay), 280, PH * 0.66, 0.55, t, arm=dive)
+        lay = lay.rotate(-60 * dive, center=(280, PH * 0.66 - 60), resample=Image.BICUBIC)
+        world.paste(lay, (0, 0), lay)
+        d = ImageDraw.Draw(world)
+        # CR7 superado, mareado
+        person(d, 900, PH * 0.64, 1.1, mouth="abierta", **cr7)
+        if tx < 950:
+            for k in range(3):
+                a = t * 6 + k * 2.1
+                d.ellipse([900 + 50 * math.cos(a) - 8, PH * 0.64 - 280 + 15 * math.sin(a) - 8,
+                           900 + 50 * math.cos(a) + 8, PH * 0.64 - 280 + 15 * math.sin(a) + 8], fill=YEL)
+        titan(d, tx, ty, 0.7, t, c)
+        if v < 0.6:
+            ball(d, tx - 90, ty - abs(math.sin(t * 10)) * 25, 18)
+        elif not scored:
+            q = (v - 0.6) / 0.12
+            bx, by = tx - 90 + (100 - tx + 90) * q, ty - (ty - gt + 20) * q
+            def lava(g):
+                g.line([(tx - 90, ty), (bx, by)], fill=(255, 110, 20), width=36)
+            world = _glow(world, lava, 18)
+            d = ImageDraw.Draw(world)
+            ball(d, bx, by, 20)
+        else:
+            ball(d, 90, gt - 20, 18)
+        im, _ = _view(world, max(tx - 150, 0) if not scored else 300, PW, PH, 1.0 if not scored else 1.15)
+        dd = ImageDraw.Draw(im)
+        goals = c + (1 if scored else 0)
+        _hud(dd, PW, PH, 1, goals, 30 + c * 12 + int(v * 10))
+        if scored:
+            text_c(dd, PW / 2, PH * 0.36, f"1-{goals}", 120, (255, 140, 90), 10)
+        if c == n - 1 and v > 0.85:
+            stamp(im, "TODAVÍA NO BASTA", PW / 2, PH * 0.52, 0.0, (v - 0.85) * T, bg=RED, fg=WHITE, size=56)
         return im
     return None

@@ -1,46 +1,59 @@
 format: serie
 style: karaoke
 experiment: serie-robot-fc
-title: "ROBOT FC · Episodio 2 🤖 Fichamos a CR7 2008 en MODO ULTRA #shorts"
-description: |
-  Episodio 2 de Robot FC. Ganó el comentario de ISV_7: «Metele CR7 2008 con ultra instinto dominado». Lo fichamos… pero Los Titanes del Volcán siguen siendo demasiado. Comenta el próximo fichaje: el comentario con más likes entra en el episodio 3.
+title: 'ROBOT FC · Episodio 2 🤖 Fichamos a CR7 2008 en MODO ULTRA #shorts'
+description: 'Episodio 2 de Robot FC. Ganó el comentario de ISV_7: «Metele CR7 2008 con ultra instinto dominado». Lo fichamos… pero Los Titanes del Volcán siguen siendo demasiado. Comenta el próximo fichaje: el comentario con más likes entra en el episodio 3.
+
   #fútbol #robotfc #serie #animación #cr7 #tueliges #fyp #shorts
-tags: [robot fc, serie fútbol, animación fútbol, tú eliges, cr7, fichajes]
-hook: "Robot FC · Episodio 2"
+
+  '
+tags:
+- robot fc
+- serie fútbol
+- animación fútbol
+- tú eliges
+- cr7
+- fichajes
+hook: Robot FC · Episodio 2
 scenes:
-  - anim: x_rb_comentario
-    pose: senala
-    say: "Lo pedisteis, y aquí está el comentario más votado: métele a CR7 de dos mil ocho, con ultra instinto dominado."
-    highlight: "comentario votado: CR7"
-    sfx: [ding]
-  - anim: x_rb_fichaje
-    pose: celebra
-    say: "Dicho y hecho. Robot FC ficha al Cristiano de dos mil ocho, el del Balón de Oro y la Champions con el United."
-    highlight: "Cristiano Balón Oro"
-    sfx: [pop]
-  - anim: x_rb_ultra
-    pose: agacha
-    say: "Y además, en modo ultra. Los ojos se le iluminan, el pelo ni se despeina, y el estadio entero tiembla."
-    highlight: "modo ultra. tiembla."
-    sfx: [boom]
-  - anim: x_rb_golazo
-    pose: salto
-    say: "Saque de centro. Recibe, se perfila, y dispara. Un rayo que atraviesa a los Titanes. Gol. Uno a cero."
-    highlight: "rayo Gol."
-    sfx: [whoosh]
-  - anim: x_rb_remontada
-    pose: piensa
-    say: "Pero los Titanes del Volcán despiertan. Uno, dos, tres, cuatro, cinco. Remontada. Todavía no basta."
-    highlight: "despiertan. Remontada. basta."
-    sfx: [fall]
-  - anim: x_rb_plantilla2
-    pose: explica
-    say: "Ya somos dos: R-01 y CR7. Faltan nueve jugadores para poder con ellos."
-    highlight: "nueve"
-  - anim: x_rb_votar
-    pose: senala
-    say: "Escribe en comentarios a quién fichamos ahora. El comentario con más likes entra en el episodio tres."
-    highlight: "comentarios más likes tres."
-  - emoji: "🤖"
-    say: "¿Quién es el siguiente fichaje de Robot FC? Comenta, dale like, y síguenos para el episodio tres."
-    highlight: "Comenta, like, síguenos"
+- anim: x_rb_comentario
+  pose: senala
+  say: 'Lo pedisteis, y aquí está el comentario más votado: métele a CR7 de dos mil ocho, con ultra instinto dominado.'
+  highlight: 'comentario votado: CR7'
+  sfx:
+  - ding
+- anim: x_rb_fichaje
+  pose: celebra
+  say: Dicho y hecho. Robot FC ficha al Cristiano de dos mil ocho, el del Balón de Oro y la Champions con el United.
+  highlight: Cristiano Balón Oro
+  sfx:
+  - pop
+- anim: x_rb_ultra
+  pose: agacha
+  say: Y además, en modo ultra. Los ojos se le iluminan, el pelo ni se despeina, y el estadio entero tiembla.
+  highlight: modo ultra. tiembla.
+  sfx:
+  - boom
+- anim: x_rb_match_gol
+  pose: salto
+  say: Pita el árbitro. CR7 recibe en el centro del campo. Se va del primer Titán, salta por encima del segundo, se planta delante de la portería… y dispara. ¡Gol! Uno a cero para Robot FC.
+  highlight: primer segundo, dispara. Gol!
+  sfx:
+  - whoosh
+- anim: x_rb_match_remontada
+  pose: piensa
+  say: Pero los Titanes del Volcán despiertan. El primero se lleva a CR7 por delante. Gol. Uno a uno. Y otro. Y otro. R-01 no llega a ninguno. Uno a cinco. Remontada.
+  highlight: despiertan. Gol. Remontada.
+  sfx:
+  - fall
+- anim: x_rb_plantilla2
+  pose: explica
+  say: 'Ya somos dos: R-01 y CR7. Faltan nueve jugadores para poder con ellos.'
+  highlight: nueve
+- anim: x_rb_votar
+  pose: senala
+  say: Escribe en comentarios a quién fichamos ahora. El comentario con más likes entra en el episodio tres.
+  highlight: comentarios más likes tres.
+- emoji: 🤖
+  say: ¿Quién es el siguiente fichaje de Robot FC? Comenta, dale like, y síguenos para el episodio tres.
+  highlight: Comenta, like, síguenos
