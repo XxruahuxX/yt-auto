@@ -40,7 +40,7 @@ def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
     """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
-    if os.environ.get("TTS_ENGINE", "chatterbox") == "chatterbox" and Path(CHATTERBOX_PY).exists():
+    if os.environ.get("TTS_ENGINE", "kokoro") == "chatterbox" and Path(CHATTERBOX_PY).exists():
         return tts_chatterbox(text, out)
     if (MODELS / "kokoro-v1.0.onnx").exists():
         return tts_kokoro(text, out)
