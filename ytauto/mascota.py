@@ -46,8 +46,12 @@ def lerp_ang(a, b, t):
 
 def blend(p, q, t):
     keys = set(p) | set(q)
-    return {k: (lerp(p.get(k, 0), q.get(k, 0), t) if k in ("lift", "tilt")
+    return {k: (lerp(p.get(k, 0), q.get(k, 0), t) if k in LINEAR
                 else lerp_ang(p[k], q[k], t)) for k in keys}
+
+
+# claves que no son ángulos de hueso (se interpolan en lineal, 0 por defecto)
+LINEAR = ("lift", "tilt", "stretch", "sh_up")
 
 
 def ease(t):
@@ -69,9 +73,9 @@ def solve(pose, x=500):
         j[s + "k"] = _go(hs, pose[s + "th"], L["thigh"])
         j[s + "f"] = _go(j[s + "k"], pose[s + "sh"], L["shin"])
         j[s + "hs"] = hs
-    neck = _go(hip, pose["spine"], L["spine"])
+    neck = _go(hip, pose["spine"], L["spine"] * (1 + pose.get("stretch", 0)))  # stretch: estirar/aplastar
     j["neck"] = neck
-    j["sh"] = _go(neck, pose["spine"] + 180, 22)  # hombros un poco por debajo del cuello
+    j["sh"] = _go(neck, pose["spine"] + 180, 22 - pose.get("sh_up", 0))  # sh_up: subir hombros  # hombros un poco por debajo del cuello
     for s in "lr":
         j[s + "e"] = _go(j["sh"], pose[s + "ua"], L["upper"])
         j[s + "h"] = _go(j[s + "e"], pose[s + "fa"], L["fore"])
@@ -95,7 +99,8 @@ def _tube(d, pts, r0, r1, col):
         d.ellipse([x - r, y - r, x + r, y + r], fill=col)
 
 
-def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0, mouth=0.0, k=K):
+def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0, mouth=0.0, k=K, face=None):
+    """face (opcional): ojos y expresión, ver _face. Sin face se dibuja como siempre."""
     j = solve(pose, x)
     s = scale * k
     P = {k: ((v[0] + dx) * s, (v[1] + dy) * s) for k, v in j.items()}
@@ -119,6 +124,9 @@ def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0, mouth=0.0, k=K):
     hx, hy = P["head"]
     r = L["head"] * s
     d.ellipse([hx - r, hy - r, hx + r, hy + r], outline=col, width=int(w * 0.95))
+    if face is not None:
+        _face(d, hx, hy, r, w, col, face, mouth)
+        return j
     # boquita: sonrisa pequeña; abierta (óvalo) cuando habla
     mx, my = hx + r * 0.12, hy + r * 0.32
     if mouth > 0.08:
@@ -129,11 +137,49 @@ def draw(img, pose, col=WHITE, x=500, dx=0, dy=0, scale=1.0, mouth=0.0, k=K):
     return j
 
 
-def render_layer(pose, scale=0.35, mouth=0.0, col=WHITE):
+def _face(d, hx, hy, r, w, col, f, mouth):
+    """Ojos que parpadean y miran + boca con forma.
+
+    f: blink 0-1 (1 = cerrados), look (x, y) en -1..1, eyes 1 = normal (>1 abiertos de sorpresa),
+       happy 0-1 (ojos en arco ^^), shape "smile" | "o" | "grin" | "flat".
+    """
+    lx, ly = f.get("look", (0.0, 0.0))
+    cx, cy = hx + r * (0.12 + 0.14 * lx), hy + r * (-0.1 + 0.1 * ly)
+    es = f.get("eyes", 1.0)
+    blink = min(max(f.get("blink", 0.0), 0.0), 1.0)
+    happy = f.get("happy", 0.0)
+    lw = max(2, int(w * 0.3))
+    for side in (-1, 1):
+        ex = cx + side * r * 0.2
+        ew, eh = r * 0.075 * es, r * 0.12 * es * (1 - blink)
+        if happy > 0.5:
+            d.arc([ex - r * 0.1, cy - r * 0.04, ex + r * 0.1, cy + r * 0.16], 200, 340, fill=col, width=lw)
+        elif eh < r * 0.03:
+            d.line([ex - ew * 1.2, cy, ex + ew * 1.2, cy], fill=col, width=lw)
+        else:
+            d.ellipse([ex - ew, cy - eh, ex + ew, cy + eh], fill=col)
+    mx, my = hx + r * (0.12 + 0.1 * lx), hy + r * (0.36 + 0.04 * ly)
+    shape = f.get("shape", "smile")
+    if shape == "o":
+        o = r * (0.1 + 0.06 * mouth)
+        d.ellipse([mx - o * 0.8, my - o, mx + o * 0.8, my + o], outline=col, width=lw)
+    elif shape == "grin":
+        g = r * (0.2 + 0.08 * mouth)
+        d.pieslice([mx - g, my - g * 0.8, mx + g, my + g * (0.6 + 0.6 * mouth)], 0, 180, fill=col)
+    elif mouth > 0.08:
+        mw, mh = r * 0.16, r * (0.06 + 0.16 * mouth)
+        d.ellipse([mx - mw, my - mh, mx + mw, my + mh], fill=col)
+    elif shape == "flat":
+        d.line([mx - r * 0.14, my, mx + r * 0.14, my], fill=col, width=lw)
+    else:
+        d.arc([mx - r * 0.24, my - r * 0.2, mx + r * 0.24, my + r * 0.1], 25, 155, fill=col, width=lw)
+
+
+def render_layer(pose, scale=0.35, mouth=0.0, col=WHITE, face=None):
     """Devuelve el monigote en una capa RGBA de (1000*scale)^2 px, suavizada."""
     size = int(1000 * scale)
     lay = Image.new("RGBA", (size * 2, size * 2), (0, 0, 0, 0))
-    draw(lay, pose, col=col, scale=scale, mouth=mouth, k=2)
+    draw(lay, pose, col=col, scale=scale, mouth=mouth, k=2, face=face)
     return lay.resize((size, size), Image.LANCZOS)
 
 
