@@ -1,78 +1,54 @@
 {
-  "guiones/001_messi_91.yaml": {
-    "id": "16GtxPI7qUU",
-    "publish_at": "2026-11-16T13:00:00Z"
-  },
-  "guiones/002_adivina_cr7.yaml": {
-    "id": "IijRjabAal8",
-    "publish_at": "2026-11-15T21:00:00Z"
-  },
-  "guiones/003_gol_mas_rapido_mundial.yaml": {
-    "id": "HUaNJS7TuRA",
-    "publish_at": "2026-11-16T17:00:00Z"
-  },
-  "guiones/004_porque_red_porteria.yaml": {
-    "id": "X8cj29MpgDc",
-    "publish_at": "2026-11-16T20:00:00Z"
-  },
-  "guiones/005_vs_balon_oro.yaml": {
-    "id": "l6PRC8WvXiY",
-    "publish_at": "2026-11-17T13:00:00Z"
-  },
-  "guiones/006_adivina_yamal.yaml": {
-    "id": "wVa2W8WQlLY",
-    "publish_at": "2026-11-17T17:00:00Z"
-  },
-  "guiones/007_149_0.yaml": {
-    "id": "1e3Xx5SnqBo",
-    "publish_at": "2026-11-17T20:00:00Z"
-  },
-  "guiones/008_zidane_2006.yaml": {
-    "id": "JLl2vO6CBTA",
-    "publish_at": "2026-11-18T13:00:00Z"
-  },
-  "guiones/009_portero_goleador.yaml": {
-    "id": "9IzVau2yLuc",
-    "publish_at": "2026-11-18T17:00:00Z"
-  },
-  "guiones/010_adivina_zlatan.yaml": {
-    "id": "EsO3ogAmKCs",
-    "publish_at": "2026-11-18T20:00:00Z"
-  },
-  "guiones/015_que_pasaria_meteorito.yaml": {
-    "id": "5r8ulCKPsmU",
-    "publish_at": "2026-11-19T13:00:00Z"
-  },
-  "guiones/016_que_pasaria_castor_pereira7.yaml": {
-    "id": "krL82y7hK9U",
-    "publish_at": "2026-11-19T17:00:00Z"
-  },
-  "guiones/017_que_pasaria_luna.yaml": {
-    "id": "dhw_Y9Zb56A",
-    "publish_at": "2026-11-19T20:00:00Z"
-  },
-  "guiones/019_que_pasaria_robot.yaml": {
-    "id": "PTwAtAjkPQ0",
-    "publish_at": "2026-11-20T13:00:00Z"
-  },
-  "guiones/011_porque_soccer.yaml": {
-    "id": "diSr_RqDY-s",
-    "publish_at": "2026-11-20T17:00:00Z"
-  },
-  "guiones/012_porque_balon_pentagonos.yaml": {
-    "id": "Jbh68OoTDPM",
-    "publish_at": "2026-11-20T20:00:00Z"
-  },
-  "guiones/013_porque_hat_trick.yaml": {
-    "id": "JrIKzL6WXpE",
-    "publish_at": "2026-11-21T13:00:00Z"
-  },
-  "guiones/014_primer_mundial.yaml": {
-    "id": "qbSohii-8FI",
-    "publish_at": "2026-11-21T17:00:00Z"
-  },
-  "guiones/027_robot_fc_ep1.yaml": {
-    "id": "Rt0TQCZsLeA",
-    "publish_at": "2026-11-21T20:00:00Z"
-  }
+ "guiones/001_messi_91.yaml": {
+  "id": "16GtxPI7qUU",
+  "publish_at": "2026-11-16T13:00:00Z"
+ },
+ "guiones/002_adivina_cr7.yaml": {
+  "id": "IijRjabAal8",
+  "publish_at": "2026-11-15T21:00:00Z"
+ },
+ "guiones/003_gol_mas_rapido_mundial.yaml": {
+  "id": "HUaNJS7TuRA",
+  "publish_at": "2026-11-16T17:00:00Z"
+ },
+ "guiones/004_porque_red_porteria.yaml": {
+  "id": "X8cj29MpgDc",
+  "publish_at": "2026-11-16T20:00:00Z"
+ },
+ "guiones/005_vs_balon_oro.yaml": {
+  "id": "l6PRC8WvXiY",
+  "publish_at": "2026-11-17T13:00:00Z"
+ },
+ "guiones/006_adivina_yamal.yaml": {
+  "id": "wVa2W8WQlLY",
+  "publish_at": "2026-11-17T17:00:00Z"
+ },
+ "guiones/007_149_0.yaml": {
+  "id": "1e3Xx5SnqBo",
+  "publish_at": "2026-11-17T20:00:00Z"
+ },
+ "guiones/008_zidane_2006.yaml": {
+  "id": "JLl2vO6CBTA",
+  "publish_at": "2026-11-18T13:00:00Z"
+ },
+ "guiones/009_portero_goleador.yaml": {
+  "id": "9IzVau2yLuc",
+  "publish_at": "2026-11-18T17:00:00Z"
+ },
+ "guiones/010_adivina_zlatan.yaml": {
+  "id": "EsO3ogAmKCs",
+  "publish_at": "2026-11-18T20:00:00Z"
+ },
+ "guiones/034_que_pasaria_balon_cubo.yaml": {
+  "id": "6A66naVA-zc",
+  "publish_at": "2026-11-19T14:30:00Z"
+ },
+ "guiones/032_porque_balon_pentagonos.yaml": {
+  "id": "1nf150p80Mk",
+  "publish_at": "2026-11-19T17:00:00Z"
+ },
+ "guiones/033_historia_panenka.yaml": {
+  "id": "fGmPqk9hJ7U",
+  "publish_at": "2026-11-19T20:00:00Z"
+ }
 }

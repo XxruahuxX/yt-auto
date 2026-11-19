@@ -393,4 +393,38 @@ def render(kind, t, dur):
             if t > dur * 0.5:
                 stamp(im, "= BALÓN REDONDO", cx, PH * 0.61, dur * 0.5, t, bg=GREEN, fg=WHITE, size=54)
             return im
+    # ======================================================== contador de dato clave
+    # Uso en guion: anim: "x_dc_contador|32|PIEZAS|12 + 20" (desglose opcional)
+    if kind.startswith("x_dc_contador"):
+        parts = (kind.split("|") + ["", "", ""])[1:4]
+        val, unidad, desg = parts
+        try:
+            target = float(val.replace(",", "."))
+        except ValueError:
+            target = 0.0
+        dec = len(val.replace(".", ",").split(",")[1]) if ("," in val or "." in val) else 0
+        d = grad(im, (10, 16, 36), (20, 30, 60))
+        cy, R = PH * 0.46, 210
+        k = _e(min(1, max(0, (t - 0.2) / min(1.6, dur * 0.5))))
+        d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(40, 50, 80), width=26)
+        if k > 0:
+            im = _glow(im, lambda g: g.arc([cx - R, cy - R, cx + R, cy + R], -90, -90 + 360 * k, fill=YEL, width=26), 18)
+            d = ImageDraw.Draw(im)
+            d.arc([cx - R, cy - R, cx + R, cy + R], -90, -90 + 360 * k, fill=YEL, width=26)
+        n = target * k
+        txt = (f"{n:.{dec}f}".replace(".", ",") if dec else f"{int(round(n)):,}".replace(",", "."))
+        size = 150 if len(txt) <= 3 else max(80, 150 - 18 * (len(txt) - 3))
+        text_c(d, cx, cy - size * 0.62, txt, size, WHITE, 9)
+        if unidad:
+            text_c(d, cx, cy + 70, unidad, 44, YEL, 6)
+        t1 = min(1.6, dur * 0.5) + 0.3
+        if t > t1:
+            text_c(d, cx, PH * 0.29, "DATO CLAVE", 50, YEL, 6)
+        if desg and t > t1:
+            kk = min(1, (t - t1) / 0.3)
+            w = 460
+            d.rounded_rectangle([cx - w / 2, PH * 0.64 - 40, cx - w / 2 + w * kk, PH * 0.64 + 34], 20, fill=GREEN)
+            if kk >= 1:
+                text_c(d, cx, PH * 0.64 - 30, desg, 46, WHITE, 5)
+        return vignette(im, 0.35)
     return im
