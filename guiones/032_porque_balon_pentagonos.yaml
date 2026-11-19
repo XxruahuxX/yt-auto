@@ -1,0 +1,31 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué el balón clásico tiene PENTÁGONOS negros? ⚽📺 #shorts"
+description: |
+  El balón blanco con pentágonos negros se hizo famoso con el Telstar del Mundial de México 1970. El motivo fue la televisión en blanco y negro: un balón todo blanco se perdía en pantalla, y el contraste lo hacía visible. Tiene 32 piezas: 12 pentágonos y 20 hexágonos. Su nombre viene del satélite Telstar.
+  #fútbol #balón #mundial #curiosidades #shorts
+tags: [balón telstar, mundial 1970, curiosidades fútbol, balón de fútbol, por qué]
+hook: "El balón clásico se diseñó para la tele"
+scenes:
+  - anim: x_bp_tv
+    pose: senala
+    say: "El balón blanco y negro no se diseñó para jugar mejor. Se diseñó para la tele. En blanco y negro, un balón todo blanco desaparecía."
+    highlight: "tele. desaparecía."
+    sfx: [whoosh]
+  - anim: x_bp_telstar
+    pose: explica
+    say: "La solución llegó en el Mundial de México mil novecientos setenta: el Telstar. Paneles blancos y negros. Contraste puro."
+    highlight: "setenta: Telstar. Contraste"
+  - anim: x_bp_32
+    pose: piensa
+    say: "Son treinta y dos piezas. Doce pentágonos negros y veinte hexágonos blancos. Así la pelota casi es una esfera."
+    highlight: "treinta dos Doce veinte esfera."
+  - anim: x_bp_satelite
+    pose: celebra
+    say: "¿Y el nombre? Viene del satélite Telstar, que también era una bola llena de paneles."
+    highlight: "satélite paneles."
+    sfx: [ding]
+  - emoji: "💬"
+    say: "¿Cuál es el balón más bonito de la historia? Dímelo en comentarios. Y síguenos."
+    highlight: "bonito síguenos."

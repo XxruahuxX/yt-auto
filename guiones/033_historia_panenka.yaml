@@ -1,0 +1,35 @@
+format: historia
+style: karaoke
+experiment: base
+title: "El PENALTI más LOCO de la historia ganó una Eurocopa 🤯 #shorts"
+description: |
+  Final de la Eurocopa 1976 en Belgrado: Checoslovaquia y Alemania Federal empatan 2-2 tras la prórroga. En la tanda, Antonín Panenka lanza el último penalti picándolo suave por el centro. Gol, y Checoslovaquia campeona. Desde entonces ese lanzamiento se llama «Panenka».
+  #fútbol #eurocopa #historia #penalti #panenka #shorts
+tags: [panenka, penalti, eurocopa 1976, historia del fútbol, checoslovaquia]
+hook: "Picó el penalti que decidía una Eurocopa"
+scenes:
+  - anim: x_pk_vaselina
+    pose: senala
+    say: "Último penalti de una final de Eurocopa. Y el lanzador decide picarla, suave, por el centro."
+    highlight: "final picarla, centro."
+    sfx: [whoosh]
+  - anim: x_pk_final
+    pose: explica
+    say: "Belgrado, mil novecientos setenta y seis. Checoslovaquia y Alemania Federal empatan a dos tras la prórroga. Penaltis."
+    highlight: "setenta seis. dos Penaltis."
+  - anim: x_pk_carrera
+    pose: piensa
+    say: "Checoslovaquia va cuatro a tres. Si marca Antonín Panenka, son campeones. El portero alemán espera un disparo fuerte."
+    highlight: "cuatro tres. campeones."
+  - anim: x_pk_vaselina
+    pose: celebra
+    say: "El portero se tira. El balón va despacio, por el centro. Gol. Checoslovaquia, campeona de Europa."
+    highlight: "despacio, Gol. campeona"
+    sfx: [ding]
+  - anim: x_pk_nombre
+    pose: celebra
+    say: "Desde ese día, picar un penalti por el centro tiene nombre propio. Se llama hacer un Panenka."
+    highlight: "nombre Panenka."
+  - emoji: "💬"
+    say: "¿Tú lo tirarías así en una final? Dímelo en comentarios. Y síguenos."
+    highlight: "final? síguenos."
