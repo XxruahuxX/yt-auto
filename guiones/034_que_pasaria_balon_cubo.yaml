@@ -1,0 +1,35 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si el BALÓN fuera un CUBO? 🧊⚽😂 #shorts"
+description: |
+  Un «¿qué pasaría si…?» de broma: el balón pasa a ser un cubo. Saques que no ruedan, regates imposibles y cabezazos que duelen.
+  #fútbol #humor #quépasaríasi #fyp #shorts
+tags: [qué pasaría si, balón, humor fútbol, fútbol, fyp]
+hook: "¿Y si el balón fuera un cubo?"
+scenes:
+  - anim: x_cu_saque
+    pose: agacha
+    say: "¿Qué pasaría si mañana el balón fuera un cubo? Primer saque del partido. Clonc. Avanza dos metros y se para."
+    highlight: "cubo? Clonc. para."
+    sfx: [whoosh]
+  - anim: x_cu_regate
+    pose: piensa
+    say: "Los regates se acaban. El cubo bota hacia donde quiere y el diez acaba en el suelo."
+    highlight: "regates suelo."
+  - anim: x_cu_cabeza
+    pose: explica
+    say: "Los cabezazos pasan a ser deporte de riesgo. Una esquina en la frente y fuera del partido."
+    highlight: "riesgo. frente"
+  - anim: x_cu_gol
+    pose: celebra
+    say: "Lo bueno: ningún portero adivina el bote. Cada disparo es una lotería. Gol imposible."
+    highlight: "lotería. imposible."
+    sfx: [ding]
+  - anim: x_cu_fabrica
+    pose: senala
+    say: "Al final alguien tendría una idea brillante: limar las esquinas. Y volveríamos a inventar el balón redondo."
+    highlight: "limar redondo."
+  - emoji: "💬"
+    say: "¿Qué forma de balón probamos la próxima vez? Dímelo en comentarios. Y síguenos."
+    highlight: "forma síguenos."
