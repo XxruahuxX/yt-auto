@@ -9,7 +9,9 @@ Qué añade frente a los senos fijos de shorts._draw_mascot:
   - Gestos nuevos: asiente, niega, encoge hombros, se rasca, sorpresa, se ríe, aplaude,
     impaciente y salto con anticipación y aplastamiento.
 
-Aún NO se usa en los Shorts: es una propuesta.
+Los Shorts la usan a través de frame() (aprobada el 19-nov).
+Posturas para el campo "pose" de las escenas: las de mascota.POSES más asiente, niega,
+encoge, rasca, sorpresa, rie, aplaude e impaciente.
 
     python -m ytauto.mascota_vida   -> vídeo demo en oficina/propuestas
 """
@@ -36,6 +38,8 @@ EXTRA = {
     "rie": dict(spine=-84, lth=100, lsh=96, rth=80, rsh=84, lua=100, lfa=40, rua=80, rfa=150, lift=0, tilt=-8),
     "aplaude": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=28, lfa=-30, rua=28, rfa=-30, lift=0, tilt=4),
     "niega": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=112, lfa=98, rua=30, rfa=-75, lift=0),
+    # saludo con la mano por fuera de la cara (el de mascota.py la tapaba al rebotar)
+    "saluda": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=112, lfa=98, rua=5, rfa=-68, lift=0, tilt=4),
     "impaciente": dict(spine=-90, lth=100, lsh=96, rth=80, rsh=84, lua=130, lfa=40, rua=50, rfa=130, lift=0, tilt=-6),
 }
 POSES = {**m.POSES, **EXTRA}
@@ -278,6 +282,54 @@ SEGMENTOS = [
     ("Salto: carga, vuela y aterriza", "quieto", g_salto, 2.0, 0.0),
     ("Saluda", "saluda", None, 2.4, 0.5),
 ]
+
+
+def g_saluda(p, u, f):
+    p["rfa"] += 20 * math.sin(u * 7)
+    p["rua"] += 5 * math.sin(u * 7 + 0.8)
+    f.update(happy=1 if u > 0.4 else 0)
+    return 0
+
+
+def g_senala(p, u, f):
+    p["rfa"] += 6 * math.sin(u * 6)
+    f.update(look=(0.9, -0.3))
+    return 0
+
+
+# gesto que acompaña a cada postura y cuánto cambia el peso (0 = pies quietos)
+GESTOS = {
+    "piensa": (g_piensa, 0.5), "saluda": (g_saluda, 0.5), "senala": (g_senala, 0.5),
+    "celebra": (g_salto, 0.0), "asiente": (g_asiente, 0.4), "niega": (g_niega, 0.4),
+    "encoge": (g_encoge, 0.3), "rasca": (g_rasca, 0.5), "sorpresa": (g_sorpresa, 0.0),
+    "rie": (g_rie, 0.0), "aplaude": (g_aplaude, 0.3), "impaciente": (g_impaciente, 0.0),
+}
+POSES["asiente"] = POSES["quieto"]
+
+
+def frame(vida: Vida, cur: str, local: float, now: float, level: float, dt: float):
+    """Un fotograma de la mascota en los Shorts: (postura, cara, boca).
+
+    cur: postura de la escena; local: segundos desde que empezó; level: volumen de la voz (0-1).
+    """
+    p = {"tilt": 0, "sh_up": 0, "stretch": 0, "lift": 0, **POSES.get(cur, POSES["explica"])}
+    f = {}
+    gesto, weight = GESTOS.get(cur, (None, 1.0))
+    extra = gesto(p, local, f) if gesto else 0.0
+    if cur in ("explica", "quieto"):  # gesticula con la mano mientras habla
+        p["rfa"] += 26 * level * math.sin(now * 5)
+        p["rua"] += 10 * level * math.sin(now * 5 + 0.6)
+    pose = vida.step(vida.idle(p, now, level, weight), dt)
+    face = vida.face(now, f)
+    if gesto is g_rie:
+        mouth = max(extra, level)
+    elif gesto is g_sorpresa and level < 0.1:
+        mouth = 0.6
+    else:
+        mouth = min(1.0, level * 1.6)
+    if level > 0.1 and face.get("shape") in ("flat", "o"):
+        face["shape"] = "smile"  # al hablar manda la boca de la voz
+    return pose, face, mouth
 
 
 def _old_idle(t, level):

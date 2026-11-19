@@ -443,28 +443,16 @@ def _mascot_pose(sc: dict) -> str:
     return "explica"
 
 
-def _draw_mascot(img: Image.Image, prev: str, cur: str, local: float, now: float, level: float,
+def _draw_mascot(img: Image.Image, vida, cur: str, local: float, now: float, level: float,
                  cx: float = W / 2, feet: float = MASCOT_FEET, scale: float = 0.5) -> None:
-    """level: volumen de la voz en este fotograma (0-1), mueve la boca y los gestos."""
+    """level: volumen de la voz en este fotograma (0-1), mueve la boca y los gestos.
+
+    vida: mascota_vida.Vida de este vídeo (parpadeo, respiración, peso, inercia y gestos).
+    """
     from . import mascota as m
-    k = min(max(local / 0.4, 0.0), 1.0)
-    pose = m.blend(m.POSES[prev], m.POSES[cur], _ease_out_back(k) if k < 1 else 1.0)
-    # vida: respiración, balanceo y cabeza que asiente al hablar
-    pose["spine"] += 2.5 * math.sin(now * 2.0)
-    pose["tilt"] = pose.get("tilt", 0) + 4 * math.sin(now * 1.3) + 7 * level * math.sin(now * 9)
-    pose["lua"] += 4 * math.sin(now * 1.7)
-    pose["rua"] += 4 * math.sin(now * 1.9 + 1)
-    if cur in ("explica", "quieto"):  # gesticula con la mano mientras habla
-        pose["rfa"] += 22 * level * math.sin(now * 5)
-        pose["rua"] += 10 * level * math.sin(now * 5 + 0.6)
-    if cur == "saluda":
-        pose["rfa"] += 28 * math.sin(now * 7)
-        pose["rua"] += 6 * math.sin(now * 7 + 0.8)
-    if cur == "senala":
-        pose["rfa"] += 6 * math.sin(now * 6)
-    if cur == "celebra" and local < 0.5:  # saltito al celebrar
-        pose["lift"] = pose.get("lift", 0) + 70 * math.sin(math.pi * local / 0.5)
-    lay = m.render_layer(pose, scale=scale, mouth=min(1.0, level * 1.6))
+    from . import mascota_vida as mv
+    pose, face, mouth = mv.frame(vida, cur, local, now, level, 1 / FPS)
+    lay = m.render_layer(pose, scale=scale, mouth=mouth, face=face)
     d = ImageDraw.Draw(img)
     sw = (130 - 0.6 * pose.get("lift", 0)) * scale / 0.5
     d.ellipse([cx - sw, feet - 10 * scale / 0.5, cx + sw, feet + 14 * scale / 0.5], fill=(10, 14, 28))
@@ -591,6 +579,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             stdin=subprocess.PIPE)
         last_prev = last_frame = None
         last_idx = 0
+        from .mascota_vida import Vida
+        vida = Vida(seed=sum(map(ord, Path(out_path).stem)))
         for f in range(int(total * FPS)):
             now = f / FPS
             start, scene = next((s, sc) for s, sc in reversed(scenes) if s <= now)
@@ -602,11 +592,10 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 scene.draw(img, local)
             if karaoke and spec.get("mascot", True):
                 cur = "saluda" if closing and not spec["scenes"][idx].get("pose") else _mascot_pose(spec["scenes"][idx])
-                prev = _mascot_pose(spec["scenes"][idx - 1]) if idx else "quieto"
                 if spec["scenes"][idx].get("anim") and not closing:  # animación a pantalla completa: mascota en la esquina
-                    _draw_mascot(img, prev, cur, local, now, float(env[f]), cx=W - 150, feet=1290, scale=0.3)
+                    _draw_mascot(img, vida, cur, local, now, float(env[f]), cx=W - 150, feet=1290, scale=0.3)
                 else:
-                    _draw_mascot(img, prev, cur, local, now, float(env[f]))
+                    _draw_mascot(img, vida, cur, local, now, float(env[f]))
             if closing:
                 # cierre: la cámara se acerca a la mascota y los subtítulos quedan fijos encima
                 z = 1 + 0.75 * (1 - (1 - min(local / 0.7, 1.0)) ** 3)
