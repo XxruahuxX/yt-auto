@@ -36,14 +36,14 @@ def _voice() -> str:
     return models[0]
 
 
-def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
-    """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
+def tts(text: str, out: Path, length_scale: float = 0.9, speed: float | None = None) -> float:
+    """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local. speed solo afecta a Kokoro."""
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
     if os.environ.get("TTS_ENGINE", "kokoro") == "chatterbox" and Path(CHATTERBOX_PY).exists():
         return tts_chatterbox(text, out)
     if (MODELS / "kokoro-v1.0.onnx").exists():
-        return tts_kokoro(text, out)
+        return tts_kokoro(text, out, speed)
     return tts_piper(text, out, length_scale)
 
 
@@ -77,7 +77,7 @@ def tts_chatterbox(text: str, out: Path) -> float:
         return w.getnframes() / w.getframerate()
 
 
-def tts_kokoro(text: str, out: Path) -> float:
+def tts_kokoro(text: str, out: Path, speed: float | None = None) -> float:
     """Kokoro (Apache 2.0, local, uso comercial permitido). Voces: em_alex, ef_dora, em_santa."""
     global _kokoro
     import soundfile as sf
@@ -85,7 +85,7 @@ def tts_kokoro(text: str, out: Path) -> float:
     if _kokoro is None:
         _kokoro = Kokoro(str(MODELS / "kokoro-v1.0.onnx"), str(MODELS / "voices-v1.0.bin"))
     samples, sr = _kokoro.create(text, voice=os.environ.get("KOKORO_VOICE", "em_alex"),
-                                 speed=float(os.environ.get("KOKORO_SPEED", "1.1")), lang="es")
+                                 speed=speed or float(os.environ.get("KOKORO_SPEED", "1.1")), lang="es")
     raw = out.with_suffix(".raw.wav")
     sf.write(str(raw), samples, sr)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af",
@@ -317,9 +317,10 @@ def _tile(ch: str, size: int, fill, fg) -> Image.Image:
     return im
 
 
-def _word_times(words: list[str], speech: float) -> list[float]:
-    """Reparte la duración de la voz entre palabras según su longitud."""
-    w = [len(x) + 2 for x in words]
+def _word_times(words: list[str], speech: float, pron: dict | None = None) -> list[float]:
+    """Reparte la duración de la voz entre palabras según su longitud (hablada si hay pron)."""
+    pron = pron or {}
+    w = [len(pron.get(x.strip(".,¿?¡!:;…"), x)) + 2 for x in words]
     tot, acc, out = sum(w), 0, []
     for x in w:
         out.append(0.15 + speech * acc / tot)
@@ -330,12 +331,19 @@ def _word_times(words: list[str], speech: float) -> list[float]:
 class KScene:
     """Escena estilo karaoke: gancho fijo arriba, visual en el centro, subtítulo palabra a palabra."""
 
-    def __init__(self, sc: dict, speech: float, dur: float):
+    def __init__(self, sc: dict, speech: float, dur: float, parts: list | None = None, pron: dict | None = None):
+        """parts: [(texto, inicio, duración)] cuando la frase lleva pausas «|»."""
         self.sc, self.speech, self.dur = sc, speech, dur
         probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
-        say = sc.get("say", sc.get("text", ""))
+        say = sc.get("say", sc.get("text", "")).replace("|", " ")
         self.words = _EMOJI_RE.sub("", say).split()
-        self.times = _word_times(self.words, speech)
+        if parts:
+            self.times = []
+            for text, st, du in parts:
+                ws = _EMOJI_RE.sub("", text).split()
+                self.times += [st + x for x in _word_times(ws, du, pron)]
+        else:
+            self.times = _word_times(self.words, speech, pron)
         self.hl = {w.strip(".,¿?¡!:;…").lower() for w in (sc.get("highlight") or "").split()}
         self.cf = ImageFont.truetype(BOLD, 86)
         # bloques de subtítulo de ~18 caracteres
@@ -379,6 +387,7 @@ class KScene:
         k = _ease_out_back(t / 0.3)
         if self.sc.get("anim"):
             from . import anim
+            anim.SYNC = {"words": list(zip(self.words, self.times)), "speech": self.speech}
             anim.draw(img, self.sc["anim"], t, self.dur, PANEL, full=True)
         elif k > 0.02:
             pw, ph = (PANEL[2] - PANEL[0]) / 2 * min(k, 1.04), (PANEL[3] - PANEL[1]) / 2 * min(k, 1.04)
@@ -509,12 +518,31 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         scenes, voices, sfx, t = [], [], [], 0.0
+        pron = spec.get("pron", {})
+        sections = []
+
+        def spoken(text: str) -> str:
+            for k, v in pron.items():
+                text = re.sub(rf"(?<!\w){re.escape(k)}(?!\w)", v, text)
+            return text
+
         for i, sc in enumerate(spec["scenes"]):
-            wav = tmp / f"{i}.wav"
-            speech = tts(sc.get("say") or sc["text"], wav)
+            say = sc.get("say") or sc["text"]
+            pieces = [x.strip() for x in say.split("|")]
+            parts, speech = [], 0.0
+            for j, piece in enumerate(pieces):
+                wav = tmp / f"{i}_{j}.wav"
+                du = tts(spoken(piece), wav, speed=sc.get("speed", spec.get("speed")))
+                voices.append((t + 0.15 + speech, audio.read_wav(wav)))
+                parts.append((piece, speech, du))
+                speech += du + (sc.get("gap", 0.45) if j < len(pieces) - 1 else 0)
             dur = speech + sc.get("pause", 0.05 if karaoke else 0.15) + 0.15
-            voices.append((t + 0.15, audio.read_wav(wav)))
-            sfx.append((max(0.0, t - 0.1), "whoosh"))
+            if sc.get("mood"):
+                sections.append([t, t + dur, sc["mood"]])
+            scn = (KScene(sc, speech, dur, parts if len(parts) > 1 else None, pron) if karaoke
+                   else Scene(sc, default_label, speech, dur))
+            if sc.get("trans", "swipe") == "swipe" and spec.get("whoosh", True) or i == 0 and spec.get("whoosh", True):
+                sfx.append((max(0.0, t - 0.1), "whoosh"))
             if sc.get("big"):
                 sfx.append((t + 0.1, "pop"))
             if sc.get("tiles"):
@@ -541,11 +569,23 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             elif a == "suspendido":
                 sfx.append((t + 0.55, "pop"))
             for name in sc.get("sfx", []):
-                if name == "countdown":
+                if "@" in name:  # «bark@perro» (palabra) o «bark@1.2» (segundo de la escena), admite «+0.1»
+                    name, off = name.split("@")
+                    extra = 0.0
+                    if "+" in off:
+                        off, ex = off.split("+")
+                        extra = float(ex)
+                    try:
+                        at = float(off)
+                    except ValueError:
+                        at = next((t0 for wd, t0 in zip(scn.words, scn.times)
+                                   if wd.strip(".,¿?¡!:;…").lower() == off.lower()), 0.15)
+                    sfx.append((t + at + extra, name))
+                elif name == "countdown":
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
                 else:
                     sfx.append((t + 0.15, name))
-            scenes.append((t, KScene(sc, speech, dur) if karaoke else Scene(sc, default_label, speech, dur)))
+            scenes.append((t, scn))
             t += dur
         total = t
         # retención: golpe de zoom + sonido en cada palabra clave (máx. uno cada 0,7 s)
@@ -556,7 +596,13 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                     if w.strip(".,¿?¡!:;…").lower() in scn.hl and (not punches or st + t0 - punches[-1] > 0.7):
                         punches.append(st + t0)
         mixwav = tmp / "mix.wav"
-        audio.mix(total, voices, sfx, mixwav, bpm=124 if karaoke else 104)
+        if sections:  # cada tramo dura hasta que empieza el siguiente
+            for a, b in zip(sections, sections[1:]):
+                a[1] = b[0]
+            sections[-1][1] = total
+        audio.mix(total, voices, sfx, mixwav, bpm=spec.get("bpm", 124 if karaoke else 104),
+                  music_gain=spec.get("music_gain", 0.15), sections=[tuple(x) for x in sections] or None,
+                  duck_to=spec.get("duck", 0.3))
 
         # volumen de la voz por fotograma (para la boca de la mascota)
         import numpy as np
@@ -587,7 +633,7 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             local = now - start
             img = bg.frame(now)
             idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
-            closing = karaoke and idx == len(scenes) - 1 and len(scenes) > 1
+            closing = karaoke and idx == len(scenes) - 1 and len(scenes) > 1 and spec.get("closing", True)
             if not closing:  # en el cierre solo quedan fondo, mascota y subtítulo
                 scene.draw(img, local)
             if karaoke and spec.get("mascot", True):
@@ -616,7 +662,7 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                     zw, zh = int(W * z), int(H * z)
                     ox, oy = (zw - W) // 2 + (sh if f % 2 else -sh), (zh - H) // 2
                     img = img.resize((zw, zh), Image.BILINEAR).crop((ox, oy, ox + W, oy + H))
-            if karaoke and now < 0.12:
+            if karaoke and now < 0.12 and spec.get("flash", True):
                 img = Image.blend(img, Image.new("RGB", (W, H), (255, 255, 255)), 0.8 * (1 - now / 0.12))
             d = ImageDraw.Draw(img)
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
@@ -625,7 +671,16 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             # transición: barrido lateral con desenfoque de movimiento entre escenas
             if karaoke and idx != last_idx:
                 last_prev, last_idx = last_frame, idx
-            if karaoke and idx > 0 and local < 0.28 and last_prev is not None:
+            trans = spec["scenes"][idx].get("trans", "swipe")
+            if karaoke and idx > 0 and trans == "flash" and local < 0.25:
+                img = Image.blend(img, Image.new("RGB", (W, H), (255, 250, 235)), 0.9 * (1 - local / 0.25) ** 2)
+            elif karaoke and idx > 0 and trans == "iris" and local < 0.4 and last_prev is not None:
+                p = 1 - (1 - local / 0.4) ** 3
+                r = 30 + p * math.hypot(W, H) / 2
+                mk = Image.new("L", (W, H), 0)
+                ImageDraw.Draw(mk).ellipse([W / 2 - r, H * 0.45 - r, W / 2 + r, H * 0.45 + r], fill=255)
+                img = Image.composite(img, Image.blend(last_prev, Image.new("RGB", (W, H)), 0.6 * p), mk)
+            elif karaoke and idx > 0 and trans == "swipe" and local < 0.28 and last_prev is not None:
                 p = 1 - (1 - local / 0.28) ** 3
                 off = int(W * p)
                 comp = Image.new("RGB", (W, H))

@@ -160,6 +160,9 @@ def render(kind, t, dur):
     if kind[:5] in ("x_bp_", "x_pk_", "x_cu_", "x_dc_"):
         from .anim_jue import render as rj
         return rj(kind, t, dur)
+    if kind.startswith("x_ca_"):
+        from .anim_caso import render as rc
+        return rc(kind, t, dur)
     if kind.startswith("x_rb_"):
         from .anim_serie import render as rs
         return rs(kind, t, dur)

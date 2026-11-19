@@ -1,0 +1,119 @@
+format: expediente
+style: karaoke
+experiment: expediente
+title: "Robaron la Copa del Mundo… y la encontró un PERRO 🐶 #shorts"
+description: |
+  Marzo de 1966. A cuatro meses del Mundial de Inglaterra, la Copa Jules Rimet desaparece de una exposición de sellos en Westminster (Londres). Llega un paquete con un trozo de la copa y una nota que pide un rescate. La policía detiene al hombre del rescate, pero la copa no aparece.
+  El 27 de marzo, David Corbett saca a pasear a su perro Pickles en Beulah Hill, al sur de Londres. Pickles olfatea un paquete envuelto en periódico junto a un seto: es la Copa del Mundo.
+  A Corbett lo interrogan como sospechoso. Pickles recibe la medalla de plata de la National Canine Defence League y lo invitan a la cena de celebración tras la victoria de Inglaterra.
+  En 1983 la Jules Rimet vuelve a ser robada, esta vez en la sede de la CBF en Río de Janeiro. Nunca se recuperó.
+  #fútbol #historiadelfútbol #mundial #curiosidades #shorts
+tags: [copa del mundo robada, jules rimet, pickles, perro, mundial 1966, historia del fútbol, curiosidades fútbol]
+hook: "Expediente: la Copa robada"
+flash: false
+closing: false
+whoosh: true
+bpm: 100
+music_gain: 0.2
+duck: 0.35
+pron:
+  "1966": "mil novecientos sesenta y seis"
+  "1983": "mil novecientos ochenta y tres"
+  "Pickles": "Píkels"
+scenes:
+  - anim: x_ca_robo
+    pose: sorpresa
+    mood: tension
+    say: "Robaron la Copa del Mundo. | Y la encontró un perro."
+    gap: 0.15
+    highlight: "Robaron perro."
+    sfx: ["whoosh@0.15", "stinger@0.55", "bark@perro+0.15"]
+  - anim: x_ca_londres
+    pose: explica
+    mood: tension
+    say: "Londres, 1966. La exponen en una feria de sellos."
+    highlight: "1966. sellos."
+    sfx: ["typewriter@0.1"]
+  - anim: x_ca_vacia
+    pose: sorpresa
+    mood: tension
+    trans: cut
+    say: "Y un domingo… | desaparece."
+    gap: 0.2
+    highlight: "desaparece."
+    sfx: ["typewriter@0.05", "boom@desaparece"]
+  - anim: x_ca_nota
+    pose: piensa
+    mood: tension
+    say: "Llega un paquete con un trozo de la Copa. Y una nota pidiendo dinero."
+    highlight: "trozo dinero."
+    sfx: ["paper@0.2", "pop@trozo"]
+  - anim: x_ca_pista
+    pose: rasca
+    mood: tension
+    say: "La policía pilla al del rescate. Pero de la Copa, ni rastro."
+    highlight: "pilla rastro."
+    sfx: ["cuffs@pilla+0.1", "thump@rastro"]
+  - anim: x_ca_paseo
+    pose: quieto
+    mood: tension
+    say: "Siete días después, un vecino saca a pasear a su perro."
+    highlight: "Siete perro."
+  - anim: x_ca_seto
+    pose: agacha
+    mood: build
+    trans: cut
+    say: "El perro se para en un seto. Hay un paquete envuelto en periódico."
+    highlight: "seto. paquete periódico."
+    sfx: ["sniff@seto+0.2", "paper@paquete"]
+    pause: 0.25
+  - anim: x_ca_abre
+    pose: sorpresa
+    mood: silence
+    trans: cut
+    say: "Lo abre…"
+    speed: 0.95
+    pause: 0.25
+    sfx: ["paper@0.1", "riser@0.0"]
+  - anim: x_ca_revela
+    pose: celebra
+    mood: reveal
+    trans: flash
+    say: "Y es la Copa del Mundo."
+    speed: 1.0
+    highlight: "Copa Mundo."
+    sfx: ["chime@0.0", "ding@0.05"]
+    pause: 0.3
+  - anim: x_ca_interroga
+    pose: niega
+    mood: light
+    say: "Al dueño lo interrogan como sospechoso."
+    highlight: "sospechoso."
+    sfx: ["thump@sospechoso"]
+  - anim: x_ca_medalla
+    pose: aplaude
+    mood: light
+    say: "Al perro le dan una medalla."
+    highlight: "medalla."
+    sfx: ["shutter@0.25", "shutter@0.6", "shutter@1.0", "shutter@1.35", "ding@medalla+0.2"]
+  - anim: x_ca_cena
+    pose: rie
+    mood: light
+    say: "Se llamaba Pickles. Inglaterra ganó el Mundial, y lo invitaron a la cena de campeones."
+    highlight: "Pickles. Mundial, cena"
+    sfx: ["typewriter@0.05", "pop@inglaterra", "bark@cena+0.4"]
+  - anim: x_ca_rio
+    pose: piensa
+    mood: dark
+    trans: cut
+    say: "En 1983 la roban otra vez, en Río de Janeiro. Nunca apareció."
+    highlight: "1983 otra vez, Nunca"
+    sfx: ["typewriter@0.05", "stinger@roban", "boom@nunca"]
+  - anim: x_ca_final
+    pose: encoge
+    mood: dark
+    trans: iris
+    say: "Esa vez no había perro."
+    speed: 0.95
+    highlight: "perro."
+    pause: 0.45
