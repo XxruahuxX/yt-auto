@@ -1,0 +1,35 @@
+format: serie
+style: karaoke
+caption: palabra
+mascot: false
+experiment: storytime
+title: "Mi equipo fichó a un PORTERO que no sabía que era portero 🧤😂 #shorts"
+description: |
+  Storytime de fútbol (historia inventada): mi equipo llevaba diez partidos sin ganar y fichó a Marcos, dos metros y guantes enormes. Solo había un problema.
+  #fútbol #humor #storytime #fyp #shorts
+tags: [storytime, fútbol, humor fútbol, portero, fyp]
+hook: "Fichamos a un portero que no era portero"
+scenes:
+  - anim: x_st_racha
+    say: "Mi equipo llevaba diez partidos sin ganar. Así que el presidente fichó a alguien."
+    highlight: "diez ganar. fichó"
+    sfx: [whoosh]
+  - anim: x_st_llega
+    say: "Se llamaba Marcos. Dos metros. Unos guantes enormes. Todo el vestuario se puso a aplaudir."
+    highlight: "Marcos. metros. guantes aplaudir."
+  - anim: x_st_porteria
+    say: "El entrenador le dijo: Marcos, a la portería. Y Marcos salió corriendo… hacia la portería del otro equipo."
+    highlight: "portería. otro equipo."
+  - anim: x_st_aparta
+    say: "Primer tiro del rival. Marcos se aparta. Gol. Y nos dice tan tranquilo: es que me iba a dar."
+    highlight: "aparta. Gol. dar."
+  - anim: x_st_descanso
+    say: "Descanso. Perdemos cero a tres. El entrenador le pregunta: ¿tú no eras portero? Y Marcos contesta: no, los guantes son para el frío."
+    highlight: "tres. portero? frío."
+  - anim: x_st_cabeza
+    say: "Segunda parte. Lo ponemos de delantero. Tres goles de cabeza. Empate a tres."
+    highlight: "delantero. cabeza. Empate"
+    sfx: [ding]
+  - anim: x_st_final
+    say: "Ahora es nuestro máximo goleador. Y sigue jugando con guantes. ¿Queréis la parte dos?"
+    highlight: "goleador. guantes. dos?"

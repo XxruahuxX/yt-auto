@@ -421,6 +421,21 @@ class KScene:
         d = ImageDraw.Draw(img)
         # subtítulo karaoke
         cur = max([i for i, t0 in enumerate(self.times) if t >= t0] or [0])
+        if getattr(self, "word_mode", False):
+            # estilo storytime: solo la palabra actual, grande y centrada, con un pequeño «pop»
+            w = self.words[cur]
+            key = w.strip(".,¿?¡!:;…").lower()
+            k = min(1.0, (t - self.times[cur]) / 0.12)
+            size = int(118 * (1.18 - 0.18 * k))
+            f = ImageFont.truetype(BOLD, size)
+            txt = w.upper()
+            lw = d.textlength(txt, font=f)
+            if lw > W - 80:
+                f = ImageFont.truetype(BOLD, int(size * (W - 80) / lw))
+                lw = d.textlength(txt, font=f)
+            col = YELLOW if key in self.hl else WHITE
+            d.text(((W - lw) / 2, 1180), txt, font=f, fill=col, stroke_width=12, stroke_fill=(5, 6, 12))
+            return
         chunk = next(c for c in self.chunks if cur in c or c[-1] >= cur)
         line = " ".join(self.words[i] for i in chunk)
         lw = d.textlength(line, font=self.cf)
@@ -585,6 +600,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
                 else:
                     sfx.append((t + 0.15, name))
+            if karaoke:
+                scn.word_mode = spec.get("caption") == "palabra"
             scenes.append((t, scn))
             t += dur
         total = t
