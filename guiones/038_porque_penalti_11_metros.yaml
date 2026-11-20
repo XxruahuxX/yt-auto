@@ -1,0 +1,44 @@
+format: porque
+style: karaoke
+experiment: corto-bucle
+title: '¿Por qué el penalti se tira desde 11 METROS? 🎯 #shorts'
+description: 'El punto de penalti está a 11 metros porque el reglamento nació en Inglaterra
+  y se medía en yardas: son 12 yardas, que equivalen a 10,97 metros.
+
+  #fútbol #curiosidades #reglas #penalti #shorts
+
+  '
+tags:
+- penalti
+- 11 metros
+- reglas del fútbol
+- curiosidades fútbol
+- por qué
+hook: El penalti no está a 11 metros
+scenes:
+- anim: x_ym_regla
+  pose: sorpresa
+  say: El penalti no está a once metros. Está a doce yardas.
+  highlight: once doce yardas.
+  sfx:
+  - whoosh
+- anim: x_ym_ingles
+  pose: explica
+  say: El reglamento nació en Inglaterra, y allí todo se mide en yardas, no en metros.
+  highlight: Inglaterra, yardas.
+- anim: x_ym_regla
+  pose: piensa
+  say: Al principio ni siquiera había punto. Era una línea pintada a doce yardas de
+    la portería.
+  highlight: punto. línea
+- anim: x_dc_contador|10,97|METROS|12 yardas
+  pose: senala
+  say: Doce yardas son diez metros con noventa y siete. Redondeado, once metros.
+  highlight: noventa siete. once.
+  sfx:
+  - ding
+- anim: x_ym_tiro
+  pose: celebra
+  say: Así que cuando alguien falla un penalti, síguenos, porque no estaba a once
+    metros.
+  highlight: falla síguenos, once

@@ -157,6 +157,9 @@ def render(kind, t, dur):
     if kind[:5] in ("x_gk_", "x_sd_", "x_tj_"):
         from .anim_pro import render as rp
         return rp(kind, t, dur)
+    if kind[:5] in ("x_ym_", "x_pi_", "x_pm_"):
+        from .anim_sab import render as rsab
+        return rsab(kind, t, dur)
     if kind[:5] in ("x_nv_", "x_mz_", "x_cs_"):
         from .anim_vie import render as rv
         return rv(kind, t, dur)
