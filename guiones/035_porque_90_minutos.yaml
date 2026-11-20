@@ -1,0 +1,36 @@
+format: porque
+style: karaoke
+experiment: estilo-porquemetro
+title: "¿Por qué un partido dura 90 MINUTOS? ⏱️ No es casualidad #shorts"
+description: |
+  Al principio el fútbol no tenía una duración fija y cada club jugaba con sus reglas. En 1866, Londres y Sheffield acordaron jugar 90 minutos en un partido entre ambas ciudades. En 1897 la duración quedó escrita en las reglas: 90 minutos, en dos partes de 45. El descanso con cambio de campo reparte el viento y el sol entre los dos equipos.
+  #fútbol #curiosidades #reglas #historia #shorts
+tags: [90 minutos, reglas del fútbol, curiosidades fútbol, historia del fútbol, por qué]
+hook: "Un partido no siempre duró 90 minutos"
+scenes:
+  - anim: x_nv_sin_reloj
+    pose: piensa
+    say: "Hubo un tiempo en que un partido no tenía final. Cada club jugaba con sus reglas, y nadie sabía cuándo parar."
+    highlight: "final. parar."
+    sfx: [whoosh]
+  - anim: x_nv_1866
+    pose: explica
+    say: "En mil ochocientos sesenta y seis, Londres y Sheffield juegan un partido entre ciudades. Para no discutir, pactan una duración: noventa minutos."
+    highlight: "sesenta seis, noventa"
+  - anim: "x_dc_contador|90|MINUTOS|45 + 45"
+    pose: asiente
+    say: "Noventa minutos, en dos partes de cuarenta y cinco."
+    highlight: "Noventa cuarenta cinco."
+    sfx: [ding]
+  - anim: x_nv_1897
+    pose: senala
+    say: "Pero era solo un acuerdo. En mil ochocientos noventa y siete, la duración queda escrita en las reglas."
+    highlight: "acuerdo. escrita"
+  - anim: x_nv_descanso
+    pose: explica
+    say: "¿Y por qué partirlo en dos? Para cambiar de campo en el descanso. Así el viento y el sol tocan igual a los dos equipos."
+    highlight: "cambiar viento sol"
+  - emoji: "💬"
+    pose: saluda
+    say: "¿Cambiarías la duración de los partidos? Dímelo en comentarios. Y síguenos."
+    highlight: "duración síguenos."

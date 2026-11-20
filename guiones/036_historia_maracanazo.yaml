@@ -1,0 +1,40 @@
+format: historia
+style: karaoke
+experiment: base
+title: "El partido que dejó en SILENCIO a 170.000 personas 😶 #shorts"
+description: |
+  Mundial de 1950. En el último partido, a Brasil le valía el empate contra Uruguay en el Maracaná. Brasil marcó primero (minuto 47), Uruguay empató en el 66 y ganó con un gol en el 79. Más de 170.000 espectadores (173.850 según la cifra oficial) se quedaron en silencio. Se le llama el Maracanazo. Tras aquel partido, Brasil dejó su camiseta blanca y adoptó la amarilla.
+  #fútbol #mundial #historia #maracanazo #shorts
+tags: [maracanazo, mundial 1950, uruguay, brasil, historia del fútbol]
+hook: "170.000 personas se quedaron mudas"
+scenes:
+  - anim: x_mz_silencio
+    pose: sorpresa
+    say: "Más de ciento setenta mil personas. Y de repente, silencio total. Esto pasó en el Maracaná."
+    highlight: "setenta silencio Maracaná."
+    sfx: [whoosh]
+  - anim: x_mz_empate
+    pose: explica
+    say: "Mundial de mil novecientos cincuenta. Último partido: Brasil contra Uruguay. A Brasil le vale el empate. Todo el país ya lo celebra."
+    highlight: "cincuenta. empate. celebra."
+  - anim: "x_dc_contador|173.850|ESPECTADORES|cifra oficial"
+    pose: senala
+    say: "La cifra oficial: ciento setenta y tres mil ochocientos cincuenta espectadores."
+    highlight: "oficial: espectadores."
+    sfx: [ding]
+  - anim: x_mz_goles
+    pose: piensa
+    say: "Brasil marca en el minuto cuarenta y siete. Uruguay empata en el sesenta y seis. Y en el setenta y nueve, gol de Uruguay."
+    highlight: "cuarenta sesenta setenta Uruguay."
+  - anim: x_mz_estadio
+    pose: niega
+    say: "Uruguay es campeón del mundo en casa de Brasil. Desde entonces, a ese partido se le llama el Maracanazo."
+    highlight: "campeón Maracanazo."
+  - anim: x_mz_camiseta
+    pose: senala
+    say: "Brasil jugaba de blanco. Después de aquel día cambió de camiseta. Así nació la amarilla."
+    highlight: "blanco. amarilla."
+  - emoji: "💬"
+    pose: saluda
+    say: "¿Cuál es la derrota más dura que recuerdas? Dímelo en comentarios. Y síguenos."
+    highlight: "dura síguenos."

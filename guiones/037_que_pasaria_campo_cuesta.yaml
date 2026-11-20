@@ -1,0 +1,36 @@
+format: quepasaria
+style: karaoke
+experiment: que-pasaria
+title: "¿Y si el CAMPO tuviera CUESTA? ⛰️⚽😂 #shorts"
+description: |
+  Un «¿qué pasaría si…?» de broma: el campo tiene cuesta. Un equipo baja volando, el otro sube sufriendo, y el saque de centro acaba en autogol.
+  #fútbol #humor #quépasaríasi #fyp #shorts
+tags: [qué pasaría si, campo de fútbol, humor fútbol, fútbol, fyp]
+hook: "¿Y si el campo tuviera cuesta?"
+scenes:
+  - anim: x_cs_campo
+    pose: sorpresa
+    say: "¿Qué pasaría si el campo tuviera cuesta? Dejas el balón en el centro y se va solo a la portería."
+    highlight: "cuesta? solo"
+    sfx: [whoosh]
+  - anim: x_cs_ataque
+    pose: rie
+    say: "Un equipo baja a toda velocidad. El otro sube sudando y sin aire. Partido muy justo."
+    highlight: "velocidad. sudando justo."
+  - anim: x_cs_porteros
+    pose: encoge
+    say: "El portero de arriba se echa la siesta. El de abajo para cuarenta tiros por parte."
+    highlight: "siesta. cuarenta"
+  - anim: x_cs_descanso
+    pose: rie
+    say: "Llega el descanso y se cambian de campo. Ahora los que bajaban tienen que subir. Nadie quiere volver a salir."
+    highlight: "descanso subir. Nadie"
+  - anim: x_cs_saque
+    pose: aplaude
+    say: "Y lo mejor: el saque de centro cuesta arriba. El balón vuelve rodando. Autogol."
+    highlight: "rodando. Autogol."
+    sfx: [ding]
+  - emoji: "💬"
+    pose: saluda
+    say: "¿Qué otro campo raro probamos? Dímelo en comentarios. Y síguenos."
+    highlight: "raro síguenos."
