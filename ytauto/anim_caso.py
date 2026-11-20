@@ -1,6 +1,6 @@
 """Formato «Expediente»: casos reales del fútbol contados como cine negro.
 
-Primer caso (035): la Copa del Mundo robada en Londres en 1966 y Pickles, el perro que la encontró.
+Primer caso (038): la Copa del Mundo robada en Londres en 1966 y Pickles, el perro que la encontró.
 Animaciones x_ca_*. Todas comparten personajes (Pickles, el dueño, el bobby, la Copa) y la misma
 luz: fondo azul noche, focos cálidos, grano de película y viñeta.
 
