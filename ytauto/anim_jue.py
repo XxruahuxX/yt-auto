@@ -399,10 +399,10 @@ def render(kind, t, dur):
         parts = (kind.split("|") + ["", "", ""])[1:4]
         val, unidad, desg = parts
         try:
-            target = float(val.replace(",", "."))
+            target = float(val.replace(".", "").replace(",", "."))
         except ValueError:
             target = 0.0
-        dec = len(val.replace(".", ",").split(",")[1]) if ("," in val or "." in val) else 0
+        dec = len(val.split(",")[1]) if "," in val else 0
         d = grad(im, (10, 16, 36), (20, 30, 60))
         cy, R = PH * 0.46, 210
         k = _e(min(1, max(0, (t - 0.2) / min(1.6, dur * 0.5))))
