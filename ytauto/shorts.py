@@ -633,7 +633,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             local = now - start
             img = bg.frame(now)
             idx = next(i for i, (st, _) in enumerate(scenes) if st == start)
-            closing = karaoke and idx == len(scenes) - 1 and len(scenes) > 1 and spec.get("closing", True)
+            closing = (karaoke and idx == len(scenes) - 1 and len(scenes) > 1 and spec.get("closing", True)
+                       and not spec["scenes"][idx].get("anim"))
             if not closing:  # en el cierre solo quedan fondo, mascota y subtítulo
                 scene.draw(img, local)
             if karaoke and spec.get("mascot", True):

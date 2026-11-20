@@ -1,0 +1,42 @@
+format: quepasaria
+style: karaoke
+experiment: corto-bucle
+title: '¿Y si las PORTERÍAS se movieran solas? 🥅🏃😂 #shorts'
+description: 'Un «¿qué pasaría si…?» de broma: las porterías tienen patas y se mueven
+  solas.
+
+  #fútbol #humor #quépasaríasi #fyp #shorts
+
+  '
+tags:
+- qué pasaría si
+- portería
+- humor fútbol
+- fútbol
+- fyp
+hook: ¿Y si la portería se escapara?
+scenes:
+- anim: x_pm_huye
+  pose: sorpresa
+  say: ¿Y si la portería tuviera patas? Chutas y se aparta.
+  highlight: patas? aparta.
+  sfx:
+  - whoosh
+- anim: x_pm_portero
+  pose: rie
+  say: El portero ya no para tiros. Se pasa el partido persiguiendo su portería.
+  highlight: persiguiendo
+- anim: x_pm_huye
+  pose: piensa
+  say: Los defensas tendrían que atarla con cuerdas para que no se fuera del campo.
+  highlight: cuerdas
+- anim: x_pm_gol
+  pose: celebra
+  say: Pero un día la portería se lanza a por el balón. Gol.
+  highlight: lanza Gol.
+  sfx:
+  - ding
+- anim: x_pm_var
+  pose: encoge
+  say: El VAR no sabe a quién dárselo. Síguenos, y que la portería no se escape.
+  highlight: VAR Síguenos, escape.

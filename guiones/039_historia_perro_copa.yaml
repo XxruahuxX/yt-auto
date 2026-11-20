@@ -1,0 +1,49 @@
+format: historia
+style: karaoke
+experiment: corto-bucle
+title: 'Un PERRO encontró la Copa del Mundo robada 🐶🏆 #shorts'
+description: 'En marzo de 1966, meses antes del Mundial de Inglaterra, robaron en
+  Londres el trofeo de la Copa del Mundo (la Copa Jules Rimet). Siete días después,
+  un perro llamado Pickles la encontró envuelta en papel de periódico junto a un seto.
+
+  #fútbol #mundial #historia #curiosidades #shorts
+
+  '
+tags:
+- copa jules rimet
+- pickles
+- mundial 1966
+- historia del fútbol
+- curiosidades
+hook: Un perro salvó la Copa del Mundo
+scenes:
+- anim: x_pi_heroe
+  pose: sorpresa
+  say: Un perro salvó la Copa del Mundo. Y no es broma.
+  highlight: perro Copa
+  sfx:
+  - whoosh
+- anim: x_pi_vitrina
+  pose: explica
+  say: Londres, mil novecientos sesenta y seis. Meses antes del Mundial, roban el
+    trofeo de una exposición.
+  highlight: sesenta seis. roban
+- anim: x_dc_contador|7|DÍAS|robada → encontrada
+  pose: piensa
+  say: Siete días después, nadie sabe dónde está.
+  highlight: Siete nadie
+- anim: x_pi_perro
+  pose: senala
+  say: Hasta que un perro, Pickles, olfatea un paquete de periódico junto a un seto.
+    Dentro estaba la Copa.
+  highlight: Pickles, Copa.
+  sfx:
+  - ding
+- anim: x_pi_heroe
+  pose: celebra
+  say: Pickles se convirtió en el héroe de todo el país.
+  highlight: héroe país.
+- anim: x_pi_heroe
+  pose: aplaude
+  say: Síguenos, porque un perro salvó la Copa del Mundo.
+  highlight: Síguenos, perro
