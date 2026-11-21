@@ -1,0 +1,32 @@
+format: serie
+style: karaoke
+caption: palabra
+mascot: false
+experiment: storytime
+title: "El árbitro que estrenó SILBATO y pitó TODO 😂🟨 #shorts"
+description: |
+  Storytime de fútbol (historia inventada): el árbitro de nuestro partido estrenaba silbato y decidió usarlo para todo. Hasta que se pitó a sí mismo.
+  #fútbol #humor #storytime #árbitro #fyp #shorts
+tags: [storytime, árbitro, fútbol, humor fútbol, fyp]
+hook: "El árbitro estrenaba silbato. Y pitó todo"
+scenes:
+  - anim: x_st_arb_llega
+    say: "El sábado nos tocó un árbitro que estrenaba silbato. Y se le notaba muchísimo la ilusión."
+    highlight: "silbato. ilusión."
+    sfx: [whoosh]
+  - anim: x_st_arb_saque
+    say: "Saque inicial. Ni he tocado el balón. Priiit. Falta."
+    highlight: "tocado Falta."
+  - anim: x_st_arb_tarjeta
+    say: "Le pregunto qué he hecho. Me saca amarilla. Por respirar fuerte."
+    highlight: "amarilla. respirar"
+  - anim: x_st_arb_contador
+    say: "Al descanso íbamos cero a cero. Con cuarenta y siete faltas. Y once amarillas."
+    highlight: "cuarenta siete once"
+    sfx: [ding]
+  - anim: x_st_arb_auto
+    say: "En la segunda parte se pita una falta a sí mismo. Se saca la roja. Y se va al vestuario."
+    highlight: "sí mismo. roja."
+  - anim: x_st_arb_final
+    say: "Terminó arbitrando el utillero. Cero faltas en todo el partido. ¿Queréis la parte dos?"
+    highlight: "utillero. Cero dos?"

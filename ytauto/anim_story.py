@@ -100,6 +100,8 @@ def goal_side(d, gx, gb, h=260, w=120, flip=False):
 
 
 def render(kind, t, dur):
+    if kind.startswith("x_st_arb_"):
+        return render2(kind, t, dur)
     PW, PH = A.PW, A.PH
     im = Image.new("RGB", (PW, PH))
     cx = PW / 2
@@ -201,3 +203,146 @@ def render(kind, t, dur):
             stamp(im, "¿PARTE 2?", cx, PH * 0.36, dur * 0.5, t, bg=RED, fg=WHITE, size=60)
         return im
     return im
+
+
+# ---------------------------------------------------------------- storytime 2: el árbitro del silbato nuevo
+REF = (24, 24, 28)
+
+
+def arbitro(d, x, y, s=1.6, mouth="sonrisa", pose="", up=0.0, whistle=True, t=0.0):
+    person(d, x, y, s, REF, SKINS[2], "corto", (20, 14, 10), "", mouth=mouth, pose=pose, arm_up=up, shorts=(20, 20, 24))
+    hx, hy = head(x, y, s)
+    if whistle:
+        d.ellipse([hx + 4 * s, hy + 14 * s, hx + 30 * s, hy + 30 * s], fill=(210, 215, 225), outline=INK, width=max(2, int(3 * s)))
+        d.line([(hx + 26 * s, hy + 18 * s), (hx + 60 * s, hy + 40 * s)], fill=(250, 200, 40), width=max(2, int(4 * s)))
+
+
+def priit(d, x, y, t, n=6):
+    for i in range(n):
+        a = i / n * 2 * math.pi + t * 3
+        r0, r1 = 40, 90 + 20 * math.sin(t * 20 + i)
+        d.line([(x + r0 * math.cos(a), y + r0 * math.sin(a)), (x + r1 * math.cos(a), y + r1 * math.sin(a))], fill=YEL, width=8)
+
+
+def talk(t, on=True):
+    return "abierta" if on and int(t * 9) % 3 else "sonrisa"
+
+
+def compose(bg, fg, shots, t, dur):
+    """Plano con profundidad: el fondo se desenfoca en los primeros planos, cámara en mano y corte con golpe."""
+    from PIL import ImageFilter
+    PW, PH = bg.size
+    n = len(shots)
+    seg = max(dur / n, 0.8)
+    i = min(int(t / seg), n - 1)
+    z = shots[i][2]
+    if z > 1.3:
+        bg = bg.filter(ImageFilter.GaussianBlur(min(9, (z - 1.2) * 6)))
+    img = bg.copy()
+    img.paste(fg, (0, 0), fg)
+    # cámara en mano: pequeño vaivén
+    fx, fy, zz = shots[i]
+    jx, jy = 6 * math.sin(t * 2.1) * zz, 5 * math.sin(t * 1.7 + 1) * zz
+    sh = [(a + jx, b + jy, c) for a, b, c in shots]
+    out = shoot(img, sh, t, dur)
+    lt = t - i * seg
+    if i > 0 and lt < 0.06:  # destello blanco muy corto en el corte
+        out = Image.blend(out, Image.new("RGB", out.size, (255, 255, 255)), 0.35 * (1 - lt / 0.06))
+    return out
+
+
+def bob(t, s, k=1.0):
+    return 4 * s * math.sin(t * 3.2) * k
+
+
+def render2(kind, t, dur):
+    from .anim_pro import card
+    PW, PH = A.PW, A.PH
+    bg = Image.new("RGB", (PW, PH))
+    fg = Image.new("RGBA", (PW, PH), (0, 0, 0, 0))
+    d = ImageDraw.Draw(fg)
+    cx = PW / 2
+    FY = PH * 0.64
+    if kind == "x_st_arb_llega":
+        side_pitch(bg, t)
+        k = _e(t / 0.9)
+        ax = -100 + (cx + 100) * k
+        walking = k < 1
+        arbitro(d, ax, FY + (0 if walking else bob(t, 1.8)), 1.8, mouth="sonrisa", t=t) if not walking else \
+            person(d, ax, FY, 1.8, REF, SKINS[2], "corto", (20, 14, 10), "", phase=t * 11, run=1.0, shorts=(20, 20, 24))
+        hx, hy = head(ax, FY, 1.8)
+        if t > dur * 0.4:
+            for i2 in range(5):
+                a = t * 4 + i2 * 1.25
+                sx, sy, r = hx + 40 + 80 * math.cos(a), hy + 30 + 55 * math.sin(a), 18 + 6 * math.sin(t * 9 + i2)
+                d.polygon([(sx, sy - r), (sx + r * 0.3, sy - r * 0.3), (sx + r, sy), (sx + r * 0.3, sy + r * 0.3),
+                           (sx, sy + r), (sx - r * 0.3, sy + r * 0.3), (sx - r, sy), (sx - r * 0.3, sy - r * 0.3)], fill=YEL)
+        im = compose(bg, fg, [(cx, PH * 0.42, 1.0), (hx, hy + 30, 2.0), (hx + 40, hy + 40, 3.2)], t, dur)
+        if t > dur * 0.4:
+            stamp(im, "SILBATO NUEVO", cx, PH * 0.36, dur * 0.4, t, bg=YEL, fg=INK, size=48)
+        return im
+    if kind == "x_st_arb_saque":
+        side_pitch(bg, t)
+        blown = t > dur * 0.35
+        yo(d, cx - 40, FY + bob(t, 1.3), 1.3, mouth="abierta" if blown else "sonrisa", run=0.0 if blown else 0.3, phase=t * 6)
+        ball(d, cx + 40, FY, 26)
+        ry = FY + 20 + bob(t + 1, 1.5)
+        arbitro(d, PW * 0.80, ry, 1.5, mouth="abierta" if blown else "sonrisa", up=1.0 if blown else 0)
+        hx, hy = head(PW * 0.80, ry, 1.5)
+        if blown:
+            priit(d, hx + 50, hy + 30, t)
+        im = compose(bg, fg, [(cx, PH * 0.42, 1.0), (hx, hy + 40, 2.2), (cx - 40, FY - 230, 2.0)], t, dur)
+        if blown:
+            stamp(im, "¡PRIIIT! ¡FALTA!", cx, PH * 0.36, dur * 0.35, t, bg=RED, fg=WHITE, size=52)
+        return im
+    if kind == "x_st_arb_tarjeta":
+        side_pitch(bg, t)
+        yo(d, PW * 0.30, FY + bob(t, 1.45), 1.45, mouth=talk(t, t > dur * 0.6))
+        ry = FY + bob(t + 1, 1.55)
+        arbitro(d, PW * 0.68, ry, 1.55, mouth="enfado", up=1.0)
+        cx2, cy2 = PW * 0.68 + 36 * 1.55, ry - 222 * 1.55 - 40
+        card(d, cx2, cy2, 70, 100, (250, 210, 30), rot=8 * math.sin(t * 6), im=fg)
+        yhx, yhy = head(PW * 0.30, FY, 1.45)
+        im = compose(bg, fg, [(cx, PH * 0.42, 1.0), (cx2, cy2 + 60, 2.4), (yhx, yhy + 40, 2.3)], t, dur)
+        stamp(im, "AMARILLA POR RESPIRAR", cx, PH * 0.36, dur * 0.3, t, bg=YEL, fg=INK, size=42)
+        return im
+    if kind == "x_st_arb_contador":
+        locker_room(bg, t)
+        dd = ImageDraw.Draw(bg)
+        dd.rounded_rectangle([60, PH * 0.32, PW - 60, PH * 0.54], 20, fill=(14, 16, 26), outline=YEL, width=6)
+        text_c(dd, cx, PH * 0.34, "DESCANSO · 0 - 0", 46, WHITE, 5)
+        n = int(min(1.0, t / (dur * 0.7)) * 47)
+        text_c(dd, cx, PH * 0.40, f"{n} FALTAS", 96, YEL, 8)
+        text_c(dd, cx, PH * 0.495, "Y 11 AMARILLAS", 44, WHITE, 5)
+        return compose(bg, fg, [(cx, PH * 0.43, 1.0), (cx, PH * 0.43, 1.25)], t, dur)
+    if kind == "x_st_arb_auto":
+        side_pitch(bg, t)
+        walking = t > dur * 0.65
+        ax = PW * 0.50 + (PW * 0.45 * _e((t - dur * 0.65) / (dur * 0.35)))
+        if walking:
+            person(d, ax, FY, 1.75, REF, SKINS[2], "corto", (20, 14, 10), "", mouth="enfado", phase=t * 9, run=0.8, shorts=(20, 20, 24))
+        else:
+            arbitro(d, ax, FY + bob(t, 1.75), 1.75, mouth="enfado", up=1.0 if t > dur * 0.3 else 0)
+        hx, hy = head(ax, FY, 1.75)
+        if dur * 0.3 < t < dur * 0.65:
+            card(d, ax + 36 * 1.75, FY - 222 * 1.75 - 40, 70, 100, (220, 40, 50), rot=-6, im=fg)
+        for x, sk in ((0.12, 1), (0.30, 0)):
+            person(d, PW * x, FY + 30 + bob(t + x * 5, 1.1), 1.1, BLUE, SKINS[sk], "corto", (40, 28, 20), "", mouth="abierta")
+        im = compose(bg, fg, [(hx, hy + 40, 2.2), (ax + 60, FY - 400, 2.2), (cx, PH * 0.42, 1.0)], t, dur)
+        if t > dur * 0.3:
+            stamp(im, "¡SE EXPULSA A SÍ MISMO!", cx, PH * 0.36, dur * 0.3, t, bg=RED, fg=WHITE, size=44)
+        return im
+    if kind == "x_st_arb_final":
+        side_pitch(bg, t)
+        bg = _glow(bg, lambda g: g.ellipse([cx - 300, PH * 0.25, cx + 300, PH * 0.65], fill=(90, 80, 20)), 50)
+        for x, sk in ((0.2, 1), (0.8, 2)):
+            hop = abs(math.sin(t * 7 + x * 4)) * 30
+            person(d, PW * x, FY - hop, 1.2, BLUE, SKINS[sk], "corto", (40, 28, 20), "", mouth="abierta", arm_up=1.0)
+        person(d, cx, FY + bob(t, 1.5), 1.5, (240, 140, 40), SKINS[0], "mono", (120, 120, 120), "", mouth=talk(t), glasses=True)
+        hx, hy = head(cx, FY, 1.5)
+        im = compose(bg, fg, [(cx, PH * 0.42, 1.0), (hx, hy + 40, 2.3), (cx, PH * 0.36, 1.2)], t, dur)
+        stamp(im, "0 FALTAS", cx, PH * 0.36, 0.4, t, bg=GREEN, fg=WHITE, size=56)
+        if t > dur * 0.55:
+            stamp(im, "¿PARTE 2?", cx, PH * 0.46, dur * 0.55, t, bg=RED, fg=WHITE, size=56)
+        return im
+    return Image.new("RGB", (PW, PH))

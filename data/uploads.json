@@ -61,7 +61,7 @@
  },
  "guiones/024_porque_portero_color.yaml": {
   "id": "fbM_74Rn4yU",
-  "publish_at": "2026-11-21T20:00:00Z"
+  "publish_at": "2026-11-22T20:00:00Z"
  },
  "guiones/038_porque_penalti_11_metros.yaml": {
   "id": "_ATVQXjzyTM",
@@ -74,5 +74,9 @@
  "guiones/042_storytime_portero_guantes.yaml": {
   "id": "qZ5xFV_7a4k",
   "publish_at": "2026-11-20T20:00:00Z"
+ },
+ "guiones/043_storytime_arbitro_silbato.yaml": {
+  "id": "ndkHvfeu7KA",
+  "publish_at": "2026-11-21T20:00:00Z"
  }
 }
