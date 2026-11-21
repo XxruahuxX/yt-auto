@@ -1,0 +1,43 @@
+format: serie
+style: karaoke
+caption: palabra
+mascot: false
+experiment: storytime
+title: "Mentí para jugar la final… y la paré con la NARIZ 😂🧤 #shorts"
+description: |
+  Storytime de fútbol (historia inventada): el portero se rompe un dedo el día antes de la final y yo digo que sé parar. Nunca había sido portero.
+  #fútbol #humor #storytime #portero #shorts
+tags: [storytime, fútbol, humor fútbol, portero, penaltis, fyp]
+hook: "Mentí para jugar la final"
+scenes:
+  - anim: x_mt_dedo
+    say: "Mentí para jugar la final. El día antes, nuestro portero se rompió un dedo."
+    highlight: "Mentí final. dedo."
+    sfx: [whoosh]
+  - anim: x_mt_mentira
+    say: "El entrenador preguntó: ¿alguien sabe parar? Y yo levanté la mano. Con los dedos cruzados."
+    highlight: "parar? mano. cruzados."
+  - anim: x_mt_nunca
+    say: "Problema: nunca había jugado de portero. Ni una vez."
+    highlight: "nunca portero. vez."
+  - anim: x_mt_goles
+    say: "Minuto uno: gol. Minuto cinco: otro gol. Me tiré las dos veces al lado contrario."
+    highlight: "gol. gol. contrario."
+    sfx: [ding]
+  - anim: x_mt_madre
+    say: "Mi madre, en la grada, ya no podía ni mirar."
+    highlight: "madre, mirar."
+  - anim: x_mt_remontada
+    say: "Pero mis compañeros remontaron. Dos a dos. Y nos fuimos a penaltis."
+    highlight: "remontaron. Dos penaltis."
+    sfx: [ding]
+  - anim: x_mt_ultimo
+    say: "Último penalti. Si lo paro, somos campeones. Cierro los ojos."
+    highlight: "Último campeones. ojos."
+  - anim: x_mt_nariz
+    say: "Y lo paro. Con la nariz. Somos campeones."
+    highlight: "paro. nariz. campeones."
+    sfx: [ding]
+  - anim: x_mt_muro
+    say: "Ahora en el pueblo me llaman El Muro. Nadie sabe que fue con la nariz. Bueno, ahora vosotros sí."
+    highlight: "Muro. nariz. sí."
