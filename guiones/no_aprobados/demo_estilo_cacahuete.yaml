@@ -12,3 +12,5 @@ scenes:
     say: "El entrenador me miró y dijo: tú, de portero. Yo no había parado un balón en mi vida."
   - anim: x_bn_campo
     say: "Primer tiro del partido. Me tiro hacia el lado contrario. Gol."
+  - anim: x_bn_balon
+    say: "Y ahora, último penalti. Bajo la lluvia. Todo depende de mí."
