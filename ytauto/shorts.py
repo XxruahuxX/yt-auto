@@ -421,6 +421,20 @@ class KScene:
         d = ImageDraw.Draw(img)
         # subtítulo karaoke
         cur = max([i for i, t0 in enumerate(self.times) if t >= t0] or [0])
+        if getattr(self, "pair_mode", False):
+            # estilo «par»: dos palabras en minúscula, blancas con borde negro, sin colores
+            i0 = cur - cur % 2
+            txt = " ".join(self.words[i0:i0 + 2]).lower()
+            f = ImageFont.truetype(BOLD, 92)
+            lw = d.textlength(txt, font=f)
+            if lw > W - 100:
+                f = ImageFont.truetype(BOLD, int(92 * (W - 100) / lw))
+                lw = d.textlength(txt, font=f)
+            k = min(1.0, (t - self.times[i0]) / 0.1)
+            y = 1150 + 8 * (1 - k)
+            d.text(((W - lw) / 2 + 4, y + 6), txt, font=f, fill=(0, 0, 0), stroke_width=11, stroke_fill=(0, 0, 0))
+            d.text(((W - lw) / 2, y), txt, font=f, fill=WHITE, stroke_width=10, stroke_fill=(8, 8, 12))
+            return
         if getattr(self, "word_mode", False):
             # estilo storytime: solo la palabra actual, grande y centrada, con un pequeño «pop»
             w = self.words[cur]
@@ -601,7 +615,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 else:
                     sfx.append((t + 0.15, name))
             if karaoke:
-                scn.word_mode = spec.get("caption") == "palabra"
+                scn.word_mode = spec.get("caption") in ("palabra", "par")
+                scn.pair_mode = spec.get("caption") == "par"
             scenes.append((t, scn))
             t += dur
         total = t

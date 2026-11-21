@@ -1,0 +1,14 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Demo estilo cacahuete"
+description: demo
+tags: [demo]
+hook: "Me pusieron de portero"
+scenes:
+  - anim: x_bn_vestuario
+    say: "El entrenador me miró y dijo: tú, de portero. Yo no había parado un balón en mi vida."
+  - anim: x_bn_campo
+    say: "Primer tiro del partido. Me tiro hacia el lado contrario. Gol."
