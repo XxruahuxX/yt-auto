@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 BOLD = "/usr/share/fonts/opentype/inter/Inter-ExtraBold.otf"
 PW, PH = 860, 460
+SYNC: dict = {}  # palabras de la escena actual con su segundo (lo rellena shorts.KScene)
 IMPACT = 1.0          # segundo de la escena en que el meteorito toca el suelo
 AIRBURST = 0.9
 GRASS = ((34, 120, 62), (40, 134, 70))
