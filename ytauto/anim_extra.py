@@ -157,6 +157,9 @@ def render(kind, t, dur):
     if kind[:5] in ("x_gk_", "x_sd_", "x_tj_"):
         from .anim_pro import render as rp
         return rp(kind, t, dur)
+    if kind.startswith("x_mt_"):
+        from .anim_toon import render as rt
+        return rt(kind, t, dur)
     if kind.startswith("x_st_"):
         from .anim_story import render as rst
         return rst(kind, t, dur)
