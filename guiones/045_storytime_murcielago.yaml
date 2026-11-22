@@ -1,0 +1,32 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Se rieron de mí por entrenar con los OJOS VENDADOS… hasta la final 🦇⚽ #shorts"
+description: |
+  Storytime de fútbol (historia inventada): durante un año entrené los penaltis con los ojos vendados y mi equipo me llamaba el Murciélago. Hasta que en la final se fue la luz.
+  #fútbol #humor #storytime #penaltis #shorts
+tags: [storytime, fútbol, humor fútbol, penaltis, final, fyp]
+hook: "Se rieron de mí por esto"
+scenes:
+  - anim: x_ap_venda
+    say: "Durante un año entrené los penaltis con los ojos vendados."
+    sfx: [whoosh]
+  - anim: x_ap_risas
+    say: "Mi equipo se reía de mí. El capitán me puso un mote: el Murciélago."
+  - anim: x_ap_banquillo
+    say: "Me pasé toda la temporada en el banquillo. Cero minutos."
+  - anim: x_ap_final
+    say: "Hasta la final. Empate a uno. Penaltis."
+  - anim: x_ap_apagon
+    say: "Y en mitad de la tanda… se fue la luz en todo el estadio."
+  - anim: x_ap_capitan
+    say: "El capitán no veía nada. Tiró… y la mandó a la grada."
+  - anim: x_ap_tetoca
+    say: "El entrenador me miró y dijo: Murciélago, te toca."
+  - anim: x_ap_gol
+    say: "Me puse la venda. Por costumbre. Gol. Volvió la luz. Campeones."
+    sfx: [ding]
+  - anim: x_ap_perdon
+    say: "Ahora el capitán entrena con los ojos vendados. Y ya nadie se ríe del Murciélago."

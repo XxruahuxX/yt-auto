@@ -14,6 +14,32 @@ from .anim_toon import C, K, OUT, WHITE, YEL, RED, shade, camera, vignette, ball
 
 SKIN = [(246, 214, 186), (228, 186, 150), (190, 136, 98), (122, 84, 60)]
 INK = (14, 12, 20)
+BLANCO = (250, 250, 248)
+
+
+def dutch(img, ang):
+    """Plano inclinado (sin bordes negros: escala un poco)."""
+    if not ang:
+        return img
+    W, H = img.size
+    a = math.radians(abs(ang))
+    k = math.cos(a) + (H / W) * math.sin(a) + 0.01
+    big = img.resize((int(W * k), int(H * k)), Image.BICUBIC).rotate(ang, resample=Image.BICUBIC)
+    x0, y0 = (big.width - W) // 2, (big.height - H) // 2
+    return big.crop((x0, y0, x0 + W, y0 + H))
+
+
+def rain(img, t, n=90, ang=0.25):
+    from PIL import ImageDraw
+    d = ImageDraw.Draw(img, "RGBA")
+    W, H = img.size
+    rnd = random.Random(5)
+    for i in range(n):
+        x0, sp, ln = rnd.uniform(-200, W), rnd.uniform(1400, 2200), rnd.uniform(40, 90)
+        y = (rnd.uniform(0, H) + t * sp) % (H + 100) - 50
+        x = x0 + (y + 50) * ang
+        d.line([(x, y), (x + ln * ang, y + ln)], fill=(220, 230, 255, 150), width=2)
+    return img
 
 
 def sign(img, txt, cx, cy, t0, t, size=86, bg=(222, 52, 40), fg=WHITE):
@@ -33,10 +59,42 @@ def sign(img, txt, cx, cy, t0, t, size=86, bg=(222, 52, 40), fg=WHITE):
     img.paste(lay, (0, 0), lay)
 
 
+def ball2(c, x, y, r, rot=0.0):
+    """Balón con pentágonos de verdad, sombreado y brillo."""
+    from PIL import ImageDraw
+    S = int(2 * r * K) + 4
+    lay = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    o, R_ = S / 2, r * K
+
+    def pent(px, py, rr, a0):
+        return [(px + rr * math.cos(a0 + i * 2 * math.pi / 5), py + rr * math.sin(a0 + i * 2 * math.pi / 5)) for i in range(5)]
+    d.ellipse([o - R_, o - R_, o + R_, o + R_], fill=(250, 250, 250))
+    d.ellipse([o - R_ * 0.7, o - R_ * 0.55, o + R_ * 1.15, o + R_ * 1.2], fill=(214, 218, 226))
+    d.ellipse([o - R_ * 1.0, o - R_ * 1.0, o + R_ * 0.75, o + R_ * 0.75], fill=(250, 250, 250))
+    cp = pent(o, o, R_ * 0.30, rot - math.pi / 2)
+    d.polygon(cp, fill=INK)
+    for i in range(5):
+        a = rot - math.pi / 2 + i * 2 * math.pi / 5
+        vx, vy = cp[i]
+        ex, ey = o + R_ * 0.62 * math.cos(a), o + R_ * 0.62 * math.sin(a)
+        d.line([(vx, vy), (ex, ey)], fill=INK, width=max(2, int(R_ * 0.06)))
+        d.polygon(pent(o + R_ * 0.97 * math.cos(a + math.pi / 5), o + R_ * 0.97 * math.sin(a + math.pi / 5), R_ * 0.26, a + math.pi / 5),
+                  fill=INK)
+        d.line([(ex, ey), (o + R_ * 0.78 * math.cos(a + math.pi / 5) * 0.98, o + R_ * 0.78 * math.sin(a + math.pi / 5) * 0.98)],
+               fill=INK, width=max(2, int(R_ * 0.06)))
+    mask = Image.new("L", (S, S), 0)
+    ImageDraw.Draw(mask).ellipse([o - R_, o - R_, o + R_, o + R_], fill=255)
+    lay.putalpha(Image.composite(lay.getchannel("A"), Image.new("L", (S, S), 0), mask))
+    d2 = ImageDraw.Draw(lay)
+    d2.ellipse([o - R_, o - R_, o + R_, o + R_], outline=INK, width=max(3, int(R_ * 0.05)))
+    c.im.alpha_composite(lay, (int(x * K - S / 2), int(y * K - S / 2)))
+
+
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92)):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None):
     """(x, y) = pies. Altura total ≈ 470*s."""
     sy = s * sq
     hip = y - 150 * s
@@ -72,7 +130,7 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         elif pose == "senala":
             el, (hx, hy2) = (x + sg * 110 * s, by - 50 * s), (x + sg * 190 * s, by - 80 * s)
         elif pose == "taza":
-            el, (hx, hy2) = (x + sg * 70 * s, by + 40 * s), (x + sg * 34 * s, hy + hr * 1.05)
+            el, (hx, hy2) = (x + sg * 96 * s, by + 10 * s), (x + sg * 58 * s, by - bh * 0.12)
         elif pose == "cara":
             el, (hx, hy2) = (x + sg * 96 * s, by - 10 * s), (x + sg * 46 * s, hy + 6 * s)
         elif pose == "abiertos":
@@ -136,6 +194,10 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         elif emo in ("sorpresa", "miedo"):
             c.c(px, ey, 13 * s, WHITE, INK, 3 * s)
             c.c(px + look * 3 * s, ey + 1 * s, 5 * s, INK, w=0)
+        elif emo == "aburrido":
+            c.c(px, ey + 4 * s, 6 * s, INK, w=0)
+            c.l([(px - 15 * s, ey - 2 * s), (px + 15 * s, ey - 2 * s)], INK, 6 * s)
+            c.l([(px - 13 * s, ey - 11 * s), (px + 13 * s, ey - 11 * s)], INK, 5 * s)
         elif emo == "serio":
             c.l([(px - 11 * s, ey), (px + 11 * s, ey)], INK, 5 * s)
         else:
@@ -158,15 +220,29 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.l([(x - 14 * s + i * 4 * s, my + (3 if i % 2 else -3) * s) for i in range(8)], INK, 3.5 * s)
     else:  # serio / enfado: boca pequeña hacia abajo
         c.arc(x - 12 * s, my - 2 * s, x + 12 * s, my + 14 * s, 200, 340, INK, 4 * s)
+    if venda is not None:
+        # venda negra: venda=0 en la frente, venda=1 tapando los ojos
+        vy = (hy - hr * 0.62) + (ey - (hy - hr * 0.62)) * max(0.0, min(1.0, venda))
+        c.r(x - hr * 1.03, vy - 15 * s, x + hr * 1.03, vy + 15 * s, 8 * s, (34, 34, 44), INK, 3 * s)
+        for k2 in (0, 1):
+            ang = 0.5 + k2 * 0.5 + 0.15 * math.sin(t * 5 + k2)
+            c.l([(x + hr * 0.98, vy), (x + hr * 0.98 + 44 * s * math.cos(ang), vy + 44 * s * math.sin(ang))], (34, 34, 44), 10 * s)
     for sg in (-1, 1):
         if sg in front:
             hx, hy2 = arm(sg, poses[sg])
             if poses[sg] == "taza":
-                c.r(hx - 18 * s, hy2 - 30 * s, hx + 18 * s, hy2 + 14 * s, 4 * s, WHITE, INK, 4 * s)
-                c.r(hx - 18 * s, hy2 - 16 * s, hx + 18 * s, hy2 - 8 * s, 0, RED, w=0)
-                for j in range(2):
-                    u = (t * 0.7 + j * 0.5) % 1
-                    c.c(hx + 10 * s + 20 * s * u, hy2 - 50 * s - 50 * s * u, (8 + 6 * u) * s, (245, 245, 250), INK, 2 * s)
+                # taza de café: cuerpo ancho, asa, café dentro y vapor ondulado
+                mw, mh = 30 * s, 46 * s
+                mx, mt = hx, hy2 - mh * 0.75
+                c.arc(mx + mw - 10 * s, mt + 8 * s, mx + mw + 22 * s, mt + 34 * s, 270, 90, INK, 7 * s)
+                c.r(mx - mw, mt, mx + mw, mt + mh, 8 * s, (236, 236, 240), INK, 4 * s)
+                c.r(mx - mw, mt + mh * 0.35, mx + mw, mt + mh * 0.55, 0, (200, 60, 50), w=0)
+                c.e(mx - mw, mt - 6 * s, mx + mw, mt + 8 * s, (110, 70, 40), INK, 4 * s)
+                c.c(hx - mw * 0.2, hy2 + 4 * s, 11 * s, BLANCO if False else (250, 250, 248), INK, 3 * s)
+                for j in (-1, 1):
+                    ph = t * 3 + j
+                    pts = [(mx + j * 10 * s + 7 * s * math.sin(ph + k * 0.9), mt - 14 * s - k * 12 * s) for k in range(6)]
+                    c.l(pts, (230, 232, 240), 4 * s)
 
 
 def bean_head(x, y, s=1.0):
@@ -209,11 +285,11 @@ def locker_persp(c, W, H, t, vp=(0.62, 0.40)):
     c.p([(W * 0.50, H * 0.55), (W * 0.98, H * 0.55), (W * 0.98, H * 0.575), (W * 0.50, H * 0.575)], (170, 120, 70), INK, 3)
 
 
-def pitch_persp(c, W, H, t, seed=4):
+def pitch_persp(c, W, H, t, seed=4, night=False):
     """Campo visto desde un lateral bajo: grada en fuga, césped con franjas diagonales, cielo de tarde."""
     for i in range(30):
         k = i / 29
-        col = tuple(int(a * (1 - k) + b * k) for a, b in zip((120, 160, 220), (238, 200, 160)))
+        col = tuple(int(a * (1 - k) + b * k) for a, b in zip(*(((14, 18, 44), (40, 46, 90)) if night else ((120, 160, 220), (238, 200, 160)))))
         c.r(0, H * 0.30 * i / 30, W, H * 0.30 * (i + 1) / 30 + 1, 0, col, w=0)
     # grada en diagonal
     gr = [(-W * 0.1, H * 0.06), (W * 1.1, H * 0.24), (W * 1.1, H * 0.40), (-W * 0.1, H * 0.46)]
@@ -266,30 +342,49 @@ def render(kind, t, dur):
     signs = []
     if kind == "x_bn_vestuario":
         locker_persp(b, W, H, t)
-        bean(f, W * 0.72, H * 0.80, 0.95, (230, 160, 40), SKIN[1], "gorra", vest=True, beard=True, emo="serio",
+        bean(f, W * 0.72, H * 0.80, 0.95, (230, 160, 40), BLANCO, "gorra", vest=True, emo="aburrido",
              t=t, arms="relax", legcol=(40, 50, 100))
-        bean(f, W * 0.24, H * 0.98, 1.45, (120, 40, 30), SKIN[0], "tupe", (30, 24, 34), emo="picaro", t=t,
+        bean(f, W * 0.24, H * 0.98, 1.45, (120, 40, 30), BLANCO, "tupe", (30, 24, 34), emo="picaro", t=t,
              arms="relax", arm_r="taza", chain=True, talk=dur * 0.5 < t < dur * 0.8, look=0.6)
         hx, hy = bean_head(W * 0.24, H * 0.98, 1.45)
         px, py = bean_head(W * 0.72, H * 0.80, 0.95)
         img = camera(b.im, f.im, [(cx, H * 0.52, 1.0), (px, py + 80, 1.9), (hx + 60, hy + 60, 1.7)], t, dur, W, H)
         signs.append(("¿PORTERO?", 0.22, dur * 0.36))
+        tilt = 0 if t < dur / 3 else (5 if t < 2 * dur / 3 else -4)
     elif kind == "x_bn_campo":
         pitch_persp(b, W, H, t)
         goal_persp(f, W * 0.12, H * 0.80, 1.1)
         dive = _e((t - dur * 0.45) / 0.3)
         kx, ky = W * 0.42 + 110 * dive, H * 0.80 - 90 * math.sin(dive * math.pi)
         tmp = C((W, H), "RGBA", (0, 0, 0, 0))
-        bean(tmp, kx, ky, 0.9, (255, 140, 30), SKIN[0], "pelo", emo="miedo" if dive < 0.9 else "dolor", t=t,
+        bean(tmp, kx, ky, 0.9, (255, 140, 30), BLANCO, "pelo", emo="miedo" if dive < 0.9 else "dolor", t=t,
              arms="abiertos" if dive < 0.2 else "arriba", legs="abiertas", num="1")
         f.im.alpha_composite(tmp.im.rotate(-75 * dive, resample=Image.BICUBIC, center=(kx * K, (ky - 200) * K)))
         u = _e((t - dur * 0.40) / 0.45)
-        ball(f, W * 0.95 - (W * 0.95 - W * 0.24) * u, H * 0.92 - (H * 0.92 - H * 0.70) * u - 160 * math.sin(u * math.pi), 30 - 8 * u, t * 9)
+        ball2(f, W * 0.95 - (W * 0.95 - W * 0.24) * u, H * 0.92 - (H * 0.92 - H * 0.70) * u - 160 * math.sin(u * math.pi), 30 - 8 * u, t * 9)
         img = camera(b.im, f.im, [(cx, H * 0.55, 1.0), (W * 0.52, H * 0.62, 1.45)], t, dur, W, H, shake=8 if dive > 0.95 and t < dur * 0.9 else 0)
         if dive >= 1:
             signs.append(("0 - 1", 0.22, dur * 0.78))
+        tilt, wet = (-6 if t > dur / 2 else 0), True
+    elif kind == "x_bn_balon":
+        # primer plano del balón en el punto de penalti, bajo la lluvia, estadio desenfocado detrás
+        pitch_persp(b, W, H, t)
+        from PIL import ImageFilter
+        b.im = b.im.filter(ImageFilter.GaussianBlur(9 * K))
+        f.e(W * 0.22, H * 0.735, W * 0.78, H * 0.785, (235, 238, 235), INK, 4)
+        f.e(W * 0.26, H * 0.74, W * 0.74, H * 0.77, (40, 70, 40, 90), w=0)
+        bb = 1.0
+        ball2(f, cx, H * 0.62, 210 * bb, 0.3)
+        img = camera(b.im, f.im, [(cx, H * 0.55, 1.0 + 0.15 * t / dur)], t, dur, W, H, blur_close=False)
+        signs.append(("ÚLTIMO PENALTI", 0.22, 0.2))
+        tilt, wet = 3 * math.sin(t * 1.5), True
     else:
         return Image.new("RGB", (int(W), int(H)))
+    if kind == "x_bn_vestuario":
+        wet = False
+    img = dutch(img, tilt)
+    if wet:
+        img = rain(img, t)
     img = vignette(img, 0.3)
     for txt, yy, t0 in signs:
         sign(img, txt, cx, H * yy, t0, t)
