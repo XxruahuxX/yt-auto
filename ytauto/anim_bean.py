@@ -130,7 +130,7 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         elif pose == "senala":
             el, (hx, hy2) = (x + sg * 110 * s, by - 50 * s), (x + sg * 190 * s, by - 80 * s)
         elif pose == "taza":
-            el, (hx, hy2) = (x + sg * 70 * s, by + 40 * s), (x + sg * 34 * s, hy + hr * 1.05)
+            el, (hx, hy2) = (x + sg * 96 * s, by + 10 * s), (x + sg * 58 * s, by - bh * 0.12)
         elif pose == "cara":
             el, (hx, hy2) = (x + sg * 96 * s, by - 10 * s), (x + sg * 46 * s, hy + 6 * s)
         elif pose == "abiertos":
@@ -224,11 +224,18 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         if sg in front:
             hx, hy2 = arm(sg, poses[sg])
             if poses[sg] == "taza":
-                c.r(hx - 18 * s, hy2 - 30 * s, hx + 18 * s, hy2 + 14 * s, 4 * s, WHITE, INK, 4 * s)
-                c.r(hx - 18 * s, hy2 - 16 * s, hx + 18 * s, hy2 - 8 * s, 0, RED, w=0)
-                for j in range(2):
-                    u = (t * 0.7 + j * 0.5) % 1
-                    c.c(hx + 10 * s + 20 * s * u, hy2 - 50 * s - 50 * s * u, (8 + 6 * u) * s, (245, 245, 250), INK, 2 * s)
+                # taza de café: cuerpo ancho, asa, café dentro y vapor ondulado
+                mw, mh = 30 * s, 46 * s
+                mx, mt = hx, hy2 - mh * 0.75
+                c.arc(mx + mw - 10 * s, mt + 8 * s, mx + mw + 22 * s, mt + 34 * s, 270, 90, INK, 7 * s)
+                c.r(mx - mw, mt, mx + mw, mt + mh, 8 * s, (236, 236, 240), INK, 4 * s)
+                c.r(mx - mw, mt + mh * 0.35, mx + mw, mt + mh * 0.55, 0, (200, 60, 50), w=0)
+                c.e(mx - mw, mt - 6 * s, mx + mw, mt + 8 * s, (110, 70, 40), INK, 4 * s)
+                c.c(hx - mw * 0.2, hy2 + 4 * s, 11 * s, BLANCO if False else (250, 250, 248), INK, 3 * s)
+                for j in (-1, 1):
+                    ph = t * 3 + j
+                    pts = [(mx + j * 10 * s + 7 * s * math.sin(ph + k * 0.9), mt - 14 * s - k * 12 * s) for k in range(6)]
+                    c.l(pts, (230, 232, 240), 4 * s)
 
 
 def bean_head(x, y, s=1.0):
@@ -359,7 +366,7 @@ def render(kind, t, dur):
         b.im = b.im.filter(ImageFilter.GaussianBlur(9 * K))
         f.e(W * 0.22, H * 0.735, W * 0.78, H * 0.785, (235, 238, 235), INK, 4)
         f.e(W * 0.26, H * 0.74, W * 0.74, H * 0.77, (40, 70, 40, 90), w=0)
-        bb = 1 + 0.03 * math.sin(t * 9)
+        bb = 1.0
         ball2(f, cx, H * 0.62, 210 * bb, 0.3)
         img = camera(b.im, f.im, [(cx, H * 0.55, 1.0 + 0.15 * t / dur)], t, dur, W, H, blur_close=False)
         signs.append(("ÚLTIMO PENALTI", 0.22, 0.2))
