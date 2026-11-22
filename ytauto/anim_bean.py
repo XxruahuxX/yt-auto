@@ -94,7 +94,7 @@ def ball2(c, x, y, r, rot=0.0):
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92)):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None):
     """(x, y) = pies. Altura total ≈ 470*s."""
     sy = s * sq
     hip = y - 150 * s
@@ -220,6 +220,13 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.l([(x - 14 * s + i * 4 * s, my + (3 if i % 2 else -3) * s) for i in range(8)], INK, 3.5 * s)
     else:  # serio / enfado: boca pequeña hacia abajo
         c.arc(x - 12 * s, my - 2 * s, x + 12 * s, my + 14 * s, 200, 340, INK, 4 * s)
+    if venda is not None:
+        # venda negra: venda=0 en la frente, venda=1 tapando los ojos
+        vy = (hy - hr * 0.62) + (ey - (hy - hr * 0.62)) * max(0.0, min(1.0, venda))
+        c.r(x - hr * 1.03, vy - 15 * s, x + hr * 1.03, vy + 15 * s, 8 * s, (34, 34, 44), INK, 3 * s)
+        for k2 in (0, 1):
+            ang = 0.5 + k2 * 0.5 + 0.15 * math.sin(t * 5 + k2)
+            c.l([(x + hr * 0.98, vy), (x + hr * 0.98 + 44 * s * math.cos(ang), vy + 44 * s * math.sin(ang))], (34, 34, 44), 10 * s)
     for sg in (-1, 1):
         if sg in front:
             hx, hy2 = arm(sg, poses[sg])
@@ -278,11 +285,11 @@ def locker_persp(c, W, H, t, vp=(0.62, 0.40)):
     c.p([(W * 0.50, H * 0.55), (W * 0.98, H * 0.55), (W * 0.98, H * 0.575), (W * 0.50, H * 0.575)], (170, 120, 70), INK, 3)
 
 
-def pitch_persp(c, W, H, t, seed=4):
+def pitch_persp(c, W, H, t, seed=4, night=False):
     """Campo visto desde un lateral bajo: grada en fuga, césped con franjas diagonales, cielo de tarde."""
     for i in range(30):
         k = i / 29
-        col = tuple(int(a * (1 - k) + b * k) for a, b in zip((120, 160, 220), (238, 200, 160)))
+        col = tuple(int(a * (1 - k) + b * k) for a, b in zip(*(((14, 18, 44), (40, 46, 90)) if night else ((120, 160, 220), (238, 200, 160)))))
         c.r(0, H * 0.30 * i / 30, W, H * 0.30 * (i + 1) / 30 + 1, 0, col, w=0)
     # grada en diagonal
     gr = [(-W * 0.1, H * 0.06), (W * 1.1, H * 0.24), (W * 1.1, H * 0.40), (-W * 0.1, H * 0.46)]
