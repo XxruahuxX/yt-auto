@@ -1,0 +1,32 @@
+format: quepasaria
+style: karaoke
+experiment: corto-bucle
+title: '¿Y si el BALÓN tuviera MIEDO? ⚽😱😂 #shorts'
+description: |
+  Un «¿qué pasaría si…?» de broma: el balón tiene miedo de que le den patadas.
+  #fútbol #humor #quépasaríasi #fyp #shorts
+tags: [qué pasaría si, balón, humor fútbol, fútbol, fyp]
+hook: ¿Y si el balón tuviera miedo?
+scenes:
+- anim: x_bm_huye
+  pose: sorpresa
+  say: ¿Y si el balón tuviera miedo? El delantero va a chutar y el balón sale corriendo.
+  highlight: miedo? corriendo.
+  sfx: [whoosh]
+- anim: x_bm_portero
+  pose: rie
+  say: Se esconde detrás del portero. El único que no le da patadas.
+  highlight: portero. patadas.
+- anim: x_bm_penalti
+  pose: piensa
+  say: En los penaltis tiembla tanto que nadie acierta a darle.
+  highlight: tiembla nadie
+- anim: x_bm_gol
+  pose: celebra
+  say: Hasta que se tira solo a la portería para que lo dejen en paz. Gol.
+  highlight: solo paz. Gol.
+  sfx: [ding]
+- anim: x_bm_sigue
+  pose: encoge
+  say: Si alguna vez un balón te huye, ya sabes por qué. Síguenos.
+  highlight: huye, Síguenos.

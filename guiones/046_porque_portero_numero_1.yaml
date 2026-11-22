@@ -1,0 +1,32 @@
+format: porque
+style: karaoke
+experiment: corto-bucle
+title: '¿Por qué el PORTERO lleva el número 1? 🧤 No es por ser el mejor #shorts'
+description: |
+  Los dorsales se numeraban según la posición en la alineación clásica 2-3-5, contando desde la portería. Por eso el portero es el 1 y el delantero centro, el 9.
+  #fútbol #curiosidades #dorsales #portero #shorts
+tags: [dorsales, portero, número 1, curiosidades fútbol, por qué]
+hook: El 1 no es por ser el mejor
+scenes:
+- anim: x_dz_portero
+  pose: sorpresa
+  say: El portero no lleva el uno por ser el mejor. Lo lleva por estar el último.
+  highlight: uno mejor. último.
+  sfx: [whoosh]
+- anim: x_dz_pizarra
+  pose: explica
+  say: En Inglaterra, en mil novecientos treinta y nueve, los dorsales se hicieron obligatorios. Y se numeraban por posición.
+  highlight: Inglaterra, obligatorios. posición.
+- anim: x_dc_contador|11|DORSALES|del 1 al 11
+  pose: senala
+  say: Se contaba desde la portería hacia delante. Portero uno, defensas dos y tres.
+  highlight: portería uno, dos tres.
+- anim: x_dz_nueve
+  pose: piensa
+  say: Por eso el nueve es el delantero centro. En la alineación de la época era el noveno empezando por atrás.
+  highlight: nueve delantero noveno
+  sfx: [ding]
+- anim: x_dz_cola
+  pose: celebra
+  say: Así que el uno no es el mejor. Es el primero por la cola. Síguenos.
+  highlight: uno primero cola. Síguenos.
