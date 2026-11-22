@@ -91,11 +91,58 @@ def ball2(c, x, y, r, rot=0.0):
     c.im.alpha_composite(lay, (int(x * K - S / 2), int(y * K - S / 2)))
 
 
+def ball_fx(c, pts, r, ground=None):
+    """Estela del balón (posiciones anteriores) y sombra en el suelo."""
+    if ground is not None:
+        x, _ = pts[-1]
+        c.e(x - r * 1.1, ground - r * 0.25, x + r * 1.1, ground + r * 0.25, (0, 0, 0, 70), w=0)
+    n = len(pts)
+    for i, (x, y) in enumerate(pts[:-1]):
+        a = int(110 * (i + 1) / n)
+        c.c(x, y, r * (0.5 + 0.5 * (i + 1) / n), (255, 255, 255, a), w=0)
+
+
+def ripple(c, x, y, t, t0, n=3):
+    """Ondas en la red cuando entra el balón."""
+    if t < t0:
+        return
+    for i in range(n):
+        k = (t - t0) * 2.2 - i * 0.18
+        if 0 < k < 1:
+            r = 30 + 160 * k
+            c.e(x - r, y - r * 0.6, x + r, y + r * 0.6, None, (255, 255, 255, int(220 * (1 - k))), 5)
+
+
+def camera2(bg, fg, shots, t, dur, W, H, **kw):
+    """camera() con barrido (whip pan) en cada corte en lugar del destello blanco."""
+    import numpy as np
+    kw.setdefault("flash", False)
+    img = camera(bg, fg, shots, t, dur, W, H, **kw)
+    n = len(shots)
+    seg = dur / n
+    i = min(int(t / seg), n - 1)
+    lt = t - i * seg
+    if i > 0 and lt < 0.12:
+        k = 1 - lt / 0.12
+        a = np.asarray(img, dtype="float32")
+        acc = np.zeros_like(a)
+        steps = 7
+        for j in range(steps):
+            acc += np.roll(a, int((j - steps // 2) * 26 * k), axis=1)
+        img = Image.fromarray((acc / steps).astype("uint8"))
+    return img
+
+
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1):
     """(x, y) = pies. Altura total ≈ 470*s."""
+    if kick is not None and kick >= 1:
+        kick = None
+    if kick is not None:
+        # anticipación (se encoge) y estirón al golpear
+        sq = sq * (1 - 0.08 * math.sin(min(1, kick / 0.45) * math.pi) + 0.06 * max(0, math.sin((kick - 0.45) / 0.55 * math.pi)))
     sy = s * sq
     hip = y - 150 * s
     bh, bw = 200 * sy, 66 * s / math.sqrt(sq)
@@ -107,7 +154,19 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
     c.e(x - 70 * s, y - 10 * s, x + 70 * s, y + 10 * s, (0, 0, 0, 60) if c.im.mode == "RGBA" else (60, 60, 70), w=0)
     # piernas de palo
     for sg in (-1, 1):
-        if legs == "corre":
+        if kick is not None and sg == -kdir:
+            # pierna de chute: atrás (carga), barrido y seguimiento
+            if kick < 0.45:
+                a = -0.9 * _e(kick / 0.45)
+            else:
+                a = -0.9 + 2.3 * _e((kick - 0.45) / 0.3)
+            a *= kdir
+            h0 = (x + sg * 22 * s, hip + 10 * s)
+            L = 150 * s
+            foot = (h0[0] + L * math.sin(a), h0[1] + L * math.cos(a) * 0.95)
+            knee = (h0[0] + L * 0.5 * math.sin(a) + kdir * 14 * s, h0[1] + L * 0.5 * math.cos(a))
+            pts = [h0, knee, foot]
+        elif legs == "corre":
             k = math.sin(phase + (0 if sg > 0 else math.pi))
             foot = (x + sg * 14 * s + k * 50 * s, y - max(0, k) * 30 * s)
             knee = (x + sg * 14 * s + k * 30 * s, y - 70 * s)
@@ -378,6 +437,39 @@ def render(kind, t, dur):
         img = camera(b.im, f.im, [(cx, H * 0.55, 1.0 + 0.15 * t / dur)], t, dur, W, H, blur_close=False)
         signs.append(("ÚLTIMO PENALTI", 0.22, 0.2))
         tilt, wet = 3 * math.sin(t * 1.5), True
+    elif kind == "x_bn_chute":
+        # demo de mejoras: chute con carga, estela y sombra, estirada girada, red que ondea, barridos entre planos
+        pitch_persp(b, W, H, t, seed=3)
+        goal_persp(f, W * 0.08, H * 0.72, 0.95)
+        seg = dur / 3
+        kick = t / (seg * 0.9)
+        px, py = W * 0.74, H * 0.96
+        bean(f, px, py, 1.1, (40, 100, 210), BLANCO, "pelo", emo="serio" if kick < 0.5 else ("sorpresa" if kick < 2.3 else "feliz"), t=t, num="9",
+             kick=kick, kdir=-1, arms="abiertos" if 0.3 < kick < 0.9 else ("arriba" if kick > 2.3 else "relax"))
+        T0, T1 = seg * 0.62, seg * 2.15                        # vuelo del balón
+        gx, gy = W * 0.20, H * 0.60                            # punto de entrada en la red
+        def bpos(tt):
+            u = _e(max(0.0, min(1.0, (tt - T0) / (T1 - T0))))
+            return (W * 0.66 - (W * 0.66 - gx) * u, H * 0.95 - (H * 0.95 - gy) * u - 260 * math.sin(u * math.pi)), u
+        (bx, by), u = bpos(t)
+        dive = _e((t - seg * 1.3) / (seg * 0.6))
+        kx, ky = W * 0.30 + 120 * dive, H * 0.72 - 70 * math.sin(dive * math.pi)
+        tmp = C((W, H), "RGBA", (0, 0, 0, 0))
+        bean(tmp, kx, ky, 0.62, (255, 140, 30), BLANCO, "pelo", emo="miedo" if dive < 0.8 else "dolor", t=t, num="1",
+             arms="abiertos" if dive < 0.2 else "arriba", legs="abiertas")
+        f.im.alpha_composite(tmp.im.rotate(-70 * dive, resample=Image.BICUBIC, center=(kx * K, (ky - 150) * K)))
+        if 0 < u < 1:
+            trail = [bpos(t - k * 0.035)[0] for k in range(6, 0, -1)] + [(bx, by)]
+            ball_fx(f, trail, 30 - 10 * u, ground=H * 0.94 - (H * 0.94 - H * 0.71) * u)
+        ball2(f, bx + (6 * math.sin(t * 50) if u >= 1 and t - T1 < 0.3 else 0), by, 30 - 10 * u, t * 10)
+        ripple(f, gx, gy, t, T1)
+        if u >= 1:
+            confetti(f, W, H, t, T1 + 0.2)
+        img = camera2(b.im, f.im, [(px - 40, H * 0.74, 1.6), (W * 0.48, H * 0.66, 1.05), (gx + 60, gy + 40, 1.9)], t, dur, W, H,
+                      shake=10 if 0 < t - T1 < 0.25 else 0)
+        if u >= 1:
+            signs.append(("GOL", 0.22, T1))
+        tilt, wet = (4 if t < seg else (0 if t < 2 * seg else -3)), False
     else:
         return Image.new("RGB", (int(W), int(H)))
     if kind == "x_bn_vestuario":
