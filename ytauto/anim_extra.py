@@ -157,6 +157,9 @@ def render(kind, t, dur):
     if kind[:5] in ("x_gk_", "x_sd_", "x_tj_"):
         from .anim_pro import render as rp
         return rp(kind, t, dur)
+    if kind[:5] in ("x_dz_", "x_bm_"):
+        from .anim_dia22 import render as r22
+        return r22(kind, t, dur)
     if kind.startswith("x_ap_"):
         from .anim_apagon import render as rap
         return rap(kind, t, dur)
