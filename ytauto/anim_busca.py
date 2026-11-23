@@ -120,7 +120,7 @@ def _clock(img, t, T0, n=10):
     W, H = img.size
     left = max(0, n - int(t - T0)) if t >= T0 else n
     lay = C((W, H), "RGBA", (0, 0, 0, 0))
-    cx, cy, r = W * 0.5, H * 0.90, 66
+    cx, cy, r = W * 0.5, H * 0.935, 60
     frac = 0 if t < T0 else min(1.0, (t - T0) / n)
     lay.c(cx, cy, r, (20, 22, 34, 235), INK, 6)
     if frac < 1:

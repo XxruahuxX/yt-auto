@@ -431,7 +431,7 @@ class KScene:
                 f = ImageFont.truetype(BOLD, int(92 * (W - 100) / lw))
                 lw = d.textlength(txt, font=f)
             k = min(1.0, (t - self.times[i0]) / 0.1)
-            y = 1150 + 8 * (1 - k)
+            y = getattr(self, "cap_y", 1150) + 8 * (1 - k)
             d.text(((W - lw) / 2 + 4, y + 6), txt, font=f, fill=(0, 0, 0), stroke_width=11, stroke_fill=(0, 0, 0))
             d.text(((W - lw) / 2, y), txt, font=f, fill=WHITE, stroke_width=10, stroke_fill=(8, 8, 12))
             return
@@ -619,6 +619,7 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             if karaoke:
                 scn.word_mode = spec.get("caption") in ("palabra", "par")
                 scn.pair_mode = spec.get("caption") == "par"
+                scn.cap_y = spec.get("caption_y", 1150)
             scenes.append((t, scn))
             t += dur
         total = t
