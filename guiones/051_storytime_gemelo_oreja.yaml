@@ -1,0 +1,32 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Mi HERMANO GEMELO me la jugó en la final de penaltis… 10 años preparándolo 😳⚽ #shorts"
+description: |
+  Storytime de fútbol (historia inventada): soy portero y en la final me tocó parar los penaltis de mi hermano gemelo. Yo conocía su secreto. O eso creía.
+  #fútbol #humor #storytime #penaltis #portero #shorts
+tags: [storytime, fútbol, humor fútbol, penaltis, portero, gemelos, final, fyp]
+hook: "Mi gemelo me la jugó"
+scenes:
+  - anim: x_gm_gemelos
+    say: "Mi hermano gemelo y yo jugamos la misma final. Él de delantero. Yo de portero. En equipos distintos."
+    sfx: [whoosh]
+  - anim: x_gm_oreja
+    say: "Desde pequeños, antes de chutar, se toca la oreja. Y siempre tira a la derecha. Siempre."
+  - anim: x_gm_secreto
+    say: "Nunca se lo dije a nadie. Ni a él."
+  - anim: x_gm_penaltis
+    say: "La final acabó cero a cero. Penaltis."
+  - anim: x_gm_ultimo
+    say: "Último penalti. Si marca, ganan ellos. Y el que tira… es mi hermano."
+  - anim: x_gm_mira
+    say: "Me mira. Y se toca la oreja. Derecha. Lo sabía."
+  - anim: x_gm_pica
+    say: "Me tiro a la derecha. Y él la pica, despacito, por el centro. Gol."
+    sfx: [ding]
+  - anim: x_gm_abrazo
+    say: "Después me abraza y me dice al oído: lo de la oreja lo hago desde los ocho años. Para ti."
+  - anim: x_gm_cierre
+    say: "Diez años preparándolo. Ahora el que se toca la oreja soy yo. A ver si adivina hacia dónde voy."

@@ -610,6 +610,8 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                         at = next((t0 for wd, t0 in zip(scn.words, scn.times)
                                    if wd.strip(".,¿?¡!:;…").lower() == off.lower()), 0.15)
                     sfx.append((t + at + extra, name))
+                elif name == "segundos":
+                    sfx += [(t + k, "tick") for k in range(1, int(dur))]
                 elif name == "countdown":
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
                 else:
