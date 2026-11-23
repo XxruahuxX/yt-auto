@@ -166,6 +166,12 @@ def render(kind, t, dur):
     if kind[:5] in ("x_dz_", "x_bm_"):
         from .anim_dia22 import render as r22
         return r22(kind, t, dur)
+    if kind.startswith("x_bs_"):
+        from .anim_busca import render as rbs
+        return rbs(kind, t, dur)
+    if kind.startswith("x_gm_"):
+        from .anim_gemelos import render as rgm
+        return rgm(kind, t, dur)
     if kind.startswith("x_ap_"):
         from .anim_apagon import render as rap
         return rap(kind, t, dur)

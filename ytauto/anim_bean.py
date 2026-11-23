@@ -200,6 +200,8 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             el, (hx, hy2) = (x + sg * 110 * s, by - 50 * s), (x + sg * 190 * s, by - 80 * s)
         elif pose == "taza":
             el, (hx, hy2) = (x + sg * 96 * s, by + 10 * s), (x + sg * 58 * s, by - bh * 0.12)
+        elif pose == "oreja":
+            el, (hx, hy2) = (x + sg * 104 * s, by - 40 * s), (x + sg * hr * 1.0, hy + 6 * s)
         elif pose == "cara":
             el, (hx, hy2) = (x + sg * 96 * s, by - 10 * s), (x + sg * 46 * s, hy + 6 * s)
         elif pose == "abiertos":
@@ -212,7 +214,7 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         return hx, hy2
 
     poses = {-1: arms, 1: arm_r or arms}
-    front = {k for k, v in poses.items() if v in ("taza", "cara")}
+    front = {k for k, v in poses.items() if v in ("taza", "cara", "oreja")}
     for sg in (-1, 1):
         if sg not in front:
             arm(sg, poses[sg])

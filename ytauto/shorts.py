@@ -570,7 +570,9 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
             elif a == "suspendido":
                 sfx.append((t + 0.55, "pop"))
             for name in sc.get("sfx", []):
-                if name == "countdown":
+                if name == "segundos":
+                    sfx += [(t + k, "tick") for k in range(1, int(dur))]
+                elif name == "countdown":
                     sfx += [(t + 0.15 + k * speech / 3, "tick") for k in range(3)]
                 else:
                     sfx.append((t + 0.15, name))

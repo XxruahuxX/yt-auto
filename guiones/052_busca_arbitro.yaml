@@ -1,0 +1,20 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: busca
+title: "¿Encuentras al ÁRBITRO escondido en la grada? Tienes 10 segundos 🔎⚽ #shorts"
+description: |
+  Reto visual de fútbol: hay un árbitro escondido entre los aficionados. Tienes 10 segundos. Si lo encuentras, dime en qué fila está 👇
+  🔎 Reto #1 · Sígueme para el siguiente.
+  #fútbol #reto #retovisual #encuentralo #árbitro #shorts
+tags: [reto visual, encuentralo, fútbol, árbitro, busca y encuentra, juego visual, fyp]
+hook: "¿Encuentras al árbitro?"
+scenes:
+  - anim: x_bs_reto_arbitro
+    say: "Hay un árbitro escondido en la grada. Tienes diez segundos."
+    pause: 7.0
+    sfx: [segundos]
+  - anim: x_bs_sol_arbitro
+    say: "Aquí está. Tarjeta amarilla y silbato. ¿Lo has encontrado? Dime en qué fila estaba."
+    sfx: [ding]
