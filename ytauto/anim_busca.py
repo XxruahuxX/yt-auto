@@ -10,7 +10,11 @@ from functools import lru_cache
 from PIL import Image, ImageDraw, ImageFilter
 
 from . import anim as A
-from .anim_bean import C, K, INK, BLANCO, WHITE, bean, bean_head, ball2, sign, vignette, _e, SKIN
+from .anim_bean import (C, K, INK, BLANCO, WHITE, bean, bean_head, ball2, sign, vignette, _e, SKIN, pitch_persp,
+                        goal_persp, camera, dutch, burst, speed_lines)
+
+REF = dict(body=(26, 26, 30), skin=BLANCO, hair="pelo", hcol=(20, 20, 24), num="", ref=True, legcol=(18, 18, 22))
+JUG = dict(skin=BLANCO, hair="pelo", hcol=(40, 30, 26))
 
 # equipos de la grada: casa (rojo/blanco) y visitante (azul/amarillo)
 TEAMS = [(200, 46, 44), (240, 240, 236), (200, 46, 44), (40, 100, 210), (250, 205, 40), (200, 46, 44),
@@ -68,7 +72,8 @@ def _crowd(W, H, key):
             if not is_t and rnd.random() < 0.10:
                 kw.update(body=rnd.choice([(26, 26, 30), (34, 34, 40), (30, 40, 80)]))
             if is_t and P["what"] == "arbitro":
-                kw.update(body=(26, 26, 30), hair="pelo", hcol=(20, 20, 24), emo="serio", arms="relax", arm_r="arriba", num="")
+                kw.update(body=(26, 26, 30), hair="pelo", hcol=(20, 20, 24), emo="serio", arms="relax", arm_r="senala", num="",
+                          ref=True, legcol=(18, 18, 22))
             elif is_t and P["what"] == "portero":
                 kw.update(body=(255, 140, 30), hair="pelo", emo="miedo", arms="abiertos", arm_r=None, num="1")
             bean(fg, x, y, s, **kw)
@@ -93,11 +98,6 @@ def _crowd(W, H, key):
                     fg.r(hr_[0] - 8, hr_[1] - 30, hr_[0] + 10, hr_[1] - 2, 2, (250, 214, 30), INK, 2)
             if is_t:
                 target = (hx, hy + 40 * s)
-                if P["what"] == "arbitro":
-                    hand = (x + 120 * s, y - 444 * s)
-                    fg.r(hand[0] - 10, hand[1] - 34, hand[0] + 12, hand[1] - 2, 2, (250, 214, 30), INK, 2)   # amarilla
-                    fg.c(hx + 12 * s * 3, hy + 22 * s * 3, 6, (190, 190, 196), INK, 2)                   # silbato
-                    fg.l([(hx - 20, hy + 46 * s * 3), (hx + 12 * s * 3, hy + 24 * s * 3)], (190, 190, 196), 2)
             if P["what"] == "balon" and is_t:
                 pass
         # barandilla de la fila: tapa las piernas
@@ -130,9 +130,67 @@ def _clock(img, t, T0, n=10):
     img.paste(l, (0, 0), l)
 
 
+def _whistle(c, x, y, s):
+    hx, hy = bean_head(x, y, s)
+    c.c(hx + 12 * s, hy + 26 * s, 9 * s, (190, 190, 196), INK, 2 * s)
+
+
+def _intro(kind, t, dur, W, H):
+    cx = W / 2
+    b = C((W, H))
+    f = C((W, H), "RGBA", (0, 0, 0, 0))
+    signs, tilt = [], 0
+    if kind == "x_bs_pita":
+        # minuto 90: el árbitro señala el punto de penalti; el delantero se tira, el defensa protesta
+        pitch_persp(b, W, H, t, seed=7, night=True)
+        goal_persp(f, W * 0.10, H * 0.70, 0.9)
+        bean(f, W * 0.30, H * 0.80, 0.6, (40, 100, 210), emo="dolor", t=t, arms="abiertos", legs="abiertas", num="9", **JUG)
+        bean(f, W * 0.46, H * 0.84, 0.7, (200, 46, 44), emo="enfado", t=t, arms="abiertos", num="4", talk=True, **JUG)
+        T = dur * 0.35
+        bean(f, W * 0.72, H * 0.98, 1.2, emo="serio", t=t, look=-1, arms="relax", arm_r="senala" if t > T else "relax", **REF)
+        hx, hy = bean_head(W * 0.72, H * 0.98, 1.2)
+        if t > T:
+            speed_lines(f, hx + 12 * 1.2, hy + 26 * 1.2, t, T, n=10, r0=40, r1=110)
+        img = camera(b.im, f.im, [(hx - 40, hy + 80, 1.7), (cx, H * 0.62, 1.0)], t, dur, W, H)
+        signs.append(("MINUTO 90", 0.22, 0.2))
+        if t > T:
+            signs[:] = [("PENALTI", 0.22, T)]
+        tilt = 0 if t < dur / 2 else -4
+    elif kind == "x_bs_huye":
+        # la grada se enfada y el árbitro sale corriendo hacia ella
+        pitch_persp(b, W, H, t, seed=7, night=True)
+        u = _e(t / dur)
+        x = W * 0.85 - W * 0.70 * u
+        y = H * 0.95 - H * 0.20 * u
+        sc = 1.1 - 0.55 * u
+        bean(f, x, y, sc, emo="miedo", t=t, look=-1, arms="arriba", legs="corre", phase=t * 16, **REF)
+        img = camera(b.im, f.im, [(cx, H * 0.58, 1.0)], t, dur, W, H, shake=4)
+        signs.append(("¡HUYE!", 0.22, 0.3))
+        tilt = 5 if t < dur / 2 else -5
+    elif kind == "x_bs_grada":
+        # la grada enfadada; él ya se ha metido dentro: solo se ve la grada, con «¿?»
+        base, _ = _crowd(int(W), int(H), "arbitro")
+        k = 1.35 - 0.35 * _e(t / dur)
+        cw, ch = W / k, H / k
+        img = base.crop((int((W - cw) / 2), int((H - ch) * 0.55), int((W + cw) / 2), int((H - ch) * 0.55 + ch))).resize((int(W), int(H)), Image.LANCZOS)
+        signs.append(("¿DÓNDE ESTÁ?", 0.22, dur * 0.3))
+        img = dutch(img, 3 if t < dur / 2 else 0)
+        img = vignette(img, 0.3)
+        for txt, yy, t0 in signs:
+            sign(img, txt, cx, H * yy, t0, t)
+        return img
+    img = dutch(img, tilt)
+    img = vignette(img, 0.3)
+    for txt, yy, t0 in signs:
+        sign(img, txt, cx, H * yy, t0, t)
+    return img
+
+
 def render(kind, t, dur):
     W, H = A.PW, A.PH
     cx = W / 2
+    if kind in ("x_bs_pita", "x_bs_huye", "x_bs_grada"):
+        return _intro(kind, t, dur, W, H)
     parts = kind.split("_")
     key = parts[3] if len(parts) > 3 else "arbitro"
     base, (tx, ty) = _crowd(int(W), int(H), key)
