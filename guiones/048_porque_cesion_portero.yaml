@@ -1,0 +1,32 @@
+format: porque
+style: karaoke
+experiment: corto-bucle
+title: '¿Por qué el PORTERO no puede coger una CESIÓN con la mano? 🧤🚫 #shorts'
+description: |
+  La regla de la cesión llegó en 1992. En el Mundial de 1990 los equipos pasaban el balón atrás y el portero lo cogía con la mano para perder tiempo. Fue el Mundial con menos goles por partido de la historia: 2,21.
+  #fútbol #curiosidades #reglas #portero #shorts
+tags: [cesión, portero, reglas del fútbol, curiosidades fútbol, por qué, mundial 1990]
+hook: El portero no puede coger esto con la mano
+scenes:
+- anim: x_ce_mano
+  pose: sorpresa
+  say: El portero no puede coger con la mano un pase de un compañero. Y la culpa es del Mundial de mil novecientos noventa.
+  highlight: mano compañero. noventa.
+  sfx: [whoosh]
+- anim: x_ce_tiempo
+  pose: explica
+  say: Los equipos que ganaban pasaban el balón atrás. El portero lo cogía, lo soltaba, y vuelta a empezar. Solo para perder tiempo.
+  highlight: atrás. tiempo.
+- anim: x_dc_contador|2,21|GOLES|por partido en Italia 90
+  pose: senala
+  say: Fue el Mundial con menos goles por partido de la historia. Dos coma veintiuno.
+  highlight: menos historia. veintiuno.
+- anim: x_ce_bostezo
+  pose: piensa
+  say: Los aficionados se aburrían. Así que en mil novecientos noventa y dos la regla cambió.
+  highlight: aburrían. cambió.
+  sfx: [ding]
+- anim: x_ce_patada
+  pose: celebra
+  say: Desde entonces, el portero tiene que jugarla con el pie. Si el tuyo la manda fuera, ya sabes a quién culpar. Síguenos.
+  highlight: pie. culpar. Síguenos.

@@ -1,0 +1,12 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Demo animación v3"
+description: demo
+tags: [demo]
+hook: "Último minuto de la final"
+scenes:
+  - anim: x_bn_chute
+    say: "Último minuto de la final. Cojo carrerilla, cierro los ojos y chuto con todo. El portero se tira al otro lado. Gol."

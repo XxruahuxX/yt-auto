@@ -1,0 +1,32 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Se rieron de mí porque mi ENTRENADORA era mi ABUELA… hasta la final 👵⚽ #shorts"
+description: |
+  Storytime de fútbol (historia inventada): mi entrenadora tenía 78 años y era mi abuela. Los rivales se reían de nosotros. Hasta que llegó la final.
+  #fútbol #humor #storytime #abuela #shorts
+tags: [storytime, fútbol, humor fútbol, abuela, final, fyp]
+hook: "Se rieron de mí por esto"
+scenes:
+  - anim: x_ya_llega
+    say: "Se rieron de mí porque mi entrenadora era mi abuela."
+    sfx: [whoosh]
+  - anim: x_ya_cafe
+    say: "Setenta y ocho años. Venía a los partidos con su silla plegable y su café."
+  - anim: x_ya_derrotas
+    say: "Perdimos los cinco primeros partidos. Los rivales la llamaban la yaya."
+  - anim: x_ya_descanso
+    say: "En la final, perdíamos dos a cero al descanso."
+  - anim: x_ya_pizarra
+    say: "Mi abuela sacó la pizarra… y sus agujas de punto."
+  - anim: x_ya_tejer
+    say: "Dijo: jugad como cuando tejo. Punto corto, punto corto. Y nunca soltéis el hilo."
+  - anim: x_ya_pases
+    say: "Pase corto. Pase corto. El rival no tocó el balón en toda la segunda parte."
+  - anim: x_ya_gol
+    say: "Remontamos. Tres a dos. Campeones."
+    sfx: [ding]
+  - anim: x_ya_final
+    say: "Ahora los rivales le piden consejo a la yaya. Y ella les cobra en bufandas."

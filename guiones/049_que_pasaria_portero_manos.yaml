@@ -1,0 +1,32 @@
+format: quepasaria
+style: karaoke
+experiment: corto-bucle
+title: '¿Y si el PORTERO pudiera usar las MANOS en todo el campo? 🧤😂 #shorts'
+description: |
+  Un «¿qué pasaría si…?» de broma: el portero puede coger el balón con la mano en cualquier parte del campo.
+  #fútbol #humor #quépasaríasi #fyp #shorts
+tags: [qué pasaría si, portero, humor fútbol, fútbol, fyp]
+hook: ¿Y si el portero usara las manos en todo el campo?
+scenes:
+- anim: x_mn_atrapa
+  pose: sorpresa
+  say: ¿Y si el portero pudiera usar las manos en todo el campo? Lo coge en el medio campo.
+  highlight: manos campo? medio
+  sfx: [whoosh]
+- anim: x_mn_corre
+  pose: rie
+  say: Y sale corriendo con el balón bajo el brazo. Nadie se atreve a quitárselo.
+  highlight: corriendo brazo. Nadie
+- anim: x_mn_lanza
+  pose: celebra
+  say: Llega a la portería contraria y la mete con la mano. Gol.
+  highlight: mano. Gol.
+  sfx: [ding]
+- anim: x_mn_arbitro
+  pose: piensa
+  say: El árbitro no sabe qué pitar. Y el otro portero ya está pidiendo lo mismo.
+  highlight: pitar. mismo.
+- anim: x_mn_sigue
+  pose: encoge
+  say: Si tu portero sale corriendo con el balón en la mano, ya sabes por qué. Síguenos.
+  highlight: corriendo mano, Síguenos.
