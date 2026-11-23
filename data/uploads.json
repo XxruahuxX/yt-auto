@@ -90,9 +90,10 @@
     "publish_at": "2026-11-22T17:00:00Z"
   },
   "guiones/052_busca_arbitro.yaml": {
-    "id": "KUZFc9kCif4",
+    "id": "Ul-0T1cruIg",
     "publish_at": "2026-11-23T13:00:00Z",
-    "title": "El \u00e1rbitro pit\u00f3 un penalti INVENTADO y se escondi\u00f3 en la grada\u2026 \u00bfLo encuentras? \ud83d\udd0e\u26bd #shorts"
+    "title": "El \u00e1rbitro pit\u00f3 un penalti INVENTADO y se escondi\u00f3 en la grada\u2026 \u00bfLo encuentras? \ud83d\udd0e\u26bd #shorts",
+    "reemplaza": "KUZFc9kCif4"
   },
   "guiones/048_porque_cesion_portero.yaml": {
     "id": "tcTNdvW5xlk",
