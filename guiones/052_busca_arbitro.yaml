@@ -3,18 +3,25 @@ style: karaoke
 caption: par
 mascot: false
 experiment: busca
-title: "¿Encuentras al ÁRBITRO escondido en la grada? Tienes 10 segundos 🔎⚽ #shorts"
+title: "El árbitro pitó un penalti INVENTADO y se escondió en la grada… ¿Lo encuentras? 🔎⚽ #shorts"
 description: |
-  Reto visual de fútbol: hay un árbitro escondido entre los aficionados. Tienes 10 segundos. Si lo encuentras, dime en qué fila está 👇
+  Reto visual de fútbol: el árbitro se ha escondido entre los aficionados. Tienes 15 segundos. Si lo encuentras, dime en qué fila está 👇
   🔎 Reto #1 · Sígueme para el siguiente.
   #fútbol #reto #retovisual #encuentralo #árbitro #shorts
-tags: [reto visual, encuentralo, fútbol, árbitro, busca y encuentra, juego visual, fyp]
+tags: [reto visual, encuentralo, fútbol, árbitro, busca y encuentra, juego visual, curiosidades fútbol, fyp]
 hook: "¿Encuentras al árbitro?"
 scenes:
+  - anim: x_bs_pita
+    say: "Minuto noventa. Cero a cero. Y el árbitro pita un penalti… que no era."
+    sfx: [whoosh]
+  - anim: x_bs_huye
+    say: "El estadio entero se le echa encima. Y él sale corriendo hacia la grada."
+  - anim: x_bs_grada
+    say: "Se ha escondido entre los aficionados. ¿Lo encuentras?"
   - anim: x_bs_reto_arbitro
-    say: "Hay un árbitro escondido en la grada. Tienes diez segundos."
-    pause: 7.0
+    say: "Tienes quince segundos. Mientras buscas: las tarjetas amarilla y roja se estrenaron en el Mundial de 1970. Se le ocurrieron a un árbitro inglés parado en un semáforo. Y hasta 1891 el árbitro ni siquiera pisaba el campo: pitaba desde fuera."
+    pause: 0.6
     sfx: [segundos]
   - anim: x_bs_sol_arbitro
-    say: "Aquí está. Tarjeta amarilla y silbato. ¿Lo has encontrado? Dime en qué fila estaba."
+    say: "¡Aquí estaba! Silbato y tarjeta amarilla en la mano. ¿Cuánto has tardado? Dímelo en comentarios."
     sfx: [ding]
