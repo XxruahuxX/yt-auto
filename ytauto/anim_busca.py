@@ -24,17 +24,17 @@ HCOL = [(40, 30, 26), (120, 70, 30), (230, 190, 90), (20, 20, 24), (160, 160, 16
 
 # objetivo escondido: fila, columna y qué es
 PUZZLES = {
-    "arbitro": dict(seed=11, row=7, col=6, what="arbitro"),
+    "arbitro": dict(seed=11, row=8, col=8, what="arbitro"),
     "portero": dict(seed=23, row=5, col=2, what="portero"),
     "balon": dict(seed=37, row=3, col=4, what="balon"),
 }
-ROWS, COLS = 12, 9
-Y0, DY = 0.255, 0.068          # pies de la primera fila y separación (fracción de H)
+ROWS, COLS = 14, 13
+Y0, DY = 0.245, 0.0585          # pies de la primera fila y separación (fracción de H)
 
 
 def _fan_pos(W, H, r, c):
     off = (r % 2) * 0.5
-    x = W * (0.07 + (c + off) * 0.86 / (COLS - 0.5))
+    x = W * (0.04 + (c + off) * 0.92 / (COLS - 0.5))
     y = H * (Y0 + r * DY)
     return x, y
 
@@ -55,7 +55,7 @@ def _crowd(W, H, key):
         y = H * (Y0 + r * DY) - H * DY * 0.25
         b.p([(0, y), (W, y), (W, y + H * DY), (0, y + H * DY)], (92 + 6 * (r % 2), 98 + 6 * (r % 2), 118), INK, 2)
     fg = C((W, H), "RGBA", (0, 0, 0, 0))
-    s = 0.24
+    s = 0.22
     target = None
     for r in range(ROWS):
         for c in range(COLS):
