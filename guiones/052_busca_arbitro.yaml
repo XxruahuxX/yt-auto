@@ -23,5 +23,5 @@ scenes:
     pause: 0.6
     sfx: [segundos]
   - anim: x_bs_sol_arbitro
-    say: "¡Aquí estaba! Silbato y tarjeta amarilla en la mano. ¿Cuánto has tardado? Dímelo en comentarios."
+    say: "¡Aquí estaba! Cuello blanco, silbato y las tarjetas en el bolsillo. ¿Cuánto has tardado? Dímelo en comentarios."
     sfx: [ding]

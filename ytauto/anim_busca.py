@@ -13,7 +13,7 @@ from . import anim as A
 from .anim_bean import (C, K, INK, BLANCO, WHITE, bean, bean_head, ball2, sign, vignette, _e, SKIN, pitch_persp,
                         goal_persp, camera, dutch, burst, speed_lines)
 
-REF = dict(body=(26, 26, 30), skin=BLANCO, hair="pelo", hcol=(20, 20, 24), num="")
+REF = dict(body=(26, 26, 30), skin=BLANCO, hair="pelo", hcol=(20, 20, 24), num="", ref=True, legcol=(18, 18, 22))
 JUG = dict(skin=BLANCO, hair="pelo", hcol=(40, 30, 26))
 
 # equipos de la grada: casa (rojo/blanco) y visitante (azul/amarillo)
@@ -72,7 +72,8 @@ def _crowd(W, H, key):
             if not is_t and rnd.random() < 0.10:
                 kw.update(body=rnd.choice([(26, 26, 30), (34, 34, 40), (30, 40, 80)]))
             if is_t and P["what"] == "arbitro":
-                kw.update(body=(26, 26, 30), hair="pelo", hcol=(20, 20, 24), emo="serio", arms="relax", arm_r="arriba", num="")
+                kw.update(body=(26, 26, 30), hair="pelo", hcol=(20, 20, 24), emo="serio", arms="relax", arm_r="senala", num="",
+                          ref=True, legcol=(18, 18, 22))
             elif is_t and P["what"] == "portero":
                 kw.update(body=(255, 140, 30), hair="pelo", emo="miedo", arms="abiertos", arm_r=None, num="1")
             bean(fg, x, y, s, **kw)
@@ -97,11 +98,6 @@ def _crowd(W, H, key):
                     fg.r(hr_[0] - 8, hr_[1] - 30, hr_[0] + 10, hr_[1] - 2, 2, (250, 214, 30), INK, 2)
             if is_t:
                 target = (hx, hy + 40 * s)
-                if P["what"] == "arbitro":
-                    hand = (x + 120 * s, y - 444 * s)
-                    fg.r(hand[0] - 10, hand[1] - 34, hand[0] + 12, hand[1] - 2, 2, (250, 214, 30), INK, 2)   # amarilla
-                    fg.c(hx + 12 * s * 3, hy + 22 * s * 3, 6, (190, 190, 196), INK, 2)                   # silbato
-                    fg.l([(hx - 20, hy + 46 * s * 3), (hx + 12 * s * 3, hy + 24 * s * 3)], (190, 190, 196), 2)
             if P["what"] == "balon" and is_t:
                 pass
         # barandilla de la fila: tapa las piernas
@@ -152,7 +148,6 @@ def _intro(kind, t, dur, W, H):
         bean(f, W * 0.46, H * 0.84, 0.7, (200, 46, 44), emo="enfado", t=t, arms="abiertos", num="4", talk=True, **JUG)
         T = dur * 0.35
         bean(f, W * 0.72, H * 0.98, 1.2, emo="serio", t=t, look=-1, arms="relax", arm_r="senala" if t > T else "relax", **REF)
-        _whistle(f, W * 0.72, H * 0.98, 1.2)
         hx, hy = bean_head(W * 0.72, H * 0.98, 1.2)
         if t > T:
             speed_lines(f, hx + 12 * 1.2, hy + 26 * 1.2, t, T, n=10, r0=40, r1=110)

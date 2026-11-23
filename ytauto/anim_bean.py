@@ -136,7 +136,7 @@ def camera2(bg, fg, shots, t, dur, W, H, **kw):
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1, ref=False):
     """(x, y) = pies. Altura total ≈ 470*s."""
     if kick is not None and kick >= 1:
         kick = None
@@ -231,6 +231,8 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             c.c(x, by - h2 * 0.6 + j * h2 * 0.45, 3.5 * s, (220, 220, 230), w=0)
     if num:
         c.text(x - 4 * s, by - h2 * 0.55, num, 58 * s, WHITE, 3 * s)
+    if ref:
+        _ref_kit(c, x, y, s, by, w2, h2)
     if chain:
         c.arc(x - 40 * s, by - h2 - 30 * s, x + 40 * s, by - h2 + 50 * s, 30, 150, (236, 196, 60), 5 * s)
     # cabeza con volumen
@@ -314,6 +316,31 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
                     ph = t * 3 + j
                     pts = [(mx + j * 10 * s + 7 * s * math.sin(ph + k * 0.9), mt - 14 * s - k * 12 * s) for k in range(6)]
                     c.l(pts, (230, 232, 240), 4 * s)
+
+
+def _ref_kit(c, x, y, s, by, w2, h2):
+    """Uniforme de árbitro: cuello blanco en V, escudo, bolsillo con tarjetas, silbato al cuello, medias con raya."""
+    top = by - h2
+    # medias negras con vuelta blanca
+    for sg in (-1, 1):
+        lx = x + sg * 23 * s
+        c.r(lx - 9 * s, y - 52 * s, lx + 9 * s, y - 40 * s, 3 * s, WHITE, INK, 2 * s)
+    # cuello blanco en V
+    c.p([(x - 40 * s, top + 12 * s), (x, top + 58 * s), (x + 40 * s, top + 12 * s), (x + 24 * s, top + 4 * s),
+         (x, top + 34 * s), (x - 24 * s, top + 4 * s)], WHITE, INK, 3 * s)
+    # cordón y silbato plateado
+    c.l([(x - 18 * s, top + 10 * s), (x - 6 * s, top + 70 * s), (x + 8 * s, top + 78 * s)], (226, 226, 232), 3 * s)
+    c.l([(x + 18 * s, top + 10 * s), (x + 14 * s, top + 60 * s), (x + 8 * s, top + 78 * s)], (226, 226, 232), 3 * s)
+    c.r(x - 4 * s, top + 70 * s, x + 34 * s, top + 92 * s, 9 * s, (214, 216, 224), INK, 3 * s)
+    c.c(x + 1 * s, top + 81 * s, 8 * s, (150, 152, 160), INK, 2 * s)
+    # escudo en el pecho (lado derecho del dibujo)
+    c.p([(x + 26 * s, top + 52 * s), (x + 48 * s, top + 52 * s), (x + 48 * s, top + 70 * s), (x + 37 * s, top + 80 * s),
+         (x + 26 * s, top + 70 * s)], (250, 205, 40), INK, 3 * s)
+    # bolsillo con tarjeta amarilla y roja asomando
+    px, py = x - 40 * s, top + 64 * s
+    c.r(px - 6 * s, py - 18 * s, px + 6 * s, py + 2 * s, 2 * s, (250, 214, 30), INK, 2 * s)
+    c.r(px + 2 * s, py - 14 * s, px + 14 * s, py + 2 * s, 2 * s, (222, 40, 36), INK, 2 * s)
+    c.r(px - 14 * s, py, px + 16 * s, py + 22 * s, 3 * s, (30, 30, 36), (230, 230, 236), 2.5 * s)
 
 
 def bean_head(x, y, s=1.0):
