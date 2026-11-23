@@ -143,6 +143,8 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
     if kick is not None:
         # anticipación (se encoge) y estirón al golpear
         sq = sq * (1 - 0.08 * math.sin(min(1, kick / 0.45) * math.pi) + 0.06 * max(0, math.sin((kick - 0.45) / 0.55 * math.pi)))
+    if legs == "anda":
+        y = y - abs(math.sin(phase)) * 8 * s           # rebote al andar
     sy = s * sq
     hip = y - 150 * s
     bh, bw = 200 * sy, 66 * s / math.sqrt(sq)
@@ -166,6 +168,11 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             foot = (h0[0] + L * math.sin(a), h0[1] + L * math.cos(a) * 0.95)
             knee = (h0[0] + L * 0.5 * math.sin(a) + kdir * 14 * s, h0[1] + L * 0.5 * math.cos(a))
             pts = [h0, knee, foot]
+        elif legs == "anda":
+            k = math.sin(phase + (0 if sg > 0 else math.pi))
+            foot = (x + sg * 16 * s + k * 34 * s, y + 8 * s * abs(math.sin(phase)) - max(0, k) * 14 * s)
+            knee = (x + sg * 18 * s + k * 22 * s, y - 72 * s)
+            pts = [(x + sg * 22 * s, hip + 10 * s), knee, foot]
         elif legs == "corre":
             k = math.sin(phase + (0 if sg > 0 else math.pi))
             foot = (x + sg * 14 * s + k * 50 * s, y - max(0, k) * 30 * s)
@@ -184,6 +191,9 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         if pose == "arriba":
             hx, hy2 = x + sg * 120 * s, by - 210 * s + 8 * s * math.sin(t * 12 + sg)
             el = (x + sg * 104 * s, by - 100 * s)
+        elif pose == "anda":
+            sw = math.sin(phase + (math.pi if sg > 0 else 0))
+            el, (hx, hy2) = (x + sg * 86 * s + sw * 18 * s, by + 26 * s), (x + sg * 84 * s + sw * 46 * s, by + 92 * s)
         elif pose == "jarras":
             el, (hx, hy2) = (x + sg * 128 * s, by + 10 * s), (x + sg * bw * 0.95, by + 40 * s)
         elif pose == "senala":
@@ -392,6 +402,57 @@ def goal_persp(c, x, y, s=1.0):
     c.l([near[0], near[1], far[1], far[0]], INK, 3)
 
 
+def dust(c, x, y, t, t0, n=7, s=1.0):
+    """Nubecillas de polvo que salen a ras de suelo al aterrizar y se desvanecen (0,7 s)."""
+    k = (t - t0) / 0.7
+    if not 0 <= k <= 1:
+        return
+    rnd = random.Random(int(x) * 7 + int(y))
+    a = int(220 * (1 - k) ** 1.5)
+    for i in range(n):
+        d = -1 if i % 2 else 1
+        sp = rnd.uniform(0.4, 1.0)
+        px = x + d * (30 + 150 * sp * _e(k)) * s
+        py = y - (8 + 40 * sp * k) * s
+        r = (14 + 26 * sp) * (0.6 + 0.8 * k) * s
+        c.c(px, py, r, (236, 228, 214, a), (60, 52, 46, a), 2.5)
+
+
+def burst(c, txt, x, y, t, t0, size=74, col=(255, 214, 40), hold=0.9, ang=-8):
+    """Onomatopeya cómic: estrella de pinchos + texto. Entra con rebote, queda fija y se apaga."""
+    k = t - t0
+    if not 0 <= k <= hold + 0.2:
+        return
+    sc = min(1.0, k / 0.12) * (1 + 0.18 * math.sin(min(1.0, k / 0.3) * math.pi))
+    a = 255 if k < hold else int(255 * (1 - (k - hold) / 0.2))
+    R, r, N = 120 * sc * size / 74, 78 * sc * size / 74, 12
+    pts = []
+    for i in range(2 * N):
+        rr = R if i % 2 == 0 else r
+        th = math.radians(ang) + i * math.pi / N
+        pts.append((x + rr * math.cos(th) * 1.25, y + rr * math.sin(th)))
+    c.p(pts, col + (a,), INK + (a,), 5)
+    if sc > 0.3:
+        from .anim_extra import font
+        fs = size * sc
+        tw = c.d.textlength(txt, font=font(int(fs * K))) / K
+        c.d.text(((x - tw / 2) * K, (y - fs * 0.62) * K), txt, font=font(int(fs * K)), fill=(230, 40, 30, a),
+                 stroke_width=int(6 * K), stroke_fill=INK + (a,))
+
+
+def speed_lines(c, x, y, t, t0, n=14, r0=90, r1=230, dur=0.35):
+    """Líneas de velocidad radiales alrededor del impacto."""
+    k = (t - t0) / dur
+    if not 0 <= k <= 1:
+        return
+    rnd = random.Random(int(t0 * 100))
+    for i in range(n):
+        th = i * 2 * math.pi / n + rnd.uniform(-0.15, 0.15)
+        a, b = r0 + 60 * k, r1 + 40 * k
+        c.l([(x + a * math.cos(th), y + a * math.sin(th)), (x + b * math.cos(th), y + b * math.sin(th))],
+            INK + (int(230 * (1 - k)),), 5)
+
+
 # ------------------------------------------------------------------ escenas demo
 def render(kind, t, dur):
     W, H = A.PW, A.PH
@@ -437,7 +498,7 @@ def render(kind, t, dur):
         img = camera(b.im, f.im, [(cx, H * 0.55, 1.0 + 0.15 * t / dur)], t, dur, W, H, blur_close=False)
         signs.append(("ÚLTIMO PENALTI", 0.22, 0.2))
         tilt, wet = 3 * math.sin(t * 1.5), True
-    elif kind == "x_bn_chute":
+    elif kind in ("x_bn_chute", "x_bn_pum"):
         # demo de mejoras: chute con carga, estela y sombra, estirada girada, red que ondea, barridos entre planos
         pitch_persp(b, W, H, t, seed=3)
         goal_persp(f, W * 0.08, H * 0.72, 0.95)
@@ -463,6 +524,12 @@ def render(kind, t, dur):
             ball_fx(f, trail, 30 - 10 * u, ground=H * 0.94 - (H * 0.94 - H * 0.71) * u)
         ball2(f, bx + (6 * math.sin(t * 50) if u >= 1 and t - T1 < 0.3 else 0), by, 30 - 10 * u, t * 10)
         ripple(f, gx, gy, t, T1)
+        if kind == "x_bn_pum":
+            TL = seg * 1.9                                     # el portero toca el suelo
+            speed_lines(f, W * 0.66, H * 0.93, t, T0)
+            burst(f, "¡PAM!", W * 0.57, H * 0.88, t, T0, 46)
+            dust(f, kx + 30, H * 0.735, t, TL, s=0.6)
+            burst(f, "¡PUM!", W * 0.38, H * 0.52, t, TL, 40, col=(255, 255, 255))
         if u >= 1:
             confetti(f, W, H, t, T1 + 0.2)
         img = camera2(b.im, f.im, [(px - 40, H * 0.74, 1.6), (W * 0.48, H * 0.66, 1.05), (gx + 60, gy + 40, 1.9)], t, dur, W, H,
