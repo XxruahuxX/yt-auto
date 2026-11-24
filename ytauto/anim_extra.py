@@ -166,6 +166,9 @@ def render(kind, t, dur):
     if kind[:5] in ("x_dz_", "x_bm_"):
         from .anim_dia22 import render as r22
         return r22(kind, t, dur)
+    if kind[:5] in ("x_cl_", "x_ml_"):
+        from .anim_dia24 import render as r24
+        return r24(kind, t, dur)
     if kind.startswith("x_bs_"):
         from .anim_busca import render as rbs
         return rbs(kind, t, dur)

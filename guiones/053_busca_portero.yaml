@@ -1,0 +1,28 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1585
+mascot: false
+experiment: busca
+title: "El portero encajó 7 GOLES y se escondió en la grada… ¿Lo encuentras? 🔎🧤 #shorts"
+description: |
+  Reto visual de fútbol: el portero se ha escondido entre los aficionados. Pista: lleva guantes. Tienes 15 segundos. Si lo encuentras, dime en qué fila está 👇
+  🔎 Reto #2 · Sígueme para el siguiente.
+  #fútbol #reto #retovisual #encuentralo #portero #shorts
+tags: [reto visual, encuentralo, fútbol, portero, busca y encuentra, juego visual, curiosidades fútbol, fyp]
+hook: "¿Encuentras al portero?"
+scenes:
+  - anim: x_bs_goles
+    say: "Final del torneo. El portero encaja siete goles. Siete."
+    sfx: [whoosh]
+  - anim: x_bs_huye_portero
+    say: "No espera ni al pitido final. Sale corriendo hacia la grada… con los guantes puestos."
+  - anim: x_bs_grada_portero
+    say: "Se ha escondido entre los aficionados. ¿Lo encuentras?"
+  - anim: x_bs_reto_portero
+    say: "Tienes quince segundos. Mientras buscas: hasta 1912 el portero podía coger el balón con la mano en todo su campo. Tiene que vestir de un color distinto al de todos, árbitro incluido. Y en un penalti debe tener un pie sobre la línea."
+    pause: 0.6
+    sfx: [segundos]
+  - anim: x_bs_sol_portero
+    say: "¡Aquí estaba! Camiseta naranja, el uno y los guantes verdes. ¿Cuánto has tardado? Dímelo en comentarios."
+    sfx: [ding]
