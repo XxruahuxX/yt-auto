@@ -26,7 +26,7 @@ RETOS = {
     "messi_cr_yamal": dict(seed=7, targets=[
         dict(name="Messi", row=6, col=9, kit="ARG", num="10", hair="pelo", hcol=(70, 44, 28), beard=True),
         dict(name="Cristiano", row=3, col=2, kit="POR", num="7", hair="tupe", hcol=(20, 20, 24), beard=False),
-        dict(name="Yamal", row=9, col=4, kit="ESP", num="19", hair="melena", hcol=(20, 18, 18), beard=False),
+        dict(name="Yamal", row=9, col=4, kit="ESP", num="19", hair="rizos", hcol=(34, 24, 18), beard=False),
     ]),
 }
 ROWS, COLS = 12, 12

@@ -253,6 +253,15 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.chord(x - hr * 1.03, hy - hr * 1.06, x + hr * 1.03, hy + hr * 0.05, 180, 360, hcol, INK, 5 * s)
     elif hair == "melena":
         c.chord(x - hr * 1.1, hy - hr * 1.12, x + hr * 1.1, hy + hr * 0.6, 160, 380, hcol, INK, 5 * s)
+    elif hair == "rizos":
+        # lados cortos y mata de rizos arriba con las puntas rubias
+        c.chord(x - hr * 1.03, hy - hr * 1.04, x + hr * 1.03, hy + hr * 0.1, 180, 360, hcol, INK, 5 * s)
+        curls = [(-0.78, -0.72), (-0.5, -1.0), (-0.15, -1.12), (0.2, -1.1), (0.52, -0.98), (0.8, -0.72),
+                 (-0.32, -0.8), (0.05, -0.85), (0.38, -0.8)]
+        for ox, oy in curls:
+            c.c(x + ox * hr, hy + oy * hr, hr * 0.27, hcol, INK, 4 * s)
+        for ox, oy in curls[1:6]:
+            c.c(x + ox * hr - hr * 0.04, hy + oy * hr - hr * 0.08, hr * 0.12, (222, 176, 92), w=0)
     # cara seria: ojos pequeños, cejas gruesas
     ex, ey = 24 * s, hy + 2 * s
     blink = ((t + blink_off) % 3.7) < 0.12
