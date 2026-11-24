@@ -175,6 +175,12 @@ def render(kind, t, dur):
     if kind.startswith("x_bs_"):
         from .anim_busca import render as rbs
         return rbs(kind, t, dur)
+    if kind.startswith("x_pc_"):
+        from .anim_portero import render as rpc
+        return rpc(kind, t, dur)
+    if kind.startswith("x_am_"):
+        from .anim_amigo import render as ram
+        return ram(kind, t, dur)
     if kind.startswith("x_gm_"):
         from .anim_gemelos import render as rgm
         return rgm(kind, t, dur)

@@ -28,6 +28,12 @@ RETOS = {
         dict(name="Cristiano", row=3, col=2, kit="POR", num="7", hair="tupe", hcol=(20, 20, 24), beard=False),
         dict(name="Yamal", row=9, col=4, kit="ESP", num="19", hair="rizos", hcol=(34, 24, 18), beard=False),
     ]),
+    "valderrama_ronaldinho_hugo": dict(seed=31, scene="playa", targets=[
+        dict(name="Valderrama", row=4, col=8, kit="COL", num="10", hair="afro", hcol=(236, 180, 70), beard=False),
+        dict(name="Ronaldinho", row=8, col=2, kit="BRA", num="10", hair="cinta", hcol=(30, 22, 18), beard=False),
+        dict(name="Hugo Sánchez", row=10, col=9, kit="MEX", num="9", hair="pelo", hcol=(30, 22, 18), beard=False,
+             bigote=True),
+    ]),
 }
 ROWS, COLS = 12, 12
 
@@ -76,12 +82,40 @@ def _backdrop(c, W, H):
         c.l([(-10, y), (W + 10, y)], (176, 164, 146), 2)
 
 
+def _backdrop_playa(c, W, H):
+    # cielo, sol, mar con olas, barco, sombrillas y arena
+    c.r(-10, -10, W + 10, H * 0.30, 0, (130, 200, 245), w=0)
+    c.r(-10, H * 0.18, W + 10, H * 0.30, 0, (170, 220, 250), w=0)
+    c.c(W * 0.82, H * 0.08, 70, (255, 226, 90), INK, 4)
+    for xx, yy in ((0.15, 0.07), (0.45, 0.12)):
+        for dx, r in ((-40, 30), (0, 42), (40, 32)):
+            c.c(W * xx + dx, H * yy, r, WHITE, w=0)
+    c.r(-10, H * 0.30, W + 10, H * 0.46, 0, (40, 140, 200), INK, 3)
+    for i in range(5):
+        y = H * (0.32 + 0.03 * i)
+        c.l([(x2, y + 6 * ((x2 // 40) % 2)) for x2 in range(-20, int(W) + 40, 40)], (230, 245, 255), 3)
+    c.p([(W * 0.14, H * 0.305), (W * 0.26, H * 0.305), (W * 0.24, H * 0.32), (W * 0.16, H * 0.32)], (220, 80, 60), INK, 3)
+    c.l([(W * 0.20, H * 0.305), (W * 0.20, H * 0.25)], INK, 3)
+    c.p([(W * 0.20, H * 0.25), (W * 0.25, H * 0.295), (W * 0.20, H * 0.295)], WHITE, INK, 2)
+    c.r(-10, H * 0.45, W + 10, H + 10, 0, (240, 214, 160), w=0)
+    c.l([(x2, H * 0.455 + 8 * ((x2 // 60) % 2)) for x2 in range(-20, int(W) + 60, 60)], WHITE, 6)
+    for i in range(12):
+        y = H * (0.47 + 0.04 * i * (1 + i * 0.12))
+        c.l([(-10, y), (W + 10, y)], (228, 200, 146), 2)
+    rnd = random.Random(5)
+    for xx in (0.06, 0.40, 0.70, 0.95):
+        x, y = W * xx, H * 0.47
+        col = rnd.choice([(230, 60, 50), (40, 120, 220), (250, 200, 40), (60, 170, 90)])
+        c.l([(x, y), (x, y - 120)], (120, 90, 60), 5)
+        c.chord(x - 80, y - 170, x + 80, y - 70, 180, 360, col, INK, 3)
+
+
 @lru_cache(maxsize=2)
 def _plaza(W, H, key):
     P = RETOS[key]
     rnd = random.Random(P["seed"])
     b = C((W, H))
-    _backdrop(b, W, H)
+    (_backdrop_playa if P.get("scene") == "playa" else _backdrop)(b, W, H)
     fg = C((W, H), "RGBA", (0, 0, 0, 0))
     tmap = {(t["row"], t["col"]): t for t in P["targets"]}
     found = {}
@@ -106,7 +140,7 @@ def _plaza(W, H, key):
                     if FAM[kit] == FAM[tg["kit"]] and kw["num"] == tg["num"]:
                         kw["num"] = "9" if tg["num"] != "9" else "8"
             else:
-                kw.update(body=KITS[t["kit"]], num=t["num"], hair=t["hair"], hcol=t["hcol"], beard=t["beard"],
+                kw.update(body=KITS[t["kit"]], num=t["num"], hair=t["hair"], hcol=t["hcol"], beard=t["beard"], bigote=t.get("bigote", False),
                           emo="serio", arms="relax", arm_r="arriba" if t["name"] != "Messi" else None)
             bean(fg, x, y, s, **kw)
             if t is not None:
@@ -122,11 +156,15 @@ def _card(c, x, y, s, tg, t, name_size=48, label=True):
     w, h = 300 * s, 420 * s
     c.r(x - w / 2, y - h, x + w / 2, y + 16 * s, 26 * s, (255, 250, 238), INK, 6 * s)
     bean(c, x, y - 20 * s, 0.78 * s, KITS[tg["kit"]], BLANCO, tg["hair"], tg["hcol"], emo="picaro", t=t,
-         num=tg["num"], beard=tg["beard"], arms="relax", blink_off=hash(tg["name"]) % 3)
+         num=tg["num"], beard=tg["beard"], bigote=tg.get("bigote", False), arms="relax", blink_off=hash(tg["name"]) % 3)
     if label:
         from .anim_extra import font
         f = font(int(name_size * s * K))
         tw = c.d.textlength(tg["name"], font=f) / K
+        if tw > w - 40 * s:   # nombres largos: letra más pequeña para que no se pisen
+            name_size *= (w - 40 * s) / tw
+            f = font(int(name_size * s * K))
+            tw = c.d.textlength(tg["name"], font=f) / K
         c.r(x - tw / 2 - 16 * s, y + 4 * s, x + tw / 2 + 16 * s, y + 4 * s + name_size * s * 1.25, 12 * s,
             (222, 52, 40), INK, 4 * s)
         c.text(x, y + 2 * s, tg["name"], name_size * s, WHITE, 0)
@@ -150,7 +188,7 @@ def render(kind, t, dur):
                 continue
             k = min(1.0, (t - t0) / 0.18)
             sc = 0.95 * (1 + 0.12 * (1 - k))
-            _card(lay, W * (0.20 + 0.30 * i), H * 0.66, sc, tg, t)
+            _card(lay, W * (0.18 + 0.32 * i), H * 0.66, sc * 0.92, tg, t)
         l = lay.im.resize(img.size, Image.LANCZOS)
         img.paste(l, (0, 0), l)
         return vignette(img, 0.22)

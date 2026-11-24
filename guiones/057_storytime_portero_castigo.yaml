@@ -1,0 +1,34 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Me pusieron de portero como CASTIGO… y pasó esto en la final 😳🧤 #shorts"
+description: |
+  Storytime de fútbol (historia inventada): llegaba tarde a todos los entrenamientos y el míster me castigó de portero. Me llamaban el Colador. Hasta que entrené con mi perro.
+  #fútbol #humor #storytime #portero #final #shorts
+tags: [storytime, fútbol, humor fútbol, portero, penaltis, final, fyp]
+hook: "De portero como castigo"
+scenes:
+  - anim: x_pc_tarde
+    say: "Yo llegaba tarde a todos los entrenamientos. A todos."
+    sfx: [whoosh]
+  - anim: x_pc_castigo
+    say: "Hasta que el míster se hartó. Castigo: de portero toda la temporada."
+  - anim: x_pc_goles
+    say: "Yo no había parado un balón en mi vida. Me metían de todo."
+  - anim: x_pc_risas
+    say: "Mis compañeros me pusieron un mote. El Colador."
+  - anim: x_pc_perro
+    say: "Así que entrené en casa con mi perro. Él saltaba a por la pelota… y yo copiaba cómo saltaba."
+  - anim: x_pc_final
+    say: "Llegó la final. Penaltis. Cuatro a cuatro. El último lo tira su mejor delantero."
+  - anim: x_pc_para
+    say: "Chuta. Salto como mi perro… y la atrapo."
+    sfx: [ding]
+  - anim: x_pc_corre
+    say: "Pero no la solté. Salí corriendo con el balón, como él. El árbitro tardó cinco minutos en quitármelo."
+  - anim: x_pc_campeones
+    say: "Ganamos la final."
+  - anim: x_pc_cierre
+    say: "Ahora llego tarde a propósito. Para que nadie me quite la portería. ¿Tú de qué jugabas?"

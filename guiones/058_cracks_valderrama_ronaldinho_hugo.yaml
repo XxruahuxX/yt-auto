@@ -1,0 +1,23 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 330
+mascot: false
+experiment: cracks
+title: "Solo el 1 % encuentra a Valderrama, Ronaldinho y Hugo Sánchez 🔎 #shorts"
+description: |
+  Reto visual: en esta playa llena de aficionados están Valderrama, Ronaldinho y Hugo Sánchez. Tienes 10 segundos. ¿Cuántos encontraste? Responde con un número 👇
+  #fútbol #reto #retovisual #valderrama #ronaldinho #hugosanchez #shorts
+tags: [reto visual, encuentralo, fútbol, valderrama, ronaldinho, hugo sánchez, leyendas, busca y encuentra, fyp]
+hook: "Solo el 1 % los encuentra"
+scenes:
+  - anim: x_ck_fichas_valderrama_ronaldinho_hugo
+    say: "Busca a Valderrama, Ronaldinho y Hugo Sánchez."
+    sfx: [whoosh]
+  - anim: x_ck_reto_valderrama_ronaldinho_hugo
+    say: "Solo el uno por ciento los encuentra. Tienes diez segundos."
+    pause: 6.0
+    sfx: [segundos]
+  - anim: x_ck_sol_valderrama_ronaldinho_hugo
+    say: "¡Aquí están! ¿Cuántos encontraste? Responde con un número."
+    sfx: [ding]
