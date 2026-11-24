@@ -117,6 +117,21 @@ def _plaza(W, H, key):
     return b.im.convert("RGB").resize((int(W), int(H)), Image.LANCZOS), found
 
 
+def _card(c, x, y, s, tg, t, name_size=48, label=True):
+    """Ficha de un crack: fondo redondeado, el personaje y su nombre debajo."""
+    w, h = 300 * s, 420 * s
+    c.r(x - w / 2, y - h, x + w / 2, y + 16 * s, 26 * s, (255, 250, 238), INK, 6 * s)
+    bean(c, x, y - 20 * s, 0.78 * s, KITS[tg["kit"]], BLANCO, tg["hair"], tg["hcol"], emo="picaro", t=t,
+         num=tg["num"], beard=tg["beard"], arms="relax", blink_off=hash(tg["name"]) % 3)
+    if label:
+        from .anim_extra import font
+        f = font(int(name_size * s * K))
+        tw = c.d.textlength(tg["name"], font=f) / K
+        c.r(x - tw / 2 - 16 * s, y + 4 * s, x + tw / 2 + 16 * s, y + 4 * s + name_size * s * 1.25, 12 * s,
+            (222, 52, 40), INK, 4 * s)
+        c.text(x, y + 2 * s, tg["name"], name_size * s, WHITE, 0)
+
+
 def render(kind, t, dur):
     W, H = A.PW, A.PH
     cx = W / 2
@@ -124,7 +139,28 @@ def render(kind, t, dur):
     key = parts[3] if len(parts) > 3 else "messi_cr_yamal"
     img, found = _plaza(int(W), int(H), key)
     img = img.copy()
+    tgs = RETOS[key]["targets"]
+    if kind.startswith("x_ck_fichas"):
+        # presentación: plaza desenfocada y oscura, las 3 fichas entran una a una con su nombre
+        img = Image.blend(img.filter(ImageFilter.GaussianBlur(10)), Image.new("RGB", img.size, (10, 12, 24)), 0.45)
+        lay = C((W, H), "RGBA", (0, 0, 0, 0))
+        for i, tg in enumerate(tgs):
+            t0 = 0.30 * i - 0.18   # la primera ya está en el primer fotograma
+            if t < t0:
+                continue
+            k = min(1.0, (t - t0) / 0.18)
+            sc = 0.95 * (1 + 0.12 * (1 - k))
+            _card(lay, W * (0.20 + 0.30 * i), H * 0.66, sc, tg, t)
+        l = lay.im.resize(img.size, Image.LANCZOS)
+        img.paste(l, (0, 0), l)
+        return vignette(img, 0.22)
     if kind.startswith("x_ck_reto"):
+        # recordatorio: las 3 fichas en pequeño sobre la pantalla gigante, fijas durante toda la búsqueda
+        lay = C((W, H), "RGBA", (0, 0, 0, 0))
+        for i, tg in enumerate(tgs):
+            _card(lay, W * (0.30 + 0.20 * i), H * 0.395, 0.42, tg, 0.0, name_size=58)
+        l = lay.im.resize(img.size, Image.LANCZOS)
+        img.paste(l, (0, 0), l)
         _clock(img, t, 0.0, n=max(3, int(round(dur - 0.3))))
     elif kind.startswith("x_ck_sol"):
         k = _e(min(1.0, t / 0.6))
