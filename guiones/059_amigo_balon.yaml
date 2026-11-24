@@ -1,0 +1,31 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: amigo
+title: "Todos tenemos un amigo que trae el balón… 😂⚽ #shorts"
+description: |
+  Todos tenemos un amigo que trae el balón… y se lo lleva si pierde. ¿Cómo se llama el tuyo? 👇
+  #fútbol #humor #fútboldebarrio #amigos #shorts
+tags: [fútbol, humor fútbol, fútbol de barrio, amigos, todos tenemos un amigo, fyp]
+hook: "Todos tenemos uno"
+scenes:
+  - anim: x_am_intro
+    say: "Todos tenemos un amigo que trae el balón. Y ese día, es el rey del barrio."
+    sfx: [whoosh]
+  - anim: x_am_equipos
+    say: "Por eso elige equipo primero. Y siempre se queda a los buenos."
+  - anim: x_am_porteria
+    say: "Las porterías son dos mochilas. Y la suya, cuando le atacan, se hace más pequeña."
+  - anim: x_am_falta
+    say: "Si le rozas, es falta. Si le miras, también es falta."
+  - anim: x_am_novale
+    say: "Si marcas tú, no vale. Era mano. Aunque estuvieras a diez metros."
+  - anim: x_am_marcador
+    say: "Pero un día va perdiendo cinco a cero."
+  - anim: x_am_cena
+    say: "Y de repente, su madre le llama a cenar. A las cinco de la tarde. Y se lleva el balón."
+  - anim: x_am_lata
+    say: "Y los demás terminamos el partido con una lata."
+  - anim: x_am_cierre
+    say: "Al día siguiente vuelve con el balón. Y le dejamos elegir otra vez. ¿Cómo se llama el tuyo?"

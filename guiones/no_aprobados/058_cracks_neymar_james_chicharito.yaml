@@ -1,0 +1,23 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 330
+mascot: false
+experiment: cracks
+title: "Solo el 1 % encuentra a Neymar, James y Chicharito 🔎 #shorts"
+description: |
+  Reto visual: en esta playa llena de aficionados están Neymar, James y Chicharito. Tienes 10 segundos. ¿Cuántos encontraste? Responde con un número 👇
+  #fútbol #reto #retovisual #neymar #james #chicharito #shorts
+tags: [reto visual, encuentralo, fútbol, neymar, james rodríguez, chicharito, busca y encuentra, fyp]
+hook: "Solo el 1 % los encuentra"
+scenes:
+  - anim: x_ck_fichas_neymar_james_chicharito
+    say: "Busca a Neymar, James y Chicharito."
+    sfx: [whoosh]
+  - anim: x_ck_reto_neymar_james_chicharito
+    say: "Solo el uno por ciento los encuentra. Tienes diez segundos."
+    pause: 6.0
+    sfx: [segundos]
+  - anim: x_ck_sol_neymar_james_chicharito
+    say: "¡Aquí están! ¿Cuántos encontraste? Responde con un número."
+    sfx: [ding]

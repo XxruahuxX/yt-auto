@@ -136,7 +136,7 @@ def camera2(bg, fg, shots, t, dur, W, H, **kw):
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1, ref=False):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1, ref=False, gloves=False, bigote=False):
     """(x, y) = pies. Altura total ≈ 470*s."""
     if kick is not None and kick >= 1:
         kick = None
@@ -210,7 +210,13 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             el, (hx, hy2) = (x + sg * 92 * s, by + 30 * s), (x + sg * 98 * s, by + 96 * s + 3 * s * math.sin(t * 2 + sg))
         c.l([(shx, shy), el, (hx, hy2)], INK, 13 * s)
         c.l([(shx, shy), el, (hx, hy2)], shade(body, 0.75), 8 * s)
-        c.c(hx, hy2, 11 * s, skin, INK, 3 * s)
+        if gloves:   # guantes de portero: mano grande lima con puño blanco
+            c.r(hx - 15 * s, hy2 + 8 * s, hx + 15 * s, hy2 + 20 * s, 4 * s, WHITE, INK, 3 * s)
+            c.c(hx, hy2, 21 * s, (170, 230, 60), INK, 4 * s)
+            c.l([(hx - 8 * s, hy2 - 12 * s), (hx - 8 * s, hy2 + 2 * s)], (110, 170, 30), 3 * s)
+            c.l([(hx + 6 * s, hy2 - 12 * s), (hx + 6 * s, hy2 + 2 * s)], (110, 170, 30), 3 * s)
+        else:
+            c.c(hx, hy2, 11 * s, skin, INK, 3 * s)
         return hx, hy2
 
     poses = {-1: arms, 1: arm_r or arms}
@@ -235,6 +241,17 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         _ref_kit(c, x, y, s, by, w2, h2)
     if chain:
         c.arc(x - 40 * s, by - h2 - 30 * s, x + 40 * s, by - h2 + 50 * s, 30, 150, (236, 196, 60), 5 * s)
+    # pelo que va detrás de la cabeza
+    if hair == "afro":
+        for k in range(14):
+            a = math.pi * (0.95 + 1.1 * k / 13)
+            c.c(x + math.cos(a) * hr * 1.15, hy - hr * 0.25 + math.sin(a) * hr * 1.05, hr * 0.42, hcol, INK, 4 * s)
+        c.c(x, hy - hr * 0.55, hr * 1.12, hcol, w=0)
+    elif hair == "cinta":
+        c.r(x - hr * 1.18, hy - hr * 0.6, x + hr * 1.18, hy + hr * 1.25, hr * 0.5, hcol, INK, 5 * s)
+        for sg in (-1, 1):
+            for j in range(3):
+                c.c(x + sg * hr * 1.12, hy + hr * (0.0 + 0.45 * j), hr * 0.24, hcol, INK, 3 * s)
     # cabeza con volumen
     c.c(x, hy, hr, shade(skin, 0.86), INK, 6 * s)
     c.c(x - 7 * s, hy - 6 * s, hr - 10 * s, skin, w=0)
@@ -253,6 +270,15 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.chord(x - hr * 1.03, hy - hr * 1.06, x + hr * 1.03, hy + hr * 0.05, 180, 360, hcol, INK, 5 * s)
     elif hair == "melena":
         c.chord(x - hr * 1.1, hy - hr * 1.12, x + hr * 1.1, hy + hr * 0.6, 160, 380, hcol, INK, 5 * s)
+    elif hair == "afro":
+        for k in range(7):
+            a = math.pi * (1.1 + 0.8 * k / 6)
+            c.c(x + math.cos(a) * hr * 0.85, hy - hr * 0.2 + math.sin(a) * hr * 0.8, hr * 0.36, hcol, w=0)
+        for k in range(6):
+            c.c(x + (k - 2.5) * hr * 0.3, hy - hr * 1.45 - 6 * s * (k % 2), 7 * s, tuple(min(255, v + 30) for v in hcol), w=0)
+    elif hair == "cinta":
+        c.chord(x - hr * 1.05, hy - hr * 1.12, x + hr * 1.05, hy + hr * 0.1, 180, 360, hcol, INK, 5 * s)
+        c.r(x - hr * 1.0, hy - hr * 0.62, x + hr * 1.0, hy - hr * 0.42, 6 * s, WHITE, INK, 4 * s)
     elif hair == "rizos":
         # lados cortos y mata de rizos arriba con las puntas rubias
         c.chord(x - hr * 1.03, hy - hr * 1.04, x + hr * 1.03, hy + hr * 0.1, 180, 360, hcol, INK, 5 * s)
@@ -302,6 +328,10 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.l([(x - 14 * s + i * 4 * s, my + (3 if i % 2 else -3) * s) for i in range(8)], INK, 3.5 * s)
     else:  # serio / enfado: boca pequeña hacia abajo
         c.arc(x - 12 * s, my - 2 * s, x + 12 * s, my + 14 * s, 200, 340, INK, 4 * s)
+    if bigote:   # bigote espeso
+        for sg in (-1, 1):
+            c.e(x + sg * 2 * s - (30 * s if sg < 0 else 0), hy + 20 * s, x + sg * 2 * s + (30 * s if sg > 0 else 0), hy + 38 * s,
+                (40, 28, 22), INK, 3 * s)
     if venda is not None:
         # venda negra: venda=0 en la frente, venda=1 tapando los ojos
         vy = (hy - hr * 0.62) + (ey - (hy - hr * 0.62)) * max(0.0, min(1.0, venda))
