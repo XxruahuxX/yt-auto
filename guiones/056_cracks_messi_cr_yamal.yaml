@@ -1,0 +1,20 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 330
+mascot: false
+experiment: cracks
+title: "Solo el 1 % encuentra a Messi, Cristiano y Lamine Yamal 🔎 #shorts"
+description: |
+  Reto visual: en esta plaza llena de aficionados están Messi, Cristiano y Lamine Yamal. Tienes 10 segundos. ¿Cuántos encontraste? Responde con un número 👇
+  #fútbol #reto #retovisual #messi #cristiano #lamineyamal #shorts
+tags: [reto visual, encuentralo, fútbol, messi, cristiano ronaldo, lamine yamal, busca y encuentra, fyp]
+hook: "Solo el 1 % los encuentra"
+scenes:
+  - anim: x_ck_reto
+    say: "Messi, Cristiano y Lamine Yamal están en esta plaza. Tienes diez segundos."
+    pause: 6.0
+    sfx: [segundos]
+  - anim: x_ck_sol
+    say: "¡Aquí están! ¿Cuántos encontraste? Responde con un número."
+    sfx: [ding]
