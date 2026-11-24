@@ -25,7 +25,7 @@ HCOL = [(40, 30, 26), (120, 70, 30), (230, 190, 90), (20, 20, 24), (160, 160, 16
 # objetivo escondido: fila, columna y qué es
 PUZZLES = {
     "arbitro": dict(seed=11, row=8, col=8, what="arbitro"),
-    "portero": dict(seed=23, row=5, col=2, what="portero"),
+    "portero": dict(seed=23, row=9, col=3, what="portero"),
     "balon": dict(seed=37, row=3, col=4, what="balon"),
 }
 ROWS, COLS = 14, 13
@@ -70,7 +70,8 @@ def _crowd(W, H, key):
             kw = dict(body=body, skin=BLANCO, hair=hair, hcol=rnd.choice(HCOL), emo=emo, arms=arms, arm_r=arm_r,
                       num=rnd.choice(["", "", "7", "10", "9"]), blink_off=rnd.random(), t=0.0)
             if not is_t and rnd.random() < 0.10:
-                kw.update(body=rnd.choice([(26, 26, 30), (34, 34, 40), (30, 40, 80)]))
+                kw.update(body=rnd.choice([(26, 26, 30), (34, 34, 40), (30, 40, 80)] if P["what"] == "arbitro"
+                                          else [(255, 140, 30), (255, 140, 30), (240, 120, 40)]))
             if is_t and P["what"] == "arbitro":
                 kw.update(body=(26, 26, 30), hair="pelo", hcol=(20, 20, 24), emo="serio", arms="relax", arm_r="senala", num="",
                           ref=True, legcol=(18, 18, 22))
@@ -98,6 +99,9 @@ def _crowd(W, H, key):
                     fg.r(hr_[0] - 8, hr_[1] - 30, hr_[0] + 10, hr_[1] - 2, 2, (250, 214, 30), INK, 2)
             if is_t:
                 target = (hx, hy + 40 * s)
+                if P["what"] == "portero":
+                    by_ = y - 234 * s
+                    _gloves(fg, [(x - 176 * s, by_ - 120 * s), (x + 176 * s, by_ - 120 * s)], s)
             if P["what"] == "balon" and is_t:
                 pass
         # barandilla de la fila: tapa las piernas
@@ -130,6 +134,16 @@ def _clock(img, t, T0, n=10):
     img.paste(l, (0, 0), l)
 
 
+def _gloves(c, pts, s):
+    """Guantes de portero: manos grandes verde lima con puño blanco."""
+    for gx, gy in pts:
+        c.c(gx, gy, 30 * s + 3, (170, 230, 60), INK, max(2, 4 * s))
+        c.r(gx - 18 * s - 2, gy + 18 * s, gx + 18 * s + 2, gy + 30 * s + 3, 4 * s, WHITE, INK, max(2, 3 * s))
+
+
+GKP = dict(body=(255, 140, 30), skin=BLANCO, hair="pelo", hcol=(30, 26, 24), num="1")
+
+
 def _whistle(c, x, y, s):
     hx, hy = bean_head(x, y, s)
     c.c(hx + 12 * s, hy + 26 * s, 9 * s, (190, 190, 196), INK, 2 * s)
@@ -156,20 +170,35 @@ def _intro(kind, t, dur, W, H):
         if t > T:
             signs[:] = [("PENALTI", 0.22, T)]
         tilt = 0 if t < dur / 2 else -4
-    elif kind == "x_bs_huye":
+    elif kind == "x_bs_goles":
+        # el portero, sentado en su portería con 7 goles encajados
+        pitch_persp(b, W, H, t, seed=7, night=True)
+        goal_persp(f, W * 0.08, H * 0.78, 1.25)
+        for i in range(4):
+            ball2(f, W * (0.20 + 0.12 * i), H * (0.70 + 0.015 * (i % 2)), 18, i)
+        bean(f, W * 0.48, H * 0.90, 1.0, emo="aburrido", t=t, look=-0.2, arms="cara", **GKP)
+        f.r(W * 0.58, H * 0.40, W * 0.94, H * 0.50, 12, (20, 22, 34), INK, 5)
+        f.text(W * 0.76, H * 0.405, "0 - 7", 92, (255, 214, 40), 4)
+        img = camera(b.im, f.im, [(W * 0.76, H * 0.46, 1.6), (W * 0.45, H * 0.70, 1.25)], t, dur, W, H)
+        signs.append(("0 - 7", 0.22, dur * 0.5))
+        tilt = -4
+    elif kind.startswith("x_bs_huye"):
         # la grada se enfada y el árbitro sale corriendo hacia ella
         pitch_persp(b, W, H, t, seed=7, night=True)
         u = _e(t / dur)
         x = W * 0.85 - W * 0.70 * u
         y = H * 0.95 - H * 0.20 * u
         sc = 1.1 - 0.55 * u
-        bean(f, x, y, sc, emo="miedo", t=t, look=-1, arms="arriba", legs="corre", phase=t * 16, **REF)
+        gk = kind.endswith("portero")
+        bean(f, x, y, sc, emo="miedo", t=t, look=-1, arms="arriba", legs="corre", phase=t * 16, **(GKP if gk else REF))
+        if gk:
+            _gloves(f, [(x - 120 * sc, y - 444 * sc), (x + 120 * sc, y - 444 * sc)], sc)
         img = camera(b.im, f.im, [(cx, H * 0.58, 1.0)], t, dur, W, H, shake=4)
         signs.append(("¡HUYE!", 0.22, 0.3))
         tilt = 5 if t < dur / 2 else -5
-    elif kind == "x_bs_grada":
+    elif kind.startswith("x_bs_grada"):
         # la grada enfadada; él ya se ha metido dentro: solo se ve la grada, con «¿?»
-        base, _ = _crowd(int(W), int(H), "arbitro")
+        base, _ = _crowd(int(W), int(H), "portero" if kind.endswith("portero") else "arbitro")
         k = 1.35 - 0.35 * _e(t / dur)
         cw, ch = W / k, H / k
         img = base.crop((int((W - cw) / 2), int((H - ch) * 0.55), int((W + cw) / 2), int((H - ch) * 0.55 + ch))).resize((int(W), int(H)), Image.LANCZOS)
@@ -189,7 +218,7 @@ def _intro(kind, t, dur, W, H):
 def render(kind, t, dur):
     W, H = A.PW, A.PH
     cx = W / 2
-    if kind in ("x_bs_pita", "x_bs_huye", "x_bs_grada"):
+    if kind.startswith(("x_bs_pita", "x_bs_huye", "x_bs_grada", "x_bs_goles")):
         return _intro(kind, t, dur, W, H)
     parts = kind.split("_")
     key = parts[3] if len(parts) > 3 else "arbitro"

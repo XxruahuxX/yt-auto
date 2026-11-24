@@ -1,0 +1,32 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Celebraba los goles ANTES de que entraran… hasta la final 😳⚽ #shorts"
+description: |
+  Storytime de fútbol (historia inventada): siempre celebraba de espaldas antes de que el balón entrara. Mi equipo me llamaba el Adivino. Hasta el último minuto de la final.
+  #fútbol #humor #storytime #final #gol #shorts
+tags: [storytime, fútbol, humor fútbol, celebración, final, gol, fyp]
+hook: "Celebraba antes de tiempo"
+scenes:
+  - anim: x_cl_sinmirar
+    say: "Yo celebraba los goles antes de que entraran. Chutaba, me daba la vuelta y a celebrar."
+    sfx: [whoosh]
+  - anim: x_cl_risas
+    say: "Mi equipo se reía de mí. Me llamaban el Adivino."
+  - anim: x_cl_final
+    say: "Hasta la final. Cero a cero. Minuto noventa. Balón para mí."
+  - anim: x_cl_chuto
+    say: "Chuto, me doy la vuelta y grito gol con todas mis fuerzas."
+  - anim: x_cl_poste
+    say: "Pero el estadio se queda en silencio. El balón había dado en el palo."
+  - anim: x_cl_solo
+    say: "Y yo seguía celebrando. Solo. Derrapando de rodillas hacia la grada."
+  - anim: x_cl_tacon
+    say: "Entonces el rebote me da en el tacón. Y el balón entra. Despacito."
+    sfx: [ding]
+  - anim: x_cl_arbitro
+    say: "El árbitro lo mira, lo piensa… y señala el centro. Gol."
+  - anim: x_cl_entreno
+    say: "Ahora todo mi equipo celebra antes de chutar. Vamos últimos."

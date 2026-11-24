@@ -1,0 +1,36 @@
+format: porque
+style: karaoke
+experiment: corto-bucle
+title: '¿Por qué el área tiene una MEDIA LUNA? 🌙⚽ No es decoración #shorts'
+description: |
+  En un penalti, todos los jugadores salvo el que tira deben estar a 9,15 metros (10 yardas) del punto. El borde del área está solo a 5,5 metros del punto, así que en 1937 se añadió el arco que marca esa distancia.
+  #fútbol #curiosidades #reglas #penalti #shorts
+tags: [media luna, área, penalti, reglas fútbol, curiosidades fútbol, por qué]
+hook: La media luna no es decoración
+scenes:
+- anim: x_ml_area
+  pose: sorpresa
+  say: Esa media luna del área no es decoración. Está ahí por los penaltis.
+  highlight: media luna decoración. penaltis.
+  sfx: [whoosh]
+- anim: x_dc_contador|9,15|METROS|10 yardas
+  pose: explica
+  say: En un penalti, todos menos el que tira tienen que estar a nueve metros y quince del punto.
+  highlight: todos nueve quince punto.
+- anim: x_ml_distancia
+  pose: piensa
+  say: Pero el borde del área está a solo cinco metros y medio del punto. Desde ahí se podían quedar demasiado cerca.
+  highlight: cinco medio demasiado cerca.
+- anim: x_ml_1937
+  pose: senala
+  say: Por eso en mil novecientos treinta y siete se dibujó ese arco. Marca justo esa distancia.
+  highlight: treinta siete arco. distancia.
+  sfx: [ding]
+- anim: x_ml_jugadores
+  pose: explica
+  say: Nadie puede pisarlo hasta que se chuta el penalti.
+  highlight: Nadie pisarlo chuta
+- anim: x_ml_cola
+  pose: celebra
+  say: Así que la media luna no es decoración. Es la distancia del penalti. Síguenos.
+  highlight: media luna distancia Síguenos.
