@@ -652,8 +652,6 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                     zw, zh = int(W * z), int(H * z)
                     ox, oy = (zw - W) // 2 + (sh if f % 2 else -sh), (zh - H) // 2
                     img = img.resize((zw, zh), Image.BILINEAR).crop((ox, oy, ox + W, oy + H))
-            if karaoke and now < 0.12:
-                img = Image.blend(img, Image.new("RGB", (W, H), (255, 255, 255)), 0.8 * (1 - now / 0.12))
             d = ImageDraw.Draw(img)
             d.rectangle([0, 0, int(W * now / total), 14], fill=YELLOW)
             d.text(((W - d.textlength(HANDLE, font=hf)) / 2, H - 420), HANDLE, font=hf,
