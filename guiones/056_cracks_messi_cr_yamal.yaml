@@ -11,8 +11,11 @@ description: |
 tags: [reto visual, encuentralo, fútbol, messi, cristiano ronaldo, lamine yamal, busca y encuentra, fyp]
 hook: "Solo el 1 % los encuentra"
 scenes:
+  - anim: x_ck_fichas
+    say: "Busca a Messi, Cristiano y Lamine Yamal."
+    sfx: [whoosh]
   - anim: x_ck_reto
-    say: "Messi, Cristiano y Lamine Yamal están en esta plaza. Tienes diez segundos."
+    say: "Solo el uno por ciento los encuentra. Tienes diez segundos."
     pause: 6.0
     sfx: [segundos]
   - anim: x_ck_sol
