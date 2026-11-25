@@ -208,10 +208,11 @@ class Personaje:
             hl = sphere(n + f"_brillo{sx}", (0.22, -1.04, 0.28), (0.12, 0.05, 0.12),
                         mat(n + "_brillo", (1, 1, 1), 0.1, emit=3.0), None)
             hl.parent = lk
-            up = dome(n + f"_parpado{sx}", (0, 0, 0), (1.1, 1.1, 1.1), self.m_skin, None, "top")
+            lid_m = mat(n + "_parpado_m", srgb(*self.piel), 0.5)    # sin subsurface: si no, se transparenta el iris
+            up = dome(n + f"_parpado{sx}", (0, 0, 0), (1.2, 1.2, 1.2), lid_m, None, "top")
             up.parent = er
             up.modifiers["grosor"].thickness = 0.08
-            lo = dome(n + f"_parpadoinf{sx}", (0, 0, 0), (1.08, 1.08, 1.08), self.m_skin, None, "bottom")
+            lo = dome(n + f"_parpadoinf{sx}", (0, 0, 0), (1.17, 1.17, 1.17), lid_m, None, "bottom")
             lo.parent = er
             lo.modifiers["grosor"].thickness = 0.08
             for o in (up, lo):
@@ -387,9 +388,11 @@ class Personaje:
             key(up, f, rotation_euler=(math.radians(lu), -sx * lt, 0))
             key(lo, f, rotation_euler=(math.radians(ll), 0, 0))
         self._last = (lu, lt, ll)
+        self._lidtl = sorted(getattr(self, "_lidtl", []) + [(f, (lu, lt, ll))])
 
     def parpadeo(self, f, dur=4):
-        lu, lt, ll = getattr(self, "_last", (-55, 0.0, 60))
+        tl = [v for fe, v in getattr(self, "_lidtl", []) if fe <= f]
+        lu, lt, ll = tl[-1] if tl else (-55, 0.0, 60)
         for up, sx in zip(self.lids_up, (-1, 1)):
             key(up, f, rotation_euler=(math.radians(lu), -sx * lt, 0))
             key(up, f + dur // 2, rotation_euler=(math.radians(92), 0, 0))

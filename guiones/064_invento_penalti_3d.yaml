@@ -1,0 +1,39 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: inventos_3d
+title: "Así se inventó el PENALTI ⚽ #shorts"
+description: |
+  El penalti se inventó para frenar a los defensas que cazaban al delantero delante de la portería. Lo propuso un portero irlandés, William McCrum, y se aprobó en 1891. ¿Qué invento del fútbol hacemos el próximo? 👇
+  #fútbol #curiosidades #penalti #historiadelfútbol #animación3d #shorts
+tags: [así se inventó, fútbol, penalti, historia del fútbol, william mccrum, curiosidades fútbol, animación 3d, fyp]
+hook: "Así se inventó…"
+scenes:
+  - anim: x_3d_gancho
+    say: "Así se inventó el penalti. Y todo fue culpa de los defensas tramposos."
+    highlight: "penalti tramposos"
+    sfx: [whoosh]
+  - anim: x_3d_caza
+    say: "Antes de 1891, si te ibas solo hacia la portería, el defensa te cazaba por detrás. Y como mucho, un tiro libre que no servía de nada."
+    highlight: "cazaba nada"
+  - anim: x_3d_mccrum
+    say: "Un portero irlandés, William McCrum, estaba hasta las narices."
+    highlight: "irlandés narices"
+  - anim: x_3d_idea
+    say: "Y propuso algo: falta cerca de la portería, tiro a doce yardas. Solo tú contra el portero."
+    highlight: "doce yardas"
+    sfx: [ding]
+  - anim: x_3d_insulto
+    say: "Se aprobó en 1891. Y a los equipos de caballeros les pareció un insulto: un caballero no hace faltas a propósito."
+    highlight: "insulto caballero"
+  - anim: x_3d_fallo
+    say: "Algunos fallaban el penalti aposta. Y su portero se apartaba del palo. Joder, qué nivel."
+    highlight: "aposta nivel"
+  - anim: x_3d_primero
+    say: "Pero el resto lo vio claro. Ese mismo año ya se tiraban penaltis en la liga inglesa."
+    highlight: "liga"
+  - anim: x_3d_cierre
+    say: "Desde entonces, el defensa se lo piensa dos veces. ¿Qué invento hacemos el próximo? Responde con una palabra."
+    highlight: "invento palabra"
