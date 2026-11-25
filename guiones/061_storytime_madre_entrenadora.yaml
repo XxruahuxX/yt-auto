@@ -1,0 +1,30 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: storytime
+title: "Mi ENTRENADORA era mi MADRE… y la expulsaron en la final 😳🟥 #shorts"
+description: |
+  Storytime de fútbol (historia inventada): mi entrenadora era mi madre y, para que nadie dijera que me enchufaba, no me sacaba nunca. Hasta la final.
+  #fútbol #humor #storytime #madre #final #shorts
+tags: [storytime, fútbol, humor fútbol, madre, entrenadora, final, tarjeta roja, fyp]
+hook: "Mi entrenadora era mi madre"
+scenes:
+  - anim: x_md_madre
+    say: "Mi entrenadora era mi madre. Y eso era un problema."
+    sfx: [whoosh]
+  - anim: x_md_banquillo
+    say: "Para que nadie dijera que me enchufaba, no me sacaba nunca. Banquillo. Toda la temporada."
+  - anim: x_md_lesion
+    say: "Llegó la final. Se lesionó uno. Luego otro. Luego otro. En el banquillo solo quedaba yo."
+  - anim: x_md_sal
+    say: "Mi madre me miró. Suspiró. Y me dijo: sal."
+  - anim: x_md_gol
+    say: "Minuto noventa. Me llega el balón. Chuto con los ojos cerrados… y gol."
+    sfx: [ding]
+  - anim: x_md_invade
+    say: "Mi madre salió corriendo al campo a abrazarme."
+  - anim: x_md_roja
+    say: "Y el árbitro la expulsó. A mi madre. En la final."
+  - anim: x_md_cierre
+    say: "Ahora soy titular. Y ella es la que más grita en la grada. ¿Tu madre iría a verte? Responde sí o no."

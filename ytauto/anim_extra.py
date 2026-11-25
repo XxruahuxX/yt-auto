@@ -181,6 +181,9 @@ def render(kind, t, dur):
     if kind.startswith("x_am_"):
         from .anim_amigo import render as ram
         return ram(kind, t, dur)
+    if kind.startswith("x_md_"):
+        from .anim_madre import render as rmd
+        return rmd(kind, t, dur)
     if kind.startswith("x_gm_"):
         from .anim_gemelos import render as rgm
         return rgm(kind, t, dur)

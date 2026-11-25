@@ -1,0 +1,23 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 330
+mascot: false
+experiment: cracks
+title: "Solo el 1 % encuentra a Puyol, Ronaldo y Maradona 🔎 #shorts"
+description: |
+  Reto visual: en la cola para entrar al estadio están Puyol, Ronaldo y Maradona. Tienes 10 segundos. ¿Cuántos encontraste? Responde con un número 👇
+  #fútbol #reto #retovisual #puyol #ronaldo #maradona #shorts
+tags: [reto visual, encuentralo, fútbol, puyol, ronaldo nazario, maradona, leyendas, busca y encuentra, fyp]
+hook: "Solo el 1 % los encuentra"
+scenes:
+  - anim: x_ck_fichas_puyol_ronaldo_maradona
+    say: "Busca a Puyol, Ronaldo y Maradona."
+    sfx: [whoosh]
+  - anim: x_ck_reto_puyol_ronaldo_maradona
+    say: "Solo el uno por ciento los encuentra. Tienes diez segundos."
+    pause: 6.0
+    sfx: [segundos]
+  - anim: x_ck_sol_puyol_ronaldo_maradona
+    say: "¡Aquí están! ¿Cuántos encontraste? Responde con un número."
+    sfx: [ding]
