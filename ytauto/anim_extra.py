@@ -154,6 +154,17 @@ def round_pitch(im, t, k=1.0, players=True):
 
 def render(kind, t, dur):
     PW, PH = A.PW, A.PH
+    if kind.startswith("x_3d_"):
+        # escena 3D prerenderizada con Blender: B3D_DIR/<kind>/f_0001.png ... a B3D_FPS
+        import os
+        from pathlib import Path as _P
+        base = _P(os.environ.get("B3D_DIR", "")) / kind
+        fps = float(os.environ.get("B3D_FPS", "24"))
+        fs = sorted(base.glob("f_*.png"))
+        if not fs:
+            return Image.new("RGB", (int(PW), int(PH)), (20, 30, 50))
+        i = min(len(fs) - 1, int(t * fps))
+        return Image.open(fs[i]).convert("RGB").resize((int(PW), int(PH)), Image.LANCZOS)
     if kind[:5] in ("x_gk_", "x_sd_", "x_tj_"):
         from .anim_pro import render as rp
         return rp(kind, t, dur)
