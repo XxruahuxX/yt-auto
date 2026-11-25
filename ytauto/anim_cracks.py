@@ -4,6 +4,7 @@ Se reconocen por camiseta + dorsal + pelo/barba; hay señuelos con la misma cami
 La plaza se dibuja una vez y se cachea: nada cambia de sitio ni de tamaño."""
 from __future__ import annotations
 
+import math
 import random
 from functools import lru_cache
 
@@ -141,15 +142,17 @@ def _backdrop_estadio(c, W, H):
         c.l([(-10, y), (W + 10, y)], (170, 164, 154), 2)
 
 
-@lru_cache(maxsize=2)
-def _plaza(W, H, key):
+@lru_cache(maxsize=4)
+def _layout(W, H, key):
+    """Fondo (supermuestreado) y reparto de la multitud. Las posiciones no cambian nunca; solo el movimiento
+    en el sitio (respirar, saltar, balancearse, mover los brazos) depende de t."""
     P = RETOS[key]
     rnd = random.Random(P["seed"])
+    mrnd = random.Random(P["seed"] + 999)      # aparte, para no mover a nadie de sitio
     b = C((W, H))
     {"playa": _backdrop_playa, "estadio": _backdrop_estadio}.get(P.get("scene"), _backdrop)(b, W, H)
-    fg = C((W, H), "RGBA", (0, 0, 0, 0))
     tmap = {(t["row"], t["col"]): t for t in P["targets"]}
-    found = {}
+    found, crowd = {}, []
     kits = list(KITS)
     for r in range(ROWS):
         y0, s = _row(H, r)
@@ -164,7 +167,7 @@ def _plaza(W, H, key):
                       arms=rnd.choice(["relax", "arriba", "arriba", "jarras", "abiertos"]),
                       arm_r=rnd.choice([None, None, "arriba", "senala"]),
                       num=rnd.choice(["", "", "5", "9", "11", "8", "10", "7", "19"]), blink_off=rnd.random(),
-                      beard=rnd.random() < 0.12, t=0.0)
+                      beard=rnd.random() < 0.12)
             # señuelos: misma camiseta que un crack pero otro dorsal, o mismo dorsal sin el pelo/barba
             if t is None:
                 for tg in P["targets"]:
@@ -173,13 +176,32 @@ def _plaza(W, H, key):
             else:
                 kw.update(body=KITS[t["kit"]], num=t["num"], hair=t["hair"], hcol=t["hcol"], beard=t["beard"], bigote=t.get("bigote", False),
                           emo="serio", arms="relax", arm_r="arriba" if t["name"] != "Messi" else None)
-            bean(fg, x, y, s, **kw)
+            ph = mrnd.uniform(0, 2 * math.pi)
+            mode = mrnd.choices(["salta", "balancea", "quieto"], [0.25, 0.45, 0.30])[0] if t is None else "balancea"
+            if mode == "salta":
+                kw.update(arms="arriba", arm_r=None)
+            crowd.append((x, y, s, kw, ph, mode, mrnd.uniform(2.6, 3.6)))
             if t is not None:
                 hx, hy = bean_head(x, y, s)
                 found[t["name"]] = (hx, hy + 90 * s, s)
-    b.im = b.im.convert("RGBA")
-    b.im.alpha_composite(fg.im)
-    return b.im.convert("RGB").resize((int(W), int(H)), Image.LANCZOS), found
+    return b.im.convert("RGBA"), crowd, found
+
+
+def _plaza(W, H, key, t=0.0):
+    bg, crowd, found = _layout(W, H, key)
+    fg = C((W, H), "RGBA", (0, 0, 0, 0))
+    for x, y, s, kw, ph, mode, w in crowd:
+        tt = t + ph
+        if mode == "salta":
+            hop = abs(math.sin(w * t + ph)) * 46 * s
+            bean(fg, x, y - hop, s, t=tt, sq=1.0 + 0.05 * math.cos(2 * (w * t + ph)), **kw)
+        elif mode == "balancea":
+            bean(fg, x + math.sin(1.7 * t + ph) * 7 * s, y, s, t=tt, look=0.8 * math.sin(1.3 * t + ph), **kw)
+        else:
+            bean(fg, x, y, s, t=tt, look=0.5 * math.sin(0.9 * t + ph), **kw)
+    img = bg.copy()
+    img.alpha_composite(fg.im)
+    return img.convert("RGB").resize((int(W), int(H)), Image.LANCZOS), found
 
 
 def _card(c, x, y, s, tg, t, name_size=48, label=True):
@@ -206,7 +228,7 @@ def render(kind, t, dur):
     cx = W / 2
     parts = kind.split("_", 3)
     key = parts[3] if len(parts) > 3 else "messi_cr_yamal"
-    img, found = _plaza(int(W), int(H), key)
+    img, found = _plaza(int(W), int(H), key, t)
     img = img.copy()
     tgs = RETOS[key]["targets"]
     if kind.startswith("x_ck_fichas"):

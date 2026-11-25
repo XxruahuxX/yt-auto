@@ -136,7 +136,7 @@ def camera2(bg, fg, shots, t, dur, W, H, **kw):
 # ------------------------------------------------------------------ personaje
 def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(40, 30, 26), emo="serio",
          talk=False, t=0.0, arms="relax", arm_r=None, legs="pie", phase=0.0, vest=False, beard=False,
-         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1, ref=False, gloves=False, bigote=False):
+         num="", look=0.0, prop=None, chain=False, blink_off=0.0, sq=1.0, legcol=(36, 44, 92), venda=None, kick=None, kdir=-1, ref=False, gloves=False, bigote=False, gafas=False):
     """(x, y) = pies. Altura total ≈ 470*s."""
     if kick is not None and kick >= 1:
         kick = None
@@ -348,6 +348,10 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
         c.l([(x - 14 * s + i * 4 * s, my + (3 if i % 2 else -3) * s) for i in range(8)], INK, 3.5 * s)
     else:  # serio / enfado: boca pequeña hacia abajo
         c.arc(x - 12 * s, my - 2 * s, x + 12 * s, my + 14 * s, 200, 340, INK, 4 * s)
+    if gafas:   # gafas redondas
+        for sg in (-1, 1):
+            c.c(x + sg * 24 * s + look * 6 * s, hy + 2 * s, 17 * s, None, INK, 4 * s)
+        c.l([(x - 8 * s + look * 6 * s, hy), (x + 8 * s + look * 6 * s, hy)], INK, 4 * s)
     if bigote:   # bigote espeso
         for sg in (-1, 1):
             c.e(x + sg * 2 * s - (30 * s if sg < 0 else 0), hy + 20 * s, x + sg * 2 * s + (30 * s if sg > 0 else 0), hy + 38 * s,
