@@ -1,0 +1,39 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 880
+mascot: false
+experiment: storytime
+title: "Se reían de mí por saberme el REGLAMENTO… hasta la final 🤓⚽ #shorts"
+description: |
+  Storytime de fútbol (historia inventada, datos reales): me llamaban el empollón por saberme el reglamento de memoria. En la final, dos reglas nos dieron la copa.
+  Datos reales: el penalti se tira a 12 yardas (unos 11 metros); en un saque de banda no hay fuera de juego; el primer gol olímpico fue en 1924, directo de córner a Uruguay.
+  #fútbol #storytime #reglamento #gololimpico #datoscuriosos #shorts
+tags: [storytime, fútbol, reglamento, gol olímpico, fuera de juego, datos curiosos fútbol, fyp]
+hook: "Me llamaban el empollón"
+scenes:
+  - anim: x_rg_empollon
+    say: "En mi equipo me llamaban el empollón. Me sabía el reglamento de memoria."
+    sfx: [whoosh]
+  - anim: x_rg_once
+    say: "Les contaba cosas como que el penalti se tira a once metros porque antes se medía en yardas. Doce."
+  - anim: x_rg_risas
+    say: "Y ellos se partían de risa. Cada día."
+  - anim: x_rg_final
+    say: "Hasta la final. Perdíamos uno a cero. Minuto ochenta y ocho."
+  - anim: x_rg_banda
+    say: "Saque de banda. Su defensa sube para dejarme en fuera de juego. Pero en un saque de banda no hay fuera de juego."
+  - anim: x_rg_empate
+    say: "Me quedo solo. Gol. Uno a uno."
+    sfx: [ding]
+  - anim: x_rg_corner
+    say: "Minuto noventa. Córner. Todos me gritan que la centre."
+  - anim: x_rg_1924
+    say: "Pero yo me acordé de 1924. Un argentino le marcó a Uruguay directo de córner. Por eso se llama gol olímpico."
+  - anim: x_rg_olimpico
+    say: "Chuto directo a portería. El balón hace la curva… y entra."
+    sfx: [ding]
+  - anim: x_rg_vale
+    say: "Ellos gritan que no vale. El árbitro lo piensa… y señala el centro."
+  - anim: x_rg_cierre
+    say: "Ahora ya no me llaman el empollón. Me llaman el Reglamento. ¿Sabías lo del gol olímpico? Responde sí o no."
