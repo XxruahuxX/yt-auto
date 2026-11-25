@@ -34,6 +34,11 @@ RETOS = {
         dict(name="Hugo Sánchez", row=10, col=9, kit="MEX", num="9", hair="pelo", hcol=(30, 22, 18), beard=False,
              bigote=True),
     ]),
+    "puyol_ronaldo_maradona": dict(seed=44, scene="estadio", targets=[
+        dict(name="Puyol", row=5, col=3, kit="ESP", num="5", hair="melenon", hcol=(70, 46, 30), beard=False),
+        dict(name="Ronaldo", row=7, col=10, kit="BRA", num="9", hair="cascao", hcol=(30, 24, 20), beard=False),
+        dict(name="Maradona", row=10, col=6, kit="ARG", num="10", hair="rizado", hcol=(26, 20, 18), beard=False),
+    ]),
 }
 ROWS, COLS = 12, 12
 
@@ -110,12 +115,38 @@ def _backdrop_playa(c, W, H):
         c.chord(x - 80, y - 170, x + 80, y - 70, 180, 360, col, INK, 3)
 
 
+def _backdrop_estadio(c, W, H):
+    # cola para entrar al estadio: fachada con arcos, puertas numeradas, banderas y taquilla
+    c.r(-10, -10, W + 10, H * 0.45, 0, (120, 170, 230), w=0)
+    c.r(-10, H * 0.06, W + 10, H * 0.45, 0, (150, 190, 236), w=0)
+    c.chord(-W * 0.4, H * 0.04, W * 1.4, H * 0.60, 180, 360, (200, 204, 214), INK, 5)
+    c.chord(-W * 0.3, H * 0.10, W * 1.3, H * 0.60, 180, 360, (176, 182, 196), INK, 3)
+    for i in range(9):
+        x = W * (-0.05 + i * 0.14)
+        c.r(x, H * 0.20, x + 56, H * 0.33, 26, (90, 100, 124), INK, 3)
+    for i in range(3):
+        x = W * (0.10 + i * 0.32)
+        c.r(x, H * 0.34, x + 150, H * 0.45, 8, (60, 64, 80), INK, 4)
+        for k in range(5):
+            c.l([(x + 12 + k * 31, H * 0.345), (x + 12 + k * 31, H * 0.45)], (150, 156, 170), 4)
+        c.r(x + 25, H * 0.305, x + 125, H * 0.335, 6, (222, 52, 40), INK, 3)
+        c.text(x + 75, H * 0.304, str(i + 1), 36, WHITE, 0)
+    for i, col in enumerate(KITS.values()):
+        x = W * (0.03 + i * 0.13)
+        c.l([(x, H * 0.04), (x, H * 0.17)], (90, 90, 96), 4)
+        c.p([(x, H * 0.04), (x + 60, H * 0.065), (x, H * 0.09)], col, INK, 2)
+    c.r(-10, H * 0.45, W + 10, H + 10, 0, (186, 180, 170), w=0)
+    for i in range(14):
+        y = H * (0.45 + 0.04 * i * (1 + i * 0.12))
+        c.l([(-10, y), (W + 10, y)], (170, 164, 154), 2)
+
+
 @lru_cache(maxsize=2)
 def _plaza(W, H, key):
     P = RETOS[key]
     rnd = random.Random(P["seed"])
     b = C((W, H))
-    (_backdrop_playa if P.get("scene") == "playa" else _backdrop)(b, W, H)
+    {"playa": _backdrop_playa, "estadio": _backdrop_estadio}.get(P.get("scene"), _backdrop)(b, W, H)
     fg = C((W, H), "RGBA", (0, 0, 0, 0))
     tmap = {(t["row"], t["col"]): t for t in P["targets"]}
     found = {}

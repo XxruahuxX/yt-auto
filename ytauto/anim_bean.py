@@ -247,6 +247,11 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             a = math.pi * (0.95 + 1.1 * k / 13)
             c.c(x + math.cos(a) * hr * 1.15, hy - hr * 0.25 + math.sin(a) * hr * 1.05, hr * 0.42, hcol, INK, 4 * s)
         c.c(x, hy - hr * 0.55, hr * 1.12, hcol, w=0)
+    elif hair == "melenon":
+        # melena rizada hasta los hombros (detrás)
+        for sg in (-1, 1):
+            for j in range(4):
+                c.c(x + sg * hr * 1.05, hy - hr * 0.4 + hr * 0.42 * j, hr * 0.32, hcol, INK, 4 * s)
     elif hair == "cinta":
         c.r(x - hr * 1.18, hy - hr * 0.6, x + hr * 1.18, hy + hr * 1.25, hr * 0.5, hcol, INK, 5 * s)
         for sg in (-1, 1):
@@ -279,6 +284,21 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
     elif hair == "cinta":
         c.chord(x - hr * 1.05, hy - hr * 1.12, x + hr * 1.05, hy + hr * 0.1, 180, 360, hcol, INK, 5 * s)
         c.r(x - hr * 1.0, hy - hr * 0.62, x + hr * 1.0, hy - hr * 0.42, 6 * s, WHITE, INK, 4 * s)
+    elif hair == "melenon":
+        for k in range(8):
+            a = math.pi * (1.0 + k / 7)
+            c.c(x + math.cos(a) * hr * 0.92, hy - hr * 0.15 + math.sin(a) * hr * 0.92, hr * 0.32, hcol, INK, 4 * s)
+        c.chord(x - hr * 0.95, hy - hr * 1.05, x + hr * 0.95, hy + hr * 0.05, 180, 360, hcol, w=0)
+    elif hair == "rizado":
+        # mata de rizos oscuros, sin puntas de color
+        c.chord(x - hr * 1.05, hy - hr * 1.06, x + hr * 1.05, hy + hr * 0.2, 180, 360, hcol, INK, 5 * s)
+        for k in range(9):
+            a = math.pi * (1.0 + k / 8)
+            c.c(x + math.cos(a) * hr * 0.98, hy - hr * 0.12 + math.sin(a) * hr * 0.98, hr * 0.27, hcol, INK, 4 * s)
+        c.chord(x - hr * 0.9, hy - hr * 0.98, x + hr * 0.9, hy + hr * 0.1, 180, 360, hcol, w=0)
+    elif hair == "cascao":
+        # cabeza rapada con un triángulo de pelo delante
+        c.p([(x - hr * 0.34, hy - hr * 0.66), (x + hr * 0.34, hy - hr * 0.66), (x, hy - hr * 0.97)], hcol, INK, 3 * s)
     elif hair == "rizos":
         # lados cortos y mata de rizos arriba con las puntas rubias
         c.chord(x - hr * 1.03, hy - hr * 1.04, x + hr * 1.03, hy + hr * 0.1, 180, 360, hcol, INK, 5 * s)
