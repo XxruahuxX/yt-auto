@@ -1,0 +1,33 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 880
+mascot: false
+experiment: inventos
+title: "Así se inventaron las TARJETAS 🟨🟥 #shorts"
+description: |
+  Así nacieron las tarjetas amarilla y roja: un lío en el Mundial de 1966, un árbitro inglés (Ken Aston) y un semáforo. Se estrenaron en México 1970. ¿Qué invento del fútbol hacemos el próximo? 👇
+  #fútbol #curiosidades #tarjetaroja #árbitro #historiadelfútbol #shorts
+tags: [así se inventó, fútbol, tarjeta roja, tarjeta amarilla, ken aston, mundial 1966, curiosidades fútbol, fyp]
+hook: "Así se inventó…"
+scenes:
+  - anim: x_iv_gancho
+    say: "Así se inventaron las tarjetas. Y todo empezó con un lío tremendo."
+    sfx: [whoosh]
+  - anim: x_iv_palabra
+    say: "Mundial de 1966. No había tarjetas: el árbitro te expulsaba de palabra."
+  - anim: x_iv_idioma
+    say: "Pero el árbitro era alemán, el capitán era argentino… y no se entendían ni de coña."
+  - anim: x_iv_minutos
+    say: "El jugador tardó varios minutos en irse. Joder, ni el público sabía qué estaba pasando."
+  - anim: x_iv_coche
+    say: "Un árbitro inglés, Ken Aston, volvía a casa en coche dándole vueltas."
+  - anim: x_iv_semaforo
+    say: "Y se para en un semáforo. Ámbar: cuidado. Rojo: para. Y pensó: me cago en todo… ya lo tengo."
+    sfx: [ding]
+  - anim: x_iv_idea
+    say: "Amarilla para avisar. Roja para echarte. Sin hablar ni una palabra."
+  - anim: x_iv_1970
+    say: "Se estrenaron en el Mundial de México de 1970. Y desde entonces, el que no se va es porque no quiere."
+  - anim: x_iv_cierre
+    say: "¿Qué invento del fútbol hacemos el próximo? Responde con una palabra."

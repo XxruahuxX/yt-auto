@@ -187,6 +187,9 @@ def render(kind, t, dur):
     if kind.startswith("x_rg_"):
         from .anim_reglamento import render as rrg
         return rrg(kind, t, dur)
+    if kind.startswith("x_iv_"):
+        from .anim_inventos import render as riv
+        return riv(kind, t, dur)
     if kind.startswith("x_gm_"):
         from .anim_gemelos import render as rgm
         return rgm(kind, t, dur)
