@@ -245,6 +245,7 @@ def s_idea(sc, dur):
     mc.mirar(F(1.0), 0, 0)
     mc.cabeza(F(1.0), 0, 0, 0)
     # plano 2: doce yardas, solo tú contra el portero
+    mc.place((40, 60, 0), 0, F(2.3))       # fuera de plano tras el corte
     d.place((0.2, 1.4, 0), 0, 1)
     d.reposo(1)
     d.expresion(1, "picaro")
