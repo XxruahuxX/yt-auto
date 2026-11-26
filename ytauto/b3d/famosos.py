@@ -124,8 +124,25 @@ def MBAPPE(n="mbappe"):
 
 
 def HAALAND(n="haaland"):
-    return Personaje(n, kit=(200, 18, 38), num="9", pelo="coleta", pelo_col=(236, 202, 125), piel=(252, 214, 190),
-                     ojos=(70, 110, 150), pantalon=(245, 245, 250), medias=(20, 34, 90), ribete=(20, 34, 90)).build()
+    p = Personaje(n, kit=(200, 18, 38), num="9", pelo="rapado", pelo_col=(236, 202, 125), piel=(252, 214, 190),
+                  ojos=(70, 110, 150), pantalon=(245, 245, 250), medias=(20, 34, 90), ribete=(20, 34, 90)).build()
+    coleta_larga(p, (236, 202, 125))
+    return p
+
+
+def coleta_larga(p, col):
+    """Pelo largo peinado hacia atrás, recogido en una coleta gruesa que cae por la espalda."""
+    from .core import cone_to
+    c, R = HEAD_C, HEAD_R
+    m = mat(p.n + "_coleta_m", srgb(*col), 0.45)
+    t = sphere(p.n + "_pelo_arriba", (0.0, 0.03, c.z + R - 0.06), (0.3, 0.32, 0.1), m, p.neck)
+    t.rotation_euler = (math.radians(-8), 0, 0)
+    for sx in (-1, 1):                                  # mechones laterales peinados hacia atrás
+        lado = sphere(f"{p.n}_lado{sx}", (sx * 0.27, 0.06, c.z + 0.08), (0.08, 0.24, 0.14), m, p.neck)
+        lado.rotation_euler = (math.radians(-20), 0, 0)
+    sphere(p.n + "_goma", (0, R + 0.03, c.z + 0.08), (0.08, 0.05, 0.08), mat("goma", srgb(30, 30, 35), 0.4), p.neck)
+    cone_to(p.n + "_coleta", c + Vector((0, R + 0.04, 0.1)), c + Vector((0, R + 0.2, -0.38)), 0.13, m, p.neck)
+    sphere(p.n + "_coleta_base", (0, R + 0.07, c.z + 0.06), (0.12, 0.1, 0.12), m, p.neck)
 
 
 def KANE(n="kane"):
@@ -133,8 +150,19 @@ def KANE(n="kane"):
                      ojos=(70, 95, 120), pantalon=(24, 30, 72), medias=(246, 246, 250), ribete=(24, 30, 72)).build()
 
 
-FAMOSOS = {"cr7": CR7, "messi": MESSI, "neymar": NEYMAR, "lamine": LAMINE, "mbappe": MBAPPE, "haaland": HAALAND,
+# estatura oficial aproximada (m): el muñeco base mide como uno de 1,80
+ALTURAS = {"cr7": 1.87, "messi": 1.70, "neymar": 1.75, "lamine": 1.80, "mbappe": 1.78, "haaland": 1.95, "kane": 1.88}
+
+
+def escala(p, clave):
+    k = ALTURAS[clave] / 1.80
+    p.root.scale = (k, k, k)
+    return p
+
+
+_FAMOSOS = {"cr7": CR7, "messi": MESSI, "neymar": NEYMAR, "lamine": LAMINE, "mbappe": MBAPPE, "haaland": HAALAND,
            "kane": KANE}
+FAMOSOS = {k: (lambda k=k, fn=fn: escala(fn(), k)) for k, fn in _FAMOSOS.items()}
 
 
 # ------------------------------------------------------------------ hoja de personajes
