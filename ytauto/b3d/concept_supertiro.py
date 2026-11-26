@@ -15,7 +15,7 @@ from .personaje import Personaje
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/sup"
 ONLY = sys.argv[2] if len(sys.argv) > 2 else ""
-RW, RH = (int(sys.argv[3]), int(sys.argv[4])) if len(sys.argv) > 4 else (720, 1280)
+RW, RH = (int(sys.argv[3]), int(sys.argv[4])) if len(sys.argv) > 4 and sys.argv[3].isdigit() else (720, 1280)
 
 
 # ------------------------------------------------------------------ materiales de efectos

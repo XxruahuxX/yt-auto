@@ -296,6 +296,14 @@ def bean(c, x, y, s=1.0, body=(240, 170, 40), skin=SKIN[1], hair="pelo", hcol=(4
             a = math.pi * (1.0 + k / 8)
             c.c(x + math.cos(a) * hr * 0.98, hy - hr * 0.12 + math.sin(a) * hr * 0.98, hr * 0.27, hcol, INK, 4 * s)
         c.chord(x - hr * 0.9, hy - hr * 0.98, x + hr * 0.9, hy + hr * 0.1, 180, 360, hcol, w=0)
+    elif hair == "mono":
+        # pelo largo recogido hacia atrás con moño alto
+        c.c(x, hy - hr * 1.18, hr * 0.36, hcol, INK, 5 * s)
+        c.r(x - hr * 0.2, hy - hr * 0.98, x + hr * 0.2, hy - hr * 0.86, 3 * s, shade(hcol, 0.7), w=0)
+        c.chord(x - hr * 1.03, hy - hr * 1.06, x + hr * 1.03, hy + hr * 0.15, 180, 360, hcol, INK, 5 * s)
+        for k in range(3):
+            c.arc(x - hr * (0.7 - 0.25 * k), hy - hr * 1.0, x + hr * (0.7 - 0.25 * k), hy - hr * 0.2, 200, 340,
+                  shade(hcol, 1.35), 3 * s)
     elif hair == "cascao":
         # cabeza rapada con un triángulo de pelo delante
         c.p([(x - hr * 0.34, hy - hr * 0.66), (x + hr * 0.34, hy - hr * 0.66), (x, hy - hr * 0.97)], hcol, INK, 3 * s)

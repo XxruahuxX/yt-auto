@@ -1,0 +1,35 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: anime_3d
+title: "¿Y si un equipo de ANIME jugara contra uno NORMAL? ⚽🔥 #shorts"
+description: |
+  Domingo, diez de la mañana: un equipo sacado de una serie de anime contra once tíos normales del barrio. Discursos, supertiros y manos de fuego… y el reglamento de toda la vida. ¿Quién ganaría de verdad? 👇
+  #fútbol #anime #animación3d #humor #futbol #shorts
+tags: [anime, fútbol, qué pasaría si, supertiro, humor fútbol, animación 3d, fyp]
+hook: "¿Y si un equipo de anime…?"
+scenes:
+  - anim: x_3d_gancho
+    say: "¿Qué pasaría si un equipo de anime jugara contra un equipo normal? Domingo, diez de la mañana."
+    highlight: "anime normal"
+    sfx: [whoosh]
+  - anim: x_3d_discurso
+    say: "Antes del saque, su capitán suelta un discurso sobre la amistad. Con los ojos brillando. Dura cuatro minutos."
+    highlight: "amistad cuatro"
+  - anim: x_3d_gol
+    say: "Mientras tanto, el equipo normal saca, avanza y marca. Uno a cero."
+    highlight: "marca cero"
+  - anim: x_3d_carga
+    say: "Entonces el número diez carga su supertiro: el Chut del Cometa. Aura, llamas y grito."
+    highlight: "Cometa grito"
+  - anim: x_3d_robo
+    say: "Tarda tanto en gritar el puto nombre que el defensa llega y le quita el balón. Así, sin más."
+    highlight: "nombre balón"
+  - anim: x_3d_mano
+    say: "Su portero saca la Mano del Volcán. Fuera del área. El árbitro pita: mano, roja y a la calle."
+    highlight: "Volcán roja"
+  - anim: x_3d_cierre
+    say: "Final: dos a cero. Los del anime lloran mirando al horizonte. ¿Quién ganaría de verdad? Comenta."
+    highlight: "horizonte Comenta"
