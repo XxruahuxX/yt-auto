@@ -189,6 +189,9 @@ def render(kind, t, dur):
     if kind.startswith("x_pc_"):
         from .anim_portero import render as rpc
         return rpc(kind, t, dur)
+    if kind.startswith("x_ch_"):
+        from .anim_amigo2 import render as rch
+        return rch(kind, t, dur)
     if kind.startswith("x_am_"):
         from .anim_amigo import render as ram
         return ram(kind, t, dur)

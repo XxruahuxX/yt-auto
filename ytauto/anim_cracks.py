@@ -17,9 +17,10 @@ from .anim_busca import _clock
 KITS = {   # camisetas de selección (solo colores, sin escudos)
     "ARG": (120, 176, 226), "POR": (190, 28, 40), "ESP": (206, 24, 34), "BRA": (250, 214, 40),
     "MEX": (20, 120, 70), "COL": (252, 206, 30), "FRA": (30, 50, 120), "URU": (110, 170, 230),
+    "SWE": (250, 206, 20),
 }
 FAM = {"POR": "rojo", "ESP": "rojo", "ARG": "celeste", "URU": "celeste", "BRA": "amarillo", "COL": "amarillo",
-       "MEX": "verde", "FRA": "azul"}
+       "MEX": "verde", "FRA": "azul", "SWE": "amarillo"}
 HCOL = [(40, 30, 26), (120, 70, 30), (230, 190, 90), (20, 20, 24), (160, 160, 160)]
 
 # cada reto: semilla y los 3 cracks (fila, columna, kit, dorsal, pelo, color de pelo, barba)
@@ -41,6 +42,12 @@ RETOS = {
         dict(name="Maradona", row=10, col=6, kit="ARG", num="10", hair="rizado", hcol=(26, 20, 18), beard=False),
     ]),
 }
+RETOS["ochoa_higuita_zlatan"] = dict(seed=58, scene="aeropuerto", targets=[
+    dict(name="Ochoa", row=4, col=9, kit="MEX", num="13", hair="afro", hcol=(34, 24, 18), beard=False, gloves=True),
+    dict(name="Higuita", row=7, col=2, kit="COL", num="1", hair="melenon", hcol=(26, 20, 18), beard=False,
+         bigote=True, gloves=True),
+    dict(name="Zlatan", row=9, col=10, kit="SWE", num="10", hair="mono", hcol=(40, 30, 24), beard=True),
+])
 ROWS, COLS = 12, 12
 
 
@@ -142,6 +149,46 @@ def _backdrop_estadio(c, W, H):
         c.l([(-10, y), (W + 10, y)], (170, 164, 154), 2)
 
 
+def _backdrop_aeropuerto(c, W, H):
+    # terminal de llegadas: cristalera con aviones, panel de vuelos, reloj y suelo brillante
+    c.r(-10, -10, W + 10, H * 0.45, 0, (150, 200, 240), w=0)
+    c.r(-10, H * 0.30, W + 10, H * 0.45, 0, (120, 130, 140), w=0)         # pista
+    for i in range(6):
+        c.l([(W * (0.1 + i * 0.18), H * 0.37), (W * (0.16 + i * 0.18), H * 0.37)], WHITE, 4)
+    # avión de fondo (genérico, sin logos)
+    ax, ay = W * 0.62, H * 0.24
+    c.e(ax - 230, ay - 34, ax + 230, ay + 34, (240, 242, 248), INK, 4)
+    c.p([(ax - 40, ay), (ax + 70, ay), (ax - 10, ay + 110), (ax - 70, ay + 110)], (220, 226, 236), INK, 3)
+    c.p([(ax + 170, ay - 20), (ax + 230, ay - 120), (ax + 250, ay - 120), (ax + 225, ay - 10)], (222, 52, 40), INK, 3)
+    for k in range(9):
+        c.c(ax - 160 + k * 34, ay - 6, 7, (60, 120, 190), w=0)
+    c.c(ax - 225, ay, 22, (60, 120, 190), INK, 2)
+    # cristalera: marcos verticales
+    for i in range(8):
+        x = W * (i / 7)
+        c.l([(x, -10), (x, H * 0.45)], (70, 80, 96), 8)
+    c.l([(-10, H * 0.14), (W + 10, H * 0.14)], (70, 80, 96), 6)
+    # panel de llegadas
+    c.r(W * 0.06, H * 0.03, W * 0.46, H * 0.12, 8, (20, 24, 36), INK, 5)
+    rnd = random.Random(11)
+    for j in range(3):
+        y = H * (0.045 + j * 0.024)
+        c.r(W * 0.08, y, W * 0.30, y + H * 0.016, 2, (250, 200, 60), w=0)
+        c.r(W * 0.32, y, W * 0.44, y + H * 0.016, 2, (90, 220, 110) if rnd.random() < 0.6 else (240, 90, 70), w=0)
+    # reloj
+    c.c(W * 0.88, H * 0.075, 46, WHITE, INK, 5)
+    c.l([(W * 0.88, H * 0.075), (W * 0.88, H * 0.075 - 30)], INK, 5)
+    c.l([(W * 0.88, H * 0.075), (W * 0.88 + 22, H * 0.075 + 8)], INK, 5)
+    # suelo de terminal con brillo
+    c.r(-10, H * 0.45, W + 10, H + 10, 0, (214, 216, 222), w=0)
+    for i in range(14):
+        y = H * (0.45 + 0.04 * i * (1 + i * 0.12))
+        c.l([(-10, y), (W + 10, y)], (196, 198, 206), 2)
+    for i in range(9):
+        x0 = W * (i / 8)
+        c.l([(W * 0.5 + (x0 - W * 0.5) * 0.3, H * 0.45), (x0 + (x0 - W * 0.5) * 0.8, H + 10)], (200, 202, 210), 2)
+
+
 @lru_cache(maxsize=4)
 def _layout(W, H, key):
     """Fondo (supermuestreado) y reparto de la multitud. Las posiciones no cambian nunca; solo el movimiento
@@ -150,7 +197,7 @@ def _layout(W, H, key):
     rnd = random.Random(P["seed"])
     mrnd = random.Random(P["seed"] + 999)      # aparte, para no mover a nadie de sitio
     b = C((W, H))
-    {"playa": _backdrop_playa, "estadio": _backdrop_estadio}.get(P.get("scene"), _backdrop)(b, W, H)
+    {"playa": _backdrop_playa, "estadio": _backdrop_estadio, "aeropuerto": _backdrop_aeropuerto}.get(P.get("scene"), _backdrop)(b, W, H)
     tmap = {(t["row"], t["col"]): t for t in P["targets"]}
     found, crowd = {}, []
     kits = list(KITS)
@@ -174,7 +221,7 @@ def _layout(W, H, key):
                     if FAM[kit] == FAM[tg["kit"]] and kw["num"] == tg["num"]:
                         kw["num"] = "9" if tg["num"] != "9" else "8"
             else:
-                kw.update(body=KITS[t["kit"]], num=t["num"], hair=t["hair"], hcol=t["hcol"], beard=t["beard"], bigote=t.get("bigote", False),
+                kw.update(body=KITS[t["kit"]], num=t["num"], hair=t["hair"], hcol=t["hcol"], beard=t["beard"], bigote=t.get("bigote", False), gloves=t.get("gloves", False),
                           emo="serio", arms="relax", arm_r="arriba" if t["name"] != "Messi" else None)
             ph = mrnd.uniform(0, 2 * math.pi)
             mode = mrnd.choices(["salta", "balancea", "quieto"], [0.25, 0.45, 0.30])[0] if t is None else "balancea"
@@ -209,7 +256,7 @@ def _card(c, x, y, s, tg, t, name_size=48, label=True):
     w, h = 300 * s, 420 * s
     c.r(x - w / 2, y - h, x + w / 2, y + 16 * s, 26 * s, (255, 250, 238), INK, 6 * s)
     bean(c, x, y - 20 * s, 0.78 * s, KITS[tg["kit"]], BLANCO, tg["hair"], tg["hcol"], emo="picaro", t=t,
-         num=tg["num"], beard=tg["beard"], bigote=tg.get("bigote", False), arms="relax", blink_off=hash(tg["name"]) % 3)
+         num=tg["num"], beard=tg["beard"], bigote=tg.get("bigote", False), gloves=tg.get("gloves", False), arms="relax", blink_off=hash(tg["name"]) % 3)
     if label:
         from .anim_extra import font
         f = font(int(name_size * s * K))

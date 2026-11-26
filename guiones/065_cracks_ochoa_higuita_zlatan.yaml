@@ -1,0 +1,23 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 330
+mascot: false
+experiment: cracks
+title: "Solo el 1 % encuentra a Ochoa, Higuita y Zlatan 🔎 #shorts"
+description: |
+  Reto visual: en la terminal del aeropuerto están Ochoa, Higuita y Zlatan. Tienes 10 segundos. ¿Cuántos encontraste? Responde con un número 👇
+  #fútbol #reto #retovisual #ochoa #higuita #zlatan #shorts
+tags: [reto visual, encuentralo, fútbol, ochoa, higuita, zlatan, porteros, busca y encuentra, fyp]
+hook: "Solo el 1 % los encuentra"
+scenes:
+  - anim: x_ck_fichas_ochoa_higuita_zlatan
+    say: "Busca a Ochoa, Higuita y Zlatan."
+    sfx: [whoosh]
+  - anim: x_ck_reto_ochoa_higuita_zlatan
+    say: "Solo el uno por ciento los encuentra. Tienes diez segundos."
+    pause: 6.0
+    sfx: [segundos]
+  - anim: x_ck_sol_ochoa_higuita_zlatan
+    say: "¡Aquí están! ¿Cuántos encontraste? Responde con un número."
+    sfx: [ding]

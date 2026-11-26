@@ -1,0 +1,28 @@
+format: serie
+style: karaoke
+caption: par
+mascot: false
+experiment: amigo
+title: "Todos tenemos un amigo que NUNCA pasa el balón… 😂⚽ #shorts"
+description: |
+  Todos tenemos un amigo que nunca la pasa… y cuando por fin se la pasas, la manda al quinto. ¿Cómo se llama el tuyo? 👇
+  #fútbol #humor #fútboldebarrio #amigos #shorts
+tags: [fútbol, humor fútbol, fútbol de barrio, amigos, todos tenemos un amigo, chupón, fyp]
+hook: "Todos tenemos uno"
+scenes:
+  - anim: x_ch_intro
+    say: "Todos tenemos un amigo que nunca pasa el balón. Nunca. Ni aunque se lo pidas de rodillas."
+    sfx: [whoosh]
+  - anim: x_ch_solo
+    say: "Tú estás solo delante de la portería, gritando que estás solo. Y él decide regatear a tres."
+  - anim: x_ch_pierde
+    say: "Y la pierde. Siempre la pierde. Y encima pide falta."
+  - anim: x_ch_mia
+    say: "Pero cuando el balón lo tienes tú, te la pide a gritos. ¡Mía, mía, mía!"
+  - anim: x_ch_quinto
+    say: "Un día, por fin, le pasas. Y la manda directa al balcón del quinto."
+    sfx: [pop]
+  - anim: x_ch_vecina
+    say: "La del quinto no devuelve balones. Joder, era el único que teníamos."
+  - anim: x_ch_cierre
+    say: "Y al día siguiente viene diciendo que juega como Messi. ¿Cómo se llama el tuyo?"

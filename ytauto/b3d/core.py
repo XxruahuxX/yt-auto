@@ -18,8 +18,12 @@ _MATS: dict[str, bpy.types.Material] = {}
 
 def mat(name, col, rough=0.55, emit=0.0, sheen=0.0, coat=0.0):
     """Material Principled. col en lineal (usa srgb())."""
-    if name in _MATS and _MATS[name].name in bpy.data.materials:
-        return _MATS[name]
+    if name in _MATS:
+        try:
+            if _MATS[name].name in bpy.data.materials:
+                return _MATS[name]
+        except ReferenceError:      # escena reiniciada: el material ya no existe
+            pass
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     b = m.node_tree.nodes["Principled BSDF"]
