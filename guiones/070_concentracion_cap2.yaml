@@ -1,0 +1,33 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: concentracion
+title: "LA CONCENTRACIÓN · Capítulo 2: El autobús 🚌⚽ #shorts"
+description: |
+  Vuelve la luz y aparece otra nota de M. Pelea por los asientos del fondo, deberes, bocatas… y el autobús se para en mitad de la nada. Mañana, capítulo 3 👀
+  Parodia animada: personajes caricaturizados e historia de ficción.
+  #fútbol #animación3d #messi #cristiano #haaland #lamineyamal #neymar #shorts
+tags: [la concentración, serie fútbol, animación 3d, messi, cristiano ronaldo, haaland, lamine yamal, mbappé, neymar, harry kane, parodia, fyp]
+hook: "La Concentración · Cap. 2"
+scenes:
+  - anim: x_3d_luz
+    say: "Vuelve la luz. La puerta está abierta. Y en el suelo hay otra nota."
+    highlight: "luz nota"
+    sfx: [whoosh]
+  - anim: x_3d_nota
+    say: "El autobús sale a las siete. No lleguéis tarde. Firmado: M."
+    highlight: "siete M"
+  - anim: x_3d_asientos
+    say: "En el autobús, pelea por los asientos del fondo. Gana Neymar, que ya estaba tumbado."
+    highlight: "fondo Neymar"
+  - anim: x_3d_deberes
+    say: "Lamine hace los deberes de mates. Y Haaland se come los bocatas de todos."
+    highlight: "deberes bocatas"
+  - anim: x_3d_kane
+    say: "Kane pregunta a dónde vamos. Nadie lo sabe."
+    highlight: "dónde nadie"
+  - anim: x_3d_frena
+    say: "De repente, el autobús frena en mitad de la nada. Y el conductor… ha desaparecido. Continuará."
+    highlight: "frena desaparecido"
