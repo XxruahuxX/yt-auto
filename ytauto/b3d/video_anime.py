@@ -186,7 +186,7 @@ def tarjeta(p, lado="R"):
     """Tarjeta roja en la mano (oculta hasta que se anima su escala)."""
     hand = bpy.data.objects[f"{p.n}_mano{lado}"]
     pos = world(hand).translation
-    c = cube(p.n + "_roja", tuple(pos + Vector((0, -0.03, -0.1))), (0.045, 0.006, 0.065),
+    c = cube(p.n + "_roja", tuple(pos + Vector((0, -0.06, -0.14))), (0.07, 0.008, 0.1),
              mat("roja", srgb(230, 20, 30), 0.4, emit=0.6), p.el[lado])
     c.scale = (0.001,) * 3
     return c
@@ -408,12 +408,14 @@ def s_mano(sc, dur):
     brillo_ojos(g, [(F(0.4), 0), (F(0.6), 3.5)], col=(1.0, 0.6, 0.15))
     hand = Vector((0.1, -0.35, 1.5))
     antes = set(bpy.data.materials)
-    e = _agrupar(tuple(hand), lambda: mano_gigante(tuple(hand), (0, 1, 0), 1.15, (1.0, 0.3, 0.02)))
+    e = _agrupar(tuple(hand), lambda: mano_gigante(tuple(hand), (0, 1, 0), 1.5, (1.0, 0.2, 0.0)))
     for m in bpy.data.materials:
         if m not in antes and m.node_tree:
             for nd in m.node_tree.nodes:
                 if nd.type == "EMISSION":
-                    nd.inputs["Strength"].default_value *= 1.8
+                    nd.inputs["Strength"].default_value *= 1.4
+                if nd.type == "MIX_SHADER":
+                    nd.inputs["Fac"].default_value = 0.85
     key(e, 1, scale=(0.001,) * 3)
     key(e, F(0.5), scale=(0.001,) * 3)
     key(e, F(0.8), scale=(1.1,) * 3)
@@ -441,9 +443,10 @@ def s_mano(sc, dur):
     r.reposo(F(t2))
     r.expresion(F(t2), "enfadado")
     silbato(r, F(t2 + 0.2))
-    r.pose(F(t2 + 0.5), shoulders=((0.05, 0.12), (0.0, -3.0)), elbows=(-0.2, 0.0))
+    r.pose(F(t2 + 0.5), shoulders=((0.05, 0.12), (-0.9, -2.4)), elbows=(-0.2, 0.0), lean=-0.08)
+    r.cabeza(F(t2 + 0.5), 0.15, -0.1, 0)
     key(card, F(t2 + 0.45), scale=(0.001,) * 3)
-    key(card, F(t2 + 0.55), scale=(0.045, 0.006, 0.065))
+    key(card, F(t2 + 0.55), scale=(0.07, 0.008, 0.1))
     g.reposo(F(t2))
     g.place((0, -1.6, 0), math.pi, F(t2))
     g.expresion(F(t2), "sorpresa")
