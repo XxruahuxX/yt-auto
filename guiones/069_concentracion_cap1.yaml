@@ -1,0 +1,33 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: concentracion
+title: "LA CONCENTRACIÓN · Capítulo 1: La carta ✉️⚽ #shorts"
+description: |
+  Siete cracks reciben la misma carta: «Partido secreto. Sábado. Sin entrenador. Firmado: M.» ¿Quién es M? Mañana, capítulo 2 👀
+  Parodia animada: personajes caricaturizados e historia de ficción.
+  #fútbol #animación3d #messi #cristiano #haaland #lamineyamal #mbappe #shorts
+tags: [la concentración, serie fútbol, animación 3d, messi, cristiano ronaldo, haaland, lamine yamal, mbappé, neymar, harry kane, parodia, fyp]
+hook: "La Concentración · Cap. 1"
+scenes:
+  - anim: x_3d_carta
+    say: "Domingo por la noche. A siete cracks del mundo les llega la misma carta."
+    highlight: "siete carta"
+    sfx: [whoosh]
+  - anim: x_3d_lee
+    say: "Partido secreto. Sábado. Sin entrenador. Firmado: M."
+    highlight: "secreto M"
+  - anim: x_3d_llegan
+    say: "El lunes, los siete aparecen en el mismo vestuario. Y se miran raro."
+    highlight: "vestuario raro"
+  - anim: x_3d_manias
+    say: "Cristiano ya está haciendo sentadillas. Haaland, meditando. Y Messi, tomando mate."
+    highlight: "sentadillas mate"
+  - anim: x_3d_quien
+    say: "Lamine pregunta: ¿quién es M? Y todos miran a Messi… y a Mbappé."
+    highlight: "M Mbappé"
+  - anim: x_3d_apagon
+    say: "Entonces se apaga la luz. Y alguien cierra la puerta con llave. Continuará."
+    highlight: "luz Continuará"
