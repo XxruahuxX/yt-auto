@@ -1,0 +1,29 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: amigo_3d
+title: "Todos tenemos un amigo que se cree que tiene AURA… 😎⚽ #shorts"
+description: |
+  Todos tenemos un amigo que se cree que tiene aura: llega a cámara lenta, se coloca las medias veinte segundos y celebra goles que no son suyos. ¿Quién es el del aura en tu grupo? 👇
+  #fútbol #humor #aura #amigos #animación3d #shorts
+tags: [fútbol, humor fútbol, aura, todos tenemos un amigo, pachanga, animación 3d, fyp]
+hook: "Todos tenemos uno"
+scenes:
+  - anim: x_3d_intro
+    say: "Todos tenemos un amigo que se cree que tiene aura. Llega a la pachanga del domingo… a cámara lenta."
+    highlight: "aura lenta"
+    sfx: [whoosh]
+  - anim: x_3d_medias
+    say: "Antes de sacar un córner, se coloca las medias. Veinte segundos. Todos esperando, joder."
+    highlight: "medias esperando"
+  - anim: x_3d_celebra
+    say: "Marca otro. Y él sale corriendo a celebrarlo como si fuera suyo."
+    highlight: "otro suyo"
+  - anim: x_3d_panenka
+    say: "Penalti. Lo pide él. Lo tira a lo Panenka… y el portero la coge sin moverse."
+    highlight: "Panenka moverse"
+  - anim: x_3d_cierre
+    say: "Pero tranquilo, el aura no se pierde. Se recarga. ¿Quién es el del aura en tu grupo?"
+    highlight: "recarga grupo"
