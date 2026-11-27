@@ -1,4 +1,4 @@
-"""Interior de autobús para «La Concentración». El bus mira a -Y (conductor delante, en y≈-1); fila del fondo en y=7.
+"""Interior de autobús para «La Concentración». Techo a 2,7 m (los muñecos miden más de 2 m con la cabeza). El bus mira a -Y (conductor delante, en y≈-1); fila del fondo en y=7.
 El paisaje (árboles, carretera) se mueve hacia +Y para simular la marcha."""
 from __future__ import annotations
 
@@ -38,14 +38,14 @@ def autobus(dur, velocidad=9.0, en_marcha=True):
     chapa = mat("chapa_int", srgb(225, 225, 230), 0.5)
     suelo = mat("suelo_bus", srgb(70, 72, 80), 0.7)
     cube("bus_suelo", (0, 2.6, -0.02), (1.32, 4.6, 0.02), suelo)
-    cube("bus_techo", (0, 2.6, 2.22), (1.32, 4.6, 0.03), chapa)
+    cube("bus_techo", (0, 2.6, 2.72), (1.32, 4.6, 0.03), chapa)
     for sx in (-1, 1):
         cube(f"bus_lat{sx}", (sx * 1.3, 2.6, 0.45), (0.03, 4.6, 0.45), chapa)
-        cube(f"bus_marco{sx}", (sx * 1.3, 2.6, 2.05), (0.03, 4.6, 0.15), chapa)
+        cube(f"bus_marco{sx}", (sx * 1.3, 2.6, 2.55), (0.03, 4.6, 0.15), chapa)
         for k in range(10):
-            cube(f"bus_pilar{sx}_{k}", (sx * 1.3, -1.6 + k * 0.95, 1.45), (0.035, 0.05, 0.6), chapa)
-        cube(f"bus_barra{sx}", (sx * 0.95, 2.6, 1.95), (0.015, 4.4, 0.015), mat("metal_bus", srgb(150, 150, 158), 0.3))
-    cube("bus_trasera", (0, 7.2, 1.1), (1.32, 0.03, 1.1), chapa)
+            cube(f"bus_pilar{sx}_{k}", (sx * 1.3, -1.6 + k * 0.95, 1.7), (0.035, 0.05, 0.85), chapa)
+        cube(f"bus_barra{sx}", (sx * 0.95, 2.6, 2.45), (0.015, 4.4, 0.015), mat("metal_bus", srgb(150, 150, 158), 0.3))
+    cube("bus_trasera", (0, 7.2, 1.36), (1.32, 0.03, 1.36), chapa)
     cube("bus_pasillo", (0, 2.6, 0.003), (0.32, 4.4, 0.003), mat("alfombra", srgb(150, 30, 40), 0.8))
     tap = mat("tapiz", srgb(40, 70, 140), 0.7, sheen=0.4)
     for i, y in enumerate(FILAS):
@@ -63,7 +63,7 @@ def autobus(dur, velocidad=9.0, en_marcha=True):
     cube("gorra_visera", (-0.72, -1.08, 0.5), (0.1, 0.06, 0.01), mat("gorra_m", srgb(25, 40, 90), 0.5))
     # luces interiores suaves
     for i, y in enumerate((0.5, 3.0, 5.5)):
-        bpy.ops.object.light_add(type="AREA", location=(0, y, 2.15))
+        bpy.ops.object.light_add(type="AREA", location=(0, y, 2.65))
         L = bpy.context.active_object
         L.data.energy, L.data.size = 70, 0.8
         LUCES_BUS.append(L)

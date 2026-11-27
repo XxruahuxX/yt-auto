@@ -227,7 +227,7 @@ def s_frena(sc, dur):
         sentado_bus(p, 1)
         p.expresion(1, "neutral")
         sentado_bus(p, F(tf))
-        sentado_bus(p, F(tf + 0.15), lean=0.7)                  # latigazo hacia delante
+        sentado_bus(p, F(tf + 0.15), lean=0.35)                  # latigazo hacia delante
         sentado_bus(p, F(tf + 0.5), lean=-0.05)
         p.expresion(F(tf + 0.1), "sorpresa")
         p.cabeza(F(tf + 0.7), 0.0, -0.1, 0)

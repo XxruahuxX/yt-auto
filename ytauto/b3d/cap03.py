@@ -26,9 +26,10 @@ def en_cama(p, f, lean=0.0, brazos=None):
            elbows=(-0.4, -0.4), lean=lean, pelvis_z=-0.15)
 
 
-def acostar(p, clave, f=1):
+def acostar(p, clave, f=1, dy=0.0):
+    """dy=0: la cabeza cae en la almohada al tumbarse (sin atravesar el cabecero)."""
     k = ALTURAS[clave] / 1.80
-    p.place((LADO[clave], BED_Y + 0.38, MATT - 0.475 * k), 0, f)
+    p.place((LADO[clave], BED_Y + dy, MATT - 0.475 * k), 0, f)
 
 
 def maleta(nombre, loc, col):
@@ -193,8 +194,8 @@ def s_frontera(sc, dur):
     from .core import sphere
     for i in range(4):                                         # la frontera de almohadas
         sphere(f"frontera{i}", (0, BED_Y - 0.35 + i * 0.32, MATT + 0.4), (0.12, 0.24, 0.22), blanco)
-    acostar(cr, "cr7")
-    acostar(me, "messi")
+    acostar(cr, "cr7", dy=0.38)
+    acostar(me, "messi", dy=0.38)
     for j, (p, sg) in enumerate(((cr, 1), (me, -1))):
         cruzados(p, 1)
         p.expresion(1, "enfadado")
