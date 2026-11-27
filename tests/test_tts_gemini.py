@@ -16,7 +16,7 @@ def test_split_por_pausas_de_parrafo():
     durs = [2.0, 3.0, 1.5]
     x = np.concatenate([_burst(durs[0]), gap, _burst(durs[1]), gap, _burst(durs[2])])
     texts = ["a" * 40, "b" * 60, "c" * 30]
-    parts = g.split(x, texts)
+    parts = g.split_silences(x, texts)
     got = [len(p) / g.SR_IN for p in parts]
     for d, e in zip(got, [2.2, 3.45, 1.7]):
         assert abs(d - e) < 0.3, got

@@ -4,3 +4,4 @@ pytest>=8.0
 kokoro-onnx>=0.4
 soundfile>=0.12
 piper-tts>=1.2
+faster-whisper>=1.0

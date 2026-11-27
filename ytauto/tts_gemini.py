@@ -5,15 +5,19 @@ llamada y luego se corta por escenas buscando los silencios entre párrafos.
 
 Variables de entorno:
     GEMINI_API_KEY      clave de Google AI Studio (obligatoria)
-    GEMINI_TTS_MODEL    modelo (por defecto gemini-2.5-flash-preview-tts)
+    GEMINI_TTS_MODEL    modelo (por defecto gemini-3.8-flash-tts)
     GEMINI_VOICE        voz precargada (por defecto Puck)
+    GEMINI_TEMPO        acelera el audio final (por defecto 1.0)
     GEMINI_STYLE        instrucción de estilo (si no, la del guion o STYLE por defecto)
 """
 from __future__ import annotations
 
 import base64
+import difflib
 import os
+import re
 import subprocess
+import sys
 import wave
 from pathlib import Path
 
@@ -21,17 +25,24 @@ import numpy as np
 import requests
 
 SR_IN = 24000  # Gemini devuelve PCM 16 bits, mono, 24 kHz
-STYLE = ("Lee este guion como un narrador de vídeos cortos de humor y fútbol en YouTube, "
-         "con acento de España (castellano peninsular). Tono cercano y con chispa, ritmo ágil "
-         "pero claro, remarcando los momentos graciosos y bajando la voz en el suspense. "
-         "Haz una pausa breve entre cada párrafo.")
+STYLE = ("Lee este guion como un narrador de Shorts de humor y fútbol en YouTube, con acento "
+         "de España (castellano peninsular). Ritmo RÁPIDO, como en TikTok, sin pausas dentro de "
+         "las frases. Tono cercano y con chispa, remarcando lo gracioso y bajando la voz en el "
+         "suspense. Deja una pausa corta solo entre párrafos.")
+# Formato de la guía de prompts de Gemini TTS: notas de dirección + transcripción.
+# Solo se lee en voz alta lo que va bajo TRANSCRIPT.
+PROMPT = """# AUDIO PROFILE: Narrador de Shorts de fútbol y humor
+## DIRECTOR'S NOTES
+{style}
+## TRANSCRIPT
+{text}"""
 URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 
 def _request(text: str, style: str, voice: str) -> np.ndarray:
-    model = os.environ.get("GEMINI_TTS_MODEL", "gemini-2.5-flash-preview-tts")
+    model = os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts")
     body = {
-        "contents": [{"parts": [{"text": f"{style}\n\n{text}"}]}],
+        "contents": [{"parts": [{"text": PROMPT.format(style=style, text=text)}]}],
         "generationConfig": {
             "responseModalities": ["AUDIO"],
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}},
@@ -62,7 +73,69 @@ def _silences(x: np.ndarray, min_len: float = 0.18, thr_db: float = -38) -> list
     return out
 
 
+def _norm(w: str) -> str:
+    return re.sub(r"[^\wáéíóúüñ]", "", w.lower())
+
+
+def _word_cuts(x: np.ndarray, texts: list[str]) -> list[int]:
+    """Fronteras exactas con Whisper: transcribe con marcas de tiempo por palabra (usando el
+    propio guion como pista), alinea las palabras con el guion y corta en el hueco entre la
+    última palabra de una escena y la primera de la siguiente."""
+    from faster_whisper import WhisperModel  # noqa: PLC0415
+
+    global _whisper
+    if _whisper is None:
+        os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+        _whisper = WhisperModel(os.environ.get("WHISPER_MODEL", "small"), device="cpu",
+                                compute_type="int8")
+    y = np.interp(np.arange(0, len(x), SR_IN / 16000), np.arange(len(x)), x).astype(np.float32)
+    segs, _ = _whisper.transcribe(y, language="es", word_timestamps=True,
+                                  initial_prompt=" ".join(texts))
+    heard = [w for sg in segs for w in sg.words]
+    script = [_norm(w) for t in texts for w in t.split()]
+    starts = np.cumsum([len(t.split()) for t in texts])[:-1]  # índice de la 1.ª palabra de cada escena
+    m = difflib.SequenceMatcher(a=script, b=[_norm(w.word) for w in heard], autojunk=False)
+    a2b = {}
+    for blk in m.get_matching_blocks():
+        for k in range(blk.size):
+            a2b[blk.a + k] = blk.b + k
+    cuts = []
+    for k in starts:
+        nxt = next((a2b[j] for j in range(k, len(script)) if j in a2b), None)
+        if nxt is None or nxt == 0:
+            raise RuntimeError("No pude alinear la voz con el guion")
+        a, b = heard[nxt - 1].end, heard[nxt].start
+        lo, hi = int(a * SR_IN), max(int(b * SR_IN), int(a * SR_IN) + 1)
+        # dentro del hueco, el punto más silencioso (ventanas de 10 ms)
+        win = int(0.01 * SR_IN)
+        seg = x[lo:hi]
+        if len(seg) > win:
+            e = np.convolve(seg ** 2, np.ones(win), mode="valid")
+            cuts.append(lo + int(e.argmin()) + win // 2)
+        else:
+            cuts.append((lo + hi) // 2)
+    if any(b <= a for a, b in zip(cuts, cuts[1:])):
+        raise RuntimeError("Cortes desordenados")
+    return cuts
+
+
+_whisper = None
+
+
 def split(x: np.ndarray, texts: list[str]) -> list[np.ndarray]:
+    """Corta el audio en len(texts) trozos. Con faster-whisper instalado usa las palabras
+    (exacto); si no, el método de abajo por silencios."""
+    if len(texts) > 1:
+        try:
+            cuts = _word_cuts(x, texts)
+            bounds = [0, *cuts, len(x)]
+            return [x[bounds[i]:bounds[i + 1]] for i in range(len(texts))]
+        except Exception as e:  # noqa: BLE001
+            print(f"Alineado por palabras falló ({e}); corto por silencios", file=sys.stderr)
+    return split_silences(x, texts)
+
+
+def split_silences(x: np.ndarray, texts: list[str]) -> list[np.ndarray]:
     """Corta el audio en len(texts) trozos: elige, para cada frontera, el silencio más largo
     cerca de donde debería caer según la longitud del texto."""
     n = len(texts)
@@ -100,7 +173,8 @@ def _save(x: np.ndarray, out: Path) -> float:
     # recorta silencios al principio y al final, iguala volumen y pasa a 44,1 kHz
     af = ("silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
           "silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
-          "highpass=f=70,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=80,"
+          "silenceremove=stop_periods=-1:stop_duration=0.22:stop_threshold=-40dB,"
+          f"atempo={os.environ.get('GEMINI_TEMPO', '1.0')},highpass=f=70,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=80,"
           "aresample=44100")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af", af, str(out)],
                    check=True)
