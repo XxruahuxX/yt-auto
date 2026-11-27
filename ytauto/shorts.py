@@ -527,9 +527,21 @@ def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
         d.text(((W - lw) / 2, y0 + 22 + j * lh), l, font=font, fill=INK)
 
 
+GEMINI_ENV = os.environ.get("GEMINI_ENV", "/mnt/project-files/yt-auto/secrets/gemini.env")
+
+
 def _pretts(spec: dict, tmp: Path) -> list[float] | None:
-    """Con TTS_ENGINE=gemini, narra todo el guion en una petición. Si falla, None (motor normal)."""
-    if os.environ.get("TTS_ENGINE") != "gemini" or not os.environ.get("GEMINI_API_KEY"):
+    """Voz por defecto desde el 27-nov: Gemini TTS, voz Orus (elegida por el usuario).
+    Narra todo el guion en una petición. Si no hay clave, GEMINI_OFF=1 o falla, devuelve None
+    y se usa el motor de siempre (TTS_ENGINE: chatterbox/kokoro/piper)."""
+    if os.environ.get("GEMINI_OFF") == "1":
+        return None
+    if not os.environ.get("GEMINI_API_KEY") and Path(GEMINI_ENV).exists():
+        for line in Path(GEMINI_ENV).read_text().splitlines():
+            k, _, v = line.partition("=")
+            if k.strip() == "GEMINI_API_KEY":
+                os.environ["GEMINI_API_KEY"] = v.strip()
+    if not os.environ.get("GEMINI_API_KEY"):
         return None
     from . import tts_gemini
     texts = [sc.get("say") or sc["text"] for sc in spec["scenes"]]

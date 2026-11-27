@@ -6,7 +6,7 @@ llamada y luego se corta por escenas buscando los silencios entre párrafos.
 Variables de entorno:
     GEMINI_API_KEY      clave de Google AI Studio (obligatoria)
     GEMINI_TTS_MODEL    modelo (por defecto gemini-3.8-flash-tts)
-    GEMINI_VOICE        voz precargada (por defecto Puck)
+    GEMINI_VOICE        voz precargada (por defecto Orus, elegida por el usuario el 27-nov)
     GEMINI_TEMPO        acelera el audio final (por defecto 1.0)
     GEMINI_STYLE        instrucción de estilo (si no, la del guion o STYLE por defecto)
 """
@@ -186,6 +186,6 @@ def tts_batch(texts: list[str], outs: list[Path], style: str | None = None,
               voice: str | None = None) -> list[float]:
     """Una sola petición para todo el guion; escribe un wav por escena y devuelve duraciones."""
     style = os.environ.get("GEMINI_STYLE") or style or STYLE
-    voice = voice or os.environ.get("GEMINI_VOICE", "Puck")
+    voice = voice or os.environ.get("GEMINI_VOICE", "Orus")
     x = _request("\n\n".join(t.strip() for t in texts), style, voice)
     return [_save(part, out) for part, out in zip(split(x, texts), outs)]
