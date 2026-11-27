@@ -256,6 +256,11 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
     ESCENAS[name](sc, dur)
+    from .core import apoyar_pies
+    import os as _os
+    print('HUNDIMIENTO', name, round(apoyar_pies(sc, 1, F(dur), solo_medir=bool(_os.environ.get('SOLO_MEDIR'))), 3), flush=True)
+    if _os.environ.get('SOLO_MEDIR'):
+        return
     cuts = sorted(m.frame for m in sc.timeline_markers if m.frame > 1)
     for o in bpy.data.objects:
         for fc in all_fcurves(o):
