@@ -1,0 +1,30 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: concentracion
+title: "LA CONCENTRACIÓN · Capítulo 3: Las habitaciones 🛏️⚽ #shorts"
+description: |
+  Cristiano y Messi comparten habitación… y solo hay una cama. A las tres de la mañana, algo suena en el pasillo. Mañana, capítulo 4 👀
+  Parodia animada: personajes caricaturizados e historia de ficción.
+  #fútbol #animación3d #messi #cristiano #neymar #shorts
+tags: [la concentración, serie fútbol, animación 3d, messi, cristiano ronaldo, neymar, parodia, fyp]
+hook: "La Concentración · Cap. 3"
+scenes:
+  - anim: x_3d_llegan
+    say: "Llegan al hotel. A Cristiano y a Messi les toca la misma habitación. Y solo hay una cama."
+    highlight: "habitación cama"
+    sfx: [whoosh]
+  - anim: x_3d_abdos
+    say: "A medianoche, Cristiano sigue haciendo abdominales. Messi solo quiere dormir."
+    highlight: "abdominales dormir"
+  - anim: x_3d_reloj
+    say: "A las tres en punto, algo suena en el pasillo."
+    highlight: "tres pasillo"
+  - anim: x_3d_pasillo
+    say: "Abren la puerta. Alguien se está llevando las botas de todo el equipo."
+    highlight: "botas equipo"
+  - anim: x_3d_fiesta
+    say: "Y el rastro de botas termina en la habitación diez. Continuará."
+    highlight: "diez Continuará"
