@@ -41,7 +41,7 @@ def maleta(nombre, loc, col):
 def s_llegan(sc, dur):
     ps = reparto(["cr7", "messi"])
     cr, me = ps["cr7"], ps["messi"]
-    habitacion(C1.OUT)
+    habitacion(C1.OUT, piernas=())
     cr.place((-0.42, -0.75, 0), math.pi, 1)
     me.place((0.42, -0.75, 0), math.pi, 1)
     maleta("maleta_cr", (-0.85, -0.85, 0.3), (230, 230, 235))
@@ -189,7 +189,7 @@ def cruzados(p, f):
 def s_frontera(sc, dur):
     ps = reparto(["cr7", "messi"])
     cr, me = ps["cr7"], ps["messi"]
-    habitacion(C1.OUT)
+    habitacion(C1.OUT, sabana_y=BED_Y + 0.43)
     blanco = mat("sabana", srgb(246, 246, 242), 0.8, sheen=0.3)
     from .core import sphere
     for i in range(4):                                         # la frontera de almohadas
