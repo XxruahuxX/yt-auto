@@ -37,7 +37,14 @@ def _voice() -> str:
 
 
 def tts(text: str, out: Path, length_scale: float = 0.9) -> float:
-    """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local."""
+    """Gemini (Orus) si hay clave: usa la caché que deja tts_gemini.prepare(guion); si la frase
+    no está, 1 petición suelta. Si no, ElevenLabs / Chatterbox / Kokoro / Piper."""
+    if _gemini_on():
+        from . import tts_gemini
+        try:
+            return tts_gemini.tts_one(text, out)
+        except Exception as e:  # noqa: BLE001
+            print(f"Gemini TTS falló ({e}); uso el motor por defecto", file=sys.stderr)
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
     if os.environ.get("TTS_ENGINE", "kokoro") == "chatterbox" and Path(CHATTERBOX_PY).exists():
@@ -530,18 +537,22 @@ def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
 GEMINI_ENV = os.environ.get("GEMINI_ENV", "/mnt/project-files/yt-auto/secrets/gemini.env")
 
 
-def _pretts(spec: dict, tmp: Path) -> list[float] | None:
-    """Voz por defecto desde el 27-nov: Gemini TTS, voz Orus (elegida por el usuario).
-    Narra todo el guion en una petición. Si no hay clave, GEMINI_OFF=1 o falla, devuelve None
-    y se usa el motor de siempre (TTS_ENGINE: chatterbox/kokoro/piper)."""
+def _gemini_on() -> bool:
     if os.environ.get("GEMINI_OFF") == "1":
-        return None
+        return False
     if not os.environ.get("GEMINI_API_KEY") and Path(GEMINI_ENV).exists():
         for line in Path(GEMINI_ENV).read_text().splitlines():
             k, _, v = line.partition("=")
             if k.strip() == "GEMINI_API_KEY":
                 os.environ["GEMINI_API_KEY"] = v.strip()
-    if not os.environ.get("GEMINI_API_KEY"):
+    return bool(os.environ.get("GEMINI_API_KEY"))
+
+
+def _pretts(spec: dict, tmp: Path) -> list[float] | None:
+    """Voz por defecto desde el 27-nov: Gemini TTS, voz Orus (elegida por el usuario).
+    Narra todo el guion en una petición (o lo saca de la caché). Si no hay clave, GEMINI_OFF=1
+    o falla, devuelve None y se usa el motor de siempre (TTS_ENGINE)."""
+    if not _gemini_on():
         return None
     from . import tts_gemini
     texts = [sc.get("say") or sc["text"] for sc in spec["scenes"]]

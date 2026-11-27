@@ -14,8 +14,10 @@ from __future__ import annotations
 
 import base64
 import difflib
+import hashlib
 import os
 import re
+import shutil
 import subprocess
 import sys
 import wave
@@ -182,10 +184,69 @@ def _save(x: np.ndarray, out: Path) -> float:
         return w.getnframes() / w.getframerate()
 
 
+CACHE = Path(os.environ.get("GEMINI_CACHE", "/mnt/project-files/yt-auto/voces/cache"))
+
+
+def _cfg(style: str | None, voice: str | None) -> tuple[str, str]:
+    return (os.environ.get("GEMINI_STYLE") or style or STYLE,
+            voice or os.environ.get("GEMINI_VOICE", "Orus"))
+
+
+def _key(text: str, style: str, voice: str) -> Path:
+    model = os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts")
+    h = hashlib.sha1(f"{model}|{voice}|{style}|{text.strip()}".encode()).hexdigest()[:20]
+    return CACHE / f"{h}.wav"
+
+
+def _dur(p: Path) -> float:
+    with wave.open(str(p)) as w:
+        return w.getnframes() / w.getframerate()
+
+
+def cached(text: str, style: str | None = None, voice: str | None = None) -> Path | None:
+    p = _key(text, *_cfg(style, voice))
+    return p if p.exists() else None
+
+
 def tts_batch(texts: list[str], outs: list[Path], style: str | None = None,
               voice: str | None = None) -> list[float]:
-    """Una sola petición para todo el guion; escribe un wav por escena y devuelve duraciones."""
-    style = os.environ.get("GEMINI_STYLE") or style or STYLE
-    voice = voice or os.environ.get("GEMINI_VOICE", "Orus")
-    x = _request("\n\n".join(t.strip() for t in texts), style, voice)
-    return [_save(part, out) for part, out in zip(split(x, texts), outs)]
+    """Una sola petición para todo el guion; escribe un wav por escena y devuelve duraciones.
+    Cada escena queda en la caché (por texto+voz+estilo), así tts() y render() reutilizan
+    exactamente el mismo audio y no gastan cuota otra vez."""
+    style, voice = _cfg(style, voice)
+    keys = [_key(t, style, voice) for t in texts]
+    if not all(k.exists() for k in keys):
+        x = _request("\n\n".join(t.strip() for t in texts), style, voice)
+        CACHE.mkdir(parents=True, exist_ok=True)
+        for part, k in zip(split(x, texts), keys):
+            tmp = k.with_suffix(".tmp.wav")
+            _save(part, tmp)
+            tmp.replace(k)
+    for k, out in zip(keys, outs):
+        shutil.copyfile(k, out)
+    return [_dur(o) for o in outs]
+
+
+def tts_one(text: str, out: Path, style: str | None = None, voice: str | None = None) -> float:
+    """Una escena suelta (usa la caché si el guion ya se preparó con prepare())."""
+    return tts_batch([text], [out], style, voice)[0]
+
+
+def prepare(script_path: str | Path) -> int:
+    """Narra un guion entero en 1 petición y lo deja en la caché. Devuelve escenas nuevas."""
+    import yaml  # noqa: PLC0415
+    spec = yaml.safe_load(Path(script_path).read_text(encoding="utf-8"))
+    texts = [sc.get("say") or sc["text"] for sc in spec["scenes"]]
+    st, vo = spec.get("voice_style"), spec.get("voice")
+    missing = sum(cached(t, st, vo) is None for t in texts)
+    if missing:
+        import tempfile  # noqa: PLC0415
+        with tempfile.TemporaryDirectory() as d:
+            tts_batch(texts, [Path(d) / f"{i}.wav" for i in range(len(texts))], st, vo)
+    return missing
+
+
+if __name__ == "__main__":
+    # python -m ytauto.tts_gemini guiones/072_x.yaml  -> deja la voz en caché (1 petición)
+    for f in sys.argv[1:]:
+        print(f, "escenas nuevas:", prepare(f))
