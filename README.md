@@ -38,3 +38,11 @@ Ejecuta `collect` dos veces separadas unas horas para obtener la aceleración.
 ```bash
 python -m pytest -q
 ```
+
+## Panel del canal
+
+```bash
+python -m ytauto.panel   # escribe reports/panel/*.json
+```
+
+Junta YouTube Data API, YouTube Analytics (retención, % visto, suscriptores, tráfico, países), TikTok y el registro local (`data/uploads.json`, guiones, fotogramas 3D, caché de voz Gemini). Los costes son estimaciones: precios en `PRICES` de `ytauto/panel.py`. Las ideas de mejora están en `data/ideas.json`. Los JSON se suben al panel de Claude.
