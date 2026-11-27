@@ -37,7 +37,15 @@ def _voice() -> str:
 
 
 def tts(text: str, out: Path, length_scale: float = 0.9, speed: float | None = None) -> float:
-    """ElevenLabs si hay ELEVENLABS_API_KEY; si no, Piper local. speed solo afecta a Kokoro."""
+    """Gemini (Orus) si hay clave: usa la caché que deja tts_gemini.prepare(guion); si la frase
+    no está, 1 petición suelta. Si no, ElevenLabs / Chatterbox / Kokoro / Piper.
+    speed solo afecta a Kokoro."""
+    if _gemini_on():
+        from . import tts_gemini
+        try:
+            return tts_gemini.tts_one(text, out)
+        except Exception as e:  # noqa: BLE001
+            print(f"Gemini TTS falló ({e}); uso el motor por defecto", file=sys.stderr)
     if os.environ.get("ELEVENLABS_API_KEY"):
         return tts_elevenlabs(text, out)
     if os.environ.get("TTS_ENGINE", "kokoro") == "chatterbox" and Path(CHATTERBOX_PY).exists():
@@ -536,6 +544,36 @@ def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
         d.text(((W - lw) / 2, y0 + 22 + j * lh), l, font=font, fill=INK)
 
 
+GEMINI_ENV = os.environ.get("GEMINI_ENV", "/mnt/project-files/yt-auto/secrets/gemini.env")
+
+
+def _gemini_on() -> bool:
+    if os.environ.get("GEMINI_OFF") == "1":
+        return False
+    if not os.environ.get("GEMINI_API_KEY") and Path(GEMINI_ENV).exists():
+        for line in Path(GEMINI_ENV).read_text().splitlines():
+            k, _, v = line.partition("=")
+            if k.strip() == "GEMINI_API_KEY":
+                os.environ["GEMINI_API_KEY"] = v.strip()
+    return bool(os.environ.get("GEMINI_API_KEY"))
+
+
+def _pretts(spec: dict, tmp: Path) -> list[float] | None:
+    """Voz por defecto desde el 27-nov: Gemini TTS, voz Orus (elegida por el usuario).
+    Narra todo el guion en una petición (o lo saca de la caché). Si no hay clave, GEMINI_OFF=1
+    o falla, devuelve None y se usa el motor de siempre (TTS_ENGINE)."""
+    if not _gemini_on():
+        return None
+    from . import tts_gemini
+    texts = [sc.get("say") or sc["text"] for sc in spec["scenes"]]
+    try:
+        return tts_gemini.tts_batch(texts, [tmp / f"{i}.wav" for i in range(len(texts))],
+                                    style=spec.get("voice_style"), voice=spec.get("voice"))
+    except Exception as e:  # noqa: BLE001 - nunca romper la producción por la voz
+        print(f"Gemini TTS falló ({e}); uso el motor por defecto", file=sys.stderr)
+        return None
+
+
 def render(script_path: str | Path, out_path: str | Path) -> float:
     from . import audio
 
@@ -555,16 +593,24 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
                 text = re.sub(rf"(?<!\w){re.escape(k)}(?!\w)", v, text)
             return text
 
+        # Gemini narra el guion entero de una vez; con «|» (pausas partidas) se usa el motor por frases
+        split = any("|" in (sc.get("say") or sc["text"]) for sc in spec["scenes"])
+        pre = None if split else _pretts(spec, tmp)
         for i, sc in enumerate(spec["scenes"]):
             say = sc.get("say") or sc["text"]
-            pieces = [x.strip() for x in say.split("|")]
-            parts, speech = [], 0.0
-            for j, piece in enumerate(pieces):
-                wav = tmp / f"{i}_{j}.wav"
-                du = tts(spoken(piece), wav, speed=sc.get("speed", spec.get("speed")))
-                voices.append((t + 0.15 + speech, audio.read_wav(wav)))
-                parts.append((piece, speech, du))
-                speech += du + (sc.get("gap", 0.45) if j < len(pieces) - 1 else 0)
+            if pre:
+                speech = pre[i]
+                voices.append((t + 0.15, audio.read_wav(tmp / f"{i}.wav")))
+                parts = [(say, 0.0, speech)]
+            else:
+                pieces = [x.strip() for x in say.split("|")]
+                parts, speech = [], 0.0
+                for j, piece in enumerate(pieces):
+                    wav = tmp / f"{i}_{j}.wav"
+                    du = tts(spoken(piece), wav, speed=sc.get("speed", spec.get("speed")))
+                    voices.append((t + 0.15 + speech, audio.read_wav(wav)))
+                    parts.append((piece, speech, du))
+                    speech += du + (sc.get("gap", 0.45) if j < len(pieces) - 1 else 0)
             dur = speech + sc.get("pause", 0.05 if karaoke else 0.15) + 0.15
             if sc.get("mood"):
                 sections.append([t, t + dur, sc["mood"]])

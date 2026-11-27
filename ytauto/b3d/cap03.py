@@ -180,7 +180,96 @@ def s_fiesta(sc, dur):
            (0.8, HAB10_Y - 0.2, 0.9), lens=26)
 
 
-ESCENAS = {"llegan": s_llegan, "abdos": s_abdos, "reloj": s_reloj, "pasillo": s_pasillo, "fiesta": s_fiesta}
+def cruzados(p, f):
+    p.pose(f, hips=(-1.5, -1.5), knees=(0.05, 0.05), shoulders=((-0.75, -0.25), (-0.75, 0.25)), elbows=(-1.9, -1.9),
+           lean=0.05, pelvis_z=-0.15)
+
+
+def s_frontera(sc, dur):
+    ps = reparto(["cr7", "messi"])
+    cr, me = ps["cr7"], ps["messi"]
+    habitacion(C1.OUT)
+    blanco = mat("sabana", srgb(246, 246, 242), 0.8, sheen=0.3)
+    from .core import sphere
+    for i in range(4):                                         # la frontera de almohadas
+        sphere(f"frontera{i}", (0, BED_Y - 0.35 + i * 0.32, MATT + 0.4), (0.12, 0.24, 0.22), blanco)
+    acostar(cr, "cr7")
+    acostar(me, "messi")
+    for j, (p, sg) in enumerate(((cr, 1), (me, -1))):
+        cruzados(p, 1)
+        p.expresion(1, "enfadado")
+        p.cabeza(1, 0, 0.05, 0)
+        p.cabeza(F(1.0), -0.5 * sg, 0, 0)                      # se miran de reojo
+        p.mirar(F(1.0), -0.45 * sg, 0)
+        p.cabeza(F(2.2), 0, 0.05, 0)
+        p.mirar(F(2.2), 0, 0)
+        p.expresion(F(2.4), "picaro" if p is cr else "enfadado")
+        vida(p, dur, 90 + j)
+    camera(sc, "c1", 0, dur, (0.0, -1.35, 1.6), (0.0, -1.1, 1.55), (0, BED_Y + 0.35, 1.05), lens=26)
+
+
+def s_mil(sc, dur):
+    ps = reparto(["cr7", "messi"])
+    cr, me = ps["cr7"], ps["messi"]
+    habitacion(C1.OUT, noche=True)
+    acostar(cr, "cr7")
+    acostar(me, "messi")
+    nuca = ((0.3, 2.6), (0.3, -2.6))
+    tl = 1.3                                                   # sale la almohada
+    th = tl + 0.35                                             # le da en la cara
+    for i, f in enumerate(range(1, F(0.9), 8)):
+        arriba = i % 2 == 1
+        cr.pose(f, hips=(-1.5, -1.5), knees=(0.05, 0.05), shoulders=nuca, elbows=(-2.2, -2.2),
+                lean=0.25 if arriba else -1.2, pelvis_z=-0.15)
+        cr.expresion(f, "grito" if arriba else "enfadado")
+    en_cama(cr, F(1.0), lean=0.2, brazos=((-2.6, 0.5), (-2.6, -0.5)))   # ¡mil! brazos arriba
+    cr.expresion(F(1.0), "feliz")
+    en_cama(cr, F(th), lean=0.2, brazos=((-2.6, 0.5), (-2.6, -0.5)))
+    en_cama(cr, F(th + 0.25), lean=-1.3)
+    cr.expresion(F(th + 0.05), "sorpresa")
+    ojos_cerrados(cr, F(th + 0.3))
+    en_cama(me, 1, lean=-0.9)
+    me.expresion(1, "enfadado")
+    me.cabeza(1, -0.4, 0.2, 0)
+    en_cama(me, F(0.8), lean=0.1, brazos=((-2.7, 0.6), (0.05, -0.2)))          # coge impulso
+    en_cama(me, F(tl), lean=0.25, brazos=((-1.0, -0.4), (0.05, -0.2)))          # lanza
+    me.expresion(F(tl), "grito")
+    me.expresion(F(tl + 0.6), "picaro")
+    en_cama(me, F(tl + 0.9), lean=-0.9)
+    me.cabeza(F(tl + 1.0), 0, 0.15, 0)
+    alm = sphere_alm = None
+    from .core import sphere
+    alm = sphere("almohada_vuela", (0.45, BED_Y + 0.88, MATT + 0.06), (0.3, 0.15, 0.08),
+                 mat("sabana", srgb(246, 246, 242), 0.8, sheen=0.3))
+    bpy.data.objects.remove(bpy.data.objects["almohada1"])
+    key(alm, 1, location=Vector((0.45, BED_Y + 0.88, MATT + 0.06)), rotation_euler=(0, 0, 0))
+    key(alm, F(0.8), location=Vector((0.45, BED_Y + 0.88, MATT + 0.06)), rotation_euler=(0, 0, 0))
+    key(alm, F(tl), location=Vector((0.4, BED_Y + 0.3, 1.75)), rotation_euler=(math.radians(80), 0, 0))
+    key(alm, F(th), location=Vector((-0.42, BED_Y + 0.12, 1.62)), rotation_euler=(math.radians(90), 0.4, 0.3))
+    key(alm, F(th + 0.25), location=Vector((-0.45, BED_Y + 0.75, 0.82)), rotation_euler=(0.2, 0.3, 0.3))
+    vida(me, dur, 93)
+    camera(sc, "c1", 0, dur, (0.15, -1.15, 1.6), (0.12, -0.95, 1.58), (0, BED_Y + 0.35, 1.05), lens=26)
+
+
+def s_siguen(sc, dur):
+    ps = reparto(["cr7", "messi"])
+    cr, me = ps["cr7"], ps["messi"]
+    fiesta, luz, _ = pasillo()
+    fiesta_anim(fiesta, luz, F(dur))
+    _rastro(random.Random(3), 2.0, HAB10_Y + 0.3)
+    y0, y1 = 2.6, 5.4
+    cr.correr(1, F(dur), (-0.42, y0, 0), (-0.42, y1, 0), yaw=math.pi, pasos_s=1.4, amp=0.35)
+    me.correr(1, F(dur), (0.38, y0 - 0.2, 0), (0.38, y1 - 0.2, 0), yaw=math.pi, pasos_s=1.4, amp=0.35)
+    for j, p in enumerate((cr, me)):
+        p.expresion(1, "sorpresa", 0.6)
+        p.mirar(F(0.8), 0.4, -0.1)
+        p.mirar(F(1.8), -0.4, -0.1)
+        p.mirar(F(2.8), 0, -0.3)
+        vida(p, dur, 95 + j)
+    camera(sc, "c1", 0, dur, (0.05, y0 + 2.6, 1.65), (0.05, y1 + 2.4, 1.65), (0, y0, 1.25), (0, y1, 1.25), lens=24)
+
+
+ESCENAS = {"frontera": s_frontera, "mil": s_mil, "siguen": s_siguen, "llegan": s_llegan, "abdos": s_abdos, "reloj": s_reloj, "pasillo": s_pasillo, "fiesta": s_fiesta}
 
 
 def main():

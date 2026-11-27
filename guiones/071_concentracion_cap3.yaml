@@ -16,15 +16,24 @@ scenes:
     say: "Llegan al hotel. A Cristiano y a Messi les toca la misma habitación. Y solo hay una cama."
     highlight: "habitación cama"
     sfx: [whoosh]
+  - anim: x_3d_frontera
+    say: "Así que montan una frontera de almohadas en mitad de la cama. Nadie la cruza."
+    highlight: "frontera almohadas"
   - anim: x_3d_abdos
     say: "A medianoche, Cristiano sigue haciendo abdominales. Messi solo quiere dormir."
     highlight: "abdominales dormir"
+  - anim: x_3d_mil
+    say: "Novecientos noventa y nueve… ¡mil! Y Messi le lanza la almohada a la cara."
+    highlight: "mil almohada"
   - anim: x_3d_reloj
     say: "A las tres en punto, algo suena en el pasillo."
     highlight: "tres pasillo"
   - anim: x_3d_pasillo
     say: "Abren la puerta. Alguien se está llevando las botas de todo el equipo."
     highlight: "botas equipo"
+  - anim: x_3d_siguen
+    say: "Siguen el rastro de puntillas, sin hacer ni un ruido."
+    highlight: "puntillas ruido"
   - anim: x_3d_fiesta
-    say: "Y el rastro de botas termina en la habitación diez. Continuará."
-    highlight: "diez Continuará"
+    say: "Las botas terminan en la habitación diez. Y de dentro sale música a todo volumen. Continuará."
+    highlight: "diez música"
