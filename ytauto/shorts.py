@@ -527,6 +527,20 @@ def _hook_bar(img: Image.Image, hook: str, t: float, font) -> None:
         d.text(((W - lw) / 2, y0 + 22 + j * lh), l, font=font, fill=INK)
 
 
+def _pretts(spec: dict, tmp: Path) -> list[float] | None:
+    """Con TTS_ENGINE=gemini, narra todo el guion en una petición. Si falla, None (motor normal)."""
+    if os.environ.get("TTS_ENGINE") != "gemini" or not os.environ.get("GEMINI_API_KEY"):
+        return None
+    from . import tts_gemini
+    texts = [sc.get("say") or sc["text"] for sc in spec["scenes"]]
+    try:
+        return tts_gemini.tts_batch(texts, [tmp / f"{i}.wav" for i in range(len(texts))],
+                                    style=spec.get("voice_style"), voice=spec.get("voice"))
+    except Exception as e:  # noqa: BLE001 - nunca romper la producción por la voz
+        print(f"Gemini TTS falló ({e}); uso el motor por defecto", file=sys.stderr)
+        return None
+
+
 def render(script_path: str | Path, out_path: str | Path) -> float:
     from . import audio
 
@@ -538,9 +552,10 @@ def render(script_path: str | Path, out_path: str | Path) -> float:
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         scenes, voices, sfx, t = [], [], [], 0.0
+        pre = _pretts(spec, tmp)
         for i, sc in enumerate(spec["scenes"]):
             wav = tmp / f"{i}.wav"
-            speech = tts(sc.get("say") or sc["text"], wav)
+            speech = pre[i] if pre else tts(sc.get("say") or sc["text"], wav)
             dur = speech + sc.get("pause", 0.05 if karaoke else 0.15) + 0.15
             voices.append((t + 0.15, audio.read_wav(wav)))
             sfx.append((max(0.0, t - 0.1), "whoosh"))
