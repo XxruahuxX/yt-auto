@@ -20,6 +20,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import wave
 from pathlib import Path
 
@@ -50,8 +51,12 @@ def _request(text: str, style: str, voice: str) -> np.ndarray:
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}},
         },
     }
-    r = requests.post(URL.format(model=model), json=body, timeout=300,
-                      headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]})
+    for intento in range(4):  # 429 = límite por minuto: espera y reintenta (no gasta cupo diario)
+        r = requests.post(URL.format(model=model), json=body, timeout=300,
+                          headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]})
+        if r.status_code != 429 or "PerDay" in r.text or intento == 3:
+            break
+        time.sleep(30 * (intento + 1))
     if not r.ok:
         raise RuntimeError(f"Gemini TTS HTTP {r.status_code}: {r.text[:300]}")
     data = r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
@@ -247,6 +252,9 @@ def prepare(script_path: str | Path) -> int:
 
 
 if __name__ == "__main__":
+    from .shorts import _gemini_on  # carga la clave de secrets/gemini.env
+    if not _gemini_on():
+        sys.exit("Falta GEMINI_API_KEY (o GEMINI_OFF=1)")
     # python -m ytauto.tts_gemini guiones/072_x.yaml  -> deja la voz en caché (1 petición)
     for f in sys.argv[1:]:
         print(f, "escenas nuevas:", prepare(f))
