@@ -61,7 +61,7 @@ def pantalla_reloj(nombre, path, loc):
     return o
 
 
-def habitacion(out, noche=False):
+def habitacion(out, noche=False, sabana_y=BED_Y + 0.05, piernas=(-0.45, 0.45)):
     LUCES_H.clear()
     if noche:
         _mundo("noche", (20, 28, 60), 0.12)
@@ -71,7 +71,6 @@ def habitacion(out, noche=False):
     pared = mat("pared_hotel", srgb(226, 214, 190), 0.85)
     madera = mat("madera_hotel", srgb(110, 70, 42), 0.5, coat=0.2)
     blanco = mat("sabana", srgb(246, 246, 242), 0.8, sheen=0.3)
-    colcha = mat("colcha", srgb(40, 70, 120), 0.85, sheen=0.4)
     cube("suelo_h", (0, 0, -0.01), (2.5, 2.5, 0.01), moqueta)
     cube("pared_h_fondo", (0, 2.55, 1.35), (2.5, 0.05, 1.35), pared)
     cube("pared_h_izq", (-2.55, 0, 1.35), (0.05, 2.5, 1.35), pared)
@@ -85,7 +84,7 @@ def habitacion(out, noche=False):
     for sx in (-1, 1):
         sphere(f"almohada{sx}", (sx * 0.45, BED_Y + 0.88, MATT + 0.06), (0.32, 0.15, 0.08), blanco)
         cube(f"mesita{sx}", (sx * 1.38, BED_Y + 0.9, 0.27), (0.25, 0.22, 0.27), madera, bevel=0.02)
-    cube("colcha", (0, BED_Y - 0.3, MATT + 0.1), (0.95, 0.78, 0.1), colcha, bevel=0.05)
+    sabana(sabana_y, piernas)
     # reloj despertador en la mesita derecha (dos pantallas: 02:59 y 03:00)
     cube("reloj", (1.38, BED_Y + 0.85, 0.62), (0.18, 0.06, 0.09), mat("reloj_m", srgb(25, 25, 30), 0.4))
     r1 = pantalla_reloj("reloj_259", reloj_tex(f"{out}/reloj_259.png", "02:59"), (1.38, BED_Y + 0.785, 0.62))
@@ -112,6 +111,81 @@ def habitacion(out, noche=False):
         _area((0, 0.4, 2.65), 260, 1.6)
         _area((0, -2.3, 1.8), 110, 3.0, rot=(math.radians(80), 0, 0))
     return r1, r2
+
+
+def _tela():
+    """Tela de sábana: rayas finas azul claro sobre blanco roto, con arrugas en relieve."""
+    m = bpy.data.materials.new("sabana_tela")
+    m.use_nodes = True
+    nt, ln = m.node_tree.nodes, m.node_tree.links
+    b = nt["Principled BSDF"]
+    b.inputs["Roughness"].default_value = 0.85
+    b.inputs["Sheen Weight"].default_value = 0.5
+    tc = nt.new("ShaderNodeTexCoord")
+    wv = nt.new("ShaderNodeTexWave")
+    wv.wave_type, wv.bands_direction = "BANDS", "X"
+    wv.inputs["Scale"].default_value = 9.0
+    wv.inputs["Distortion"].default_value = 0.6
+    ramp = nt.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "CONSTANT"
+    ramp.color_ramp.elements[0].color = (*srgb(238, 236, 228), 1)
+    ramp.color_ramp.elements[1].position = 0.82
+    ramp.color_ramp.elements[1].color = (*srgb(120, 160, 205), 1)
+    ln.new(tc.outputs["Object"], wv.inputs["Vector"])
+    ln.new(wv.outputs["Fac"], ramp.inputs["Fac"])
+    ln.new(ramp.outputs["Color"], b.inputs["Base Color"])
+    nz = nt.new("ShaderNodeTexNoise")
+    nz.inputs["Scale"].default_value = 6.0
+    nz.inputs["Detail"].default_value = 4.0
+    bump = nt.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.35
+    ln.new(tc.outputs["Object"], nz.inputs["Vector"])
+    ln.new(nz.outputs["Fac"], bump.inputs["Height"])
+    ln.new(bump.outputs["Normal"], b.inputs["Normal"])
+    return m
+
+
+def sabana(y_fin, piernas=(-0.45, 0.45), alto=0.2):
+    """Sábana como malla: tapa el colchón desde los pies hasta y_fin, abombada sobre las piernas de cada uno
+    (sin atravesarse: su parte alta queda por encima del muslo) y cae por los lados y por los pies."""
+    import bmesh
+    nx, ny = 64, 48
+    x0, x1 = -1.02, 1.02
+    y0 = BED_Y - 1.14
+    pies_y = y_fin - 0.68                                        # las botas apuntan hacia arriba: más bulto
+    bm = bmesh.new()
+    grid = []
+    for j in range(ny + 1):
+        fila = []
+        y = y0 + (y_fin - y0) * j / ny
+        for i in range(nx + 1):
+            x = x0 + (x1 - x0) * i / nx
+            z = MATT + 0.035
+            for px in piernas:                                   # bulto de las piernas
+                z += alto * math.exp(-((x - px) / 0.22) ** 4) * (1 + 0.9 * math.exp(-((y - pies_y) / 0.16) ** 2))
+            z += 0.012 * math.sin(x * 23 + y * 7) * math.sin(y * 13)   # arrugas suaves
+            if abs(x) > 0.94:                                    # cae por los lados
+                z -= (abs(x) - 0.94) * 4.5
+            if y < BED_Y - 1.07:                                 # cae por los pies
+                z -= (BED_Y - 1.07 - y) * 4.5
+            if j == ny:                                          # borde doblado
+                z += 0.01
+            fila.append(bm.verts.new((x, y, max(z, 0.12))))
+        grid.append(fila)
+    for j in range(ny):
+        for i in range(nx):
+            bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]))
+    me = bpy.data.meshes.new("sabana")
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new("sabana", me)
+    bpy.context.collection.objects.link(o)
+    o.data.materials.append(_tela())
+    for poly in me.polygons:
+        poly.use_smooth = True
+    sol = o.modifiers.new("grosor", "SOLIDIFY")
+    sol.thickness = 0.012
+    return o
 
 
 def bota(nombre, loc, col, yaw=0.0):

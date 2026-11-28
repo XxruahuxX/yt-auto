@@ -289,3 +289,35 @@ def setup_render(sc, w, h, fps, frames, samples=20):
     except TypeError:
         pass
     sc.render.image_settings.file_format = "PNG"
+
+
+def apoyar_pies(sc, f0, f1, suelo=0.0, tol=0.004, solo_medir=False):
+    """Evita que las botas atraviesen el suelo: en cada fotograma mide el punto más bajo de botas y suelas
+    de cada muñeco y, si queda por debajo de `suelo`, sube la raíz lo justo (clave en location.z).
+    Devuelve el hundimiento máximo encontrado (m) antes de corregir."""
+    import collections
+    pies = collections.defaultdict(list)
+    for o in bpy.data.objects:
+        if o.type == "MESH" and o.name.endswith(("_botaL", "_botaR", "_suelaL", "_suelaR")):
+            r = o
+            while r.parent:
+                r = r.parent
+            pies[r].append(o)
+    vs = {o: [Vector(v.co) for v in list(o.data.vertices)[::3]] for os_ in pies.values() for o in os_}
+    plan, peor = [], 0.0
+    for f in range(f0, f1 + 1):
+        sc.frame_set(f)
+        dg = bpy.context.evaluated_depsgraph_get()
+        for r, os_ in pies.items():
+            mz = min(min((ob.evaluated_get(dg).matrix_world @ v).z for v in vs[ob]) for ob in os_)
+            d = suelo - mz if suelo - 0.4 < mz < suelo - tol else 0.0
+            peor = max(peor, d)
+            plan.append((r, f, r.evaluated_get(dg).matrix_world.translation.z, d))
+    if not solo_medir:
+        tocadas = {r for r, f, z, d in plan if d > 0}
+        for r, f, z, d in plan:
+            if r in tocadas:
+                r.location.z = z + d
+                r.keyframe_insert("location", index=2, frame=f)
+    sc.frame_set(f0)
+    return peor

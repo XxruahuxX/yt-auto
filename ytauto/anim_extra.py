@@ -163,7 +163,10 @@ def render(kind, t, dur):
         fs = sorted(base.glob("f_*.png"))
         if not fs:
             return Image.new("RGB", (int(PW), int(PH)), (20, 30, 50))
-        i = min(len(fs) - 1, int(t * fps))
+        if os.environ.get("B3D_STRETCH") and dur > 0:
+            i = min(len(fs) - 1, int(t / dur * len(fs)))      # ajusta el clip a la duración de la voz
+        else:
+            i = min(len(fs) - 1, int(t * fps))
         return Image.open(fs[i]).convert("RGB").resize((int(PW), int(PH)), Image.LANCZOS)
     if kind[:5] in ("x_gk_", "x_sd_", "x_tj_"):
         from .anim_pro import render as rp

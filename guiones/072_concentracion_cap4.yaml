@@ -1,0 +1,42 @@
+format: serie
+style: karaoke
+caption: par
+caption_y: 1240
+mascot: false
+experiment: concentracion
+title: "LA CONCENTRACIÓN · Capítulo 4: La fiesta 🪩⚽ #shorts"
+description: |
+  Detrás de la puerta 10 hay una fiesta… y las botas de todo el equipo. Hasta que la tele se enciende sola. Mañana, capítulo 5 👀
+  Parodia animada: personajes caricaturizados e historia de ficción.
+  #fútbol #animación3d #messi #cristiano #neymar #haaland #mbappé #shorts
+tags: [la concentración, serie fútbol, animación 3d, messi, cristiano ronaldo, neymar, haaland, mbappé, droides, parodia, fyp]
+hook: "La Concentración · Cap. 4"
+scenes:
+  - anim: x_3d_abren
+    say: "Cristiano y Messi abren la puerta de la habitación diez."
+    highlight: "puerta diez"
+    sfx: [whoosh]
+  - anim: x_3d_fiesta
+    say: "Dentro, Neymar está de fiesta. Con las botas de todo el equipo colgadas como decoración."
+    highlight: "fiesta botas"
+  - anim: x_3d_jura
+    say: "Neymar jura que no ha sido. Se las encontró en la puerta, con un lazo."
+    highlight: "jura lazo"
+  - anim: x_3d_tarta
+    say: "Haaland se come la tarta entera. Y Mbappé gana el concurso de baile."
+    highlight: "tarta baile"
+  - anim: x_3d_kane
+    say: "Kane también baila. Como un robot. Literalmente."
+    highlight: "Kane robot"
+  - anim: x_3d_tele
+    say: "De repente, la tele se enciende sola."
+    highlight: "tele sola"
+  - anim: x_3d_droide
+    say: "Terrícolas. En siete días jugaremos un partido por vuestro planeta. Si perdéis, el fútbol será nuestro."
+    highlight: "planeta nuestro"
+  - anim: x_3d_champions
+    say: "Kane levanta la mano y pregunta si eso cuenta para la Champions. Nadie le contesta."
+    highlight: "Champions Nadie"
+  - anim: x_3d_caras
+    say: "Y la fiesta… a tomar por culo. Continuará."
+    highlight: "fiesta Continuará"

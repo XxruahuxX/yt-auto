@@ -227,7 +227,7 @@ def s_frena(sc, dur):
         sentado_bus(p, 1)
         p.expresion(1, "neutral")
         sentado_bus(p, F(tf))
-        sentado_bus(p, F(tf + 0.15), lean=0.7)                  # latigazo hacia delante
+        sentado_bus(p, F(tf + 0.15), lean=0.35)                  # latigazo hacia delante
         sentado_bus(p, F(tf + 0.5), lean=-0.05)
         p.expresion(F(tf + 0.1), "sorpresa")
         p.cabeza(F(tf + 0.7), 0.0, -0.1, 0)
@@ -256,6 +256,11 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
     ESCENAS[name](sc, dur)
+    from .core import apoyar_pies
+    import os as _os
+    print('HUNDIMIENTO', name, round(apoyar_pies(sc, 1, F(dur), solo_medir=bool(_os.environ.get('SOLO_MEDIR'))), 3), flush=True)
+    if _os.environ.get('SOLO_MEDIR'):
+        return
     cuts = sorted(m.frame for m in sc.timeline_markers if m.frame > 1)
     for o in bpy.data.objects:
         for fc in all_fcurves(o):
