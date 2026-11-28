@@ -1,7 +1,7 @@
 """Aplicación de escritorio del panel del canal.
 
     pip install pywebview
-    python -m ytauto.app
+    python -m ytauto.app        (o DatoCrackPanel.exe dentro de la carpeta del repo)
 
 Abre una ventana con el panel. Al arrancar muestra los últimos datos guardados en
 reports/panel/; el botón «Actualizar» los vuelve a pedir a YouTube y TikTok (unos 40 s).
@@ -20,8 +20,14 @@ import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-WEB = Path(__file__).resolve().parent / "web"
+import sys
+
+if getattr(sys, "frozen", False):  # .exe de PyInstaller: el repo es la carpeta del .exe
+    ROOT = Path(os.environ.get("YT_REPO_DIR") or Path(sys.executable).parent)
+    WEB = Path(sys._MEIPASS) / "ytauto" / "app" / "web"
+else:
+    ROOT = Path(os.environ.get("YT_REPO_DIR") or Path(__file__).resolve().parents[2])
+    WEB = Path(__file__).resolve().parent / "web"
 NAMES = ["videos", "retencion", "costes", "diario", "trafico", "paises", "canal", "tiktok", "ideas"]
 
 
@@ -45,6 +51,9 @@ class Api:
         if not self._lock.acquire(blocking=False):
             return {"error": "Ya se está actualizando."}
         try:
+            if not (ROOT / "data" / "uploads.json").exists():
+                return {"error": f"No encuentro data/uploads.json en {ROOT}. "
+                                 "Pon el .exe en la carpeta del repo yt-auto."}
             _collect()
             return self.datos()
         except Exception as e:

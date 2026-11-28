@@ -1,0 +1,32 @@
+name: App de escritorio (.exe)
+
+on:
+  push:
+    paths: ["ytauto/**", "DatoCrackPanel.py", ".github/workflows/exe.yml"]
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependencias
+        run: pip install pyinstaller==6.11.1 pywebview==5.3.2 requests PyYAML numpy pytest
+      - name: Tests
+        run: python -m pytest -q tests
+      - name: Compilar
+        run: >
+          pyinstaller --noconfirm --onefile --windowed --name DatoCrackPanel
+          --add-data "ytauto/app/web;ytauto/app/web"
+          --hidden-import ytauto.panel --hidden-import ytauto.tts_gemini --hidden-import ytauto.tiktok
+          DatoCrackPanel.py
+      - name: Comprobar que arranca el módulo
+        run: python -c "import ytauto.app, ytauto.panel; print('ok')"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DatoCrackPanel-windows
+          path: dist/DatoCrackPanel.exe
+          retention-days: 30
