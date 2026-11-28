@@ -52,6 +52,58 @@
 .pc-idea .pc-chips { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); }
 .pc-note { border-left: 3px solid var(--cds-chart-muted); padding-left: var(--cds-pad-md); }
 @media print { .pc-tabs { display: none; } .pc-sec[hidden] { display: flex !important; break-before: page; } }
+.pc-seg { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; margin-left: auto; }
+.pc-segb { font: inherit; border: 0; background: none; color: var(--color-fg-muted); padding: 6px 12px; cursor: pointer; }
+.pc-segb[aria-pressed="true"] { background: var(--color-panel); color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.pc-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--cds-gap-lg); }
+.pc-vc { appearance: none; text-align: left; font: inherit; color: inherit; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; min-width: 0; }
+.pc-vc:hover { transform: translateY(-2px); box-shadow: var(--cds-shadow-popover); }
+.pc-vc:focus-visible { outline: 2px solid var(--accent, var(--color-fg)); outline-offset: 2px; }
+.pc-thumb { position: relative; aspect-ratio: 4 / 5; background: var(--color-border-line); overflow: hidden; }
+.pc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-thumb .pc-pill { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.65); color: #fff; border-color: transparent; }
+.pc-thumb .pc-dur { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.pc-thumb .pc-num { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.pc-thumb .pc-noimg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-fg-muted); font-size: 12px; padding: 12px; text-align: center; }
+.pc-vbody { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.pc-vt { font-weight: var(--cds-font-weight-medium); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+.pc-vm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; font-variant-numeric: tabular-nums; }
+.pc-vm div { display: flex; flex-direction: column; }
+.pc-vm b { font-size: 15px; }
+.pc-vm span { font-size: 11px; color: var(--color-fg-muted); }
+.pc-spark { height: 34px; }
+.pc-spark svg { width: 100%; height: 34px; display: block; }
+.pc-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.pc-pill.info { color: var(--color-fg-muted); }
+.pc-modal { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.55); display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+.pc-modal-box { position: relative; background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border-line); border-radius: 14px; width: min(980px, 100%); padding: 24px; box-shadow: var(--cds-shadow-popover); }
+.pc-close { position: absolute; top: 10px; right: 12px; font-size: 26px; line-height: 1; border: 0; background: none; color: var(--color-fg-muted); cursor: pointer; }
+.pc-det { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+@media (max-width: 700px) { .pc-det { grid-template-columns: 1fr; } }
+.pc-det .pc-thumb { border-radius: 10px; }
+.pc-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.pc-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.pc-kpi b { font-size: 20px; font-family: var(--font-anthropic-serif); font-weight: 400; font-variant-numeric: tabular-nums; }
+.pc-kpi span { font-size: 11px; color: var(--color-fg-muted); }
+.pc-kpi .up { color: var(--color-ok); } .pc-kpi .down { color: var(--color-bad); }
+.pc-mej { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pc-mej li { display: grid; grid-template-columns: 86px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border: 1px solid var(--color-border-line); border-radius: 8px; background: var(--color-panel); line-height: 1.45; }
+.pc-mej li[data-n="alta"] { border-left: 4px solid var(--color-bad); }
+.pc-mej li[data-n="media"] { border-left: 4px solid var(--color-warn); }
+.pc-mej li[data-n="baja"] { border-left: 4px solid var(--cds-chart-muted); }
+.pc-mej li[data-n="bien"] { border-left: 4px solid var(--color-ok); }
+.pc-mej li[data-n="info"] { border-left: 4px solid var(--color-border-line); }
+.pc-btn2 { font: inherit; padding: 6px 14px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); cursor: pointer; white-space: nowrap; }
+.pc-btn2:disabled { opacity: .6; cursor: progress; }
+.pc-ext { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--cds-gap-lg); }
+.pc-xc { display: grid; grid-template-columns: 110px 1fr; gap: 12px; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 12px; padding: 12px; min-width: 0; }
+.pc-xc .pc-thumb { border-radius: 8px; aspect-ratio: 9 / 16; }
+.pc-xc a { color: inherit; }
+.pc-xc h3 { font-size: 14px; line-height: 1.3; }
+.pc-xc p { font-size: 13px; line-height: 1.45; margin: 0; }
+.pc-idea-box { background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: 8px; padding: 8px 10px; }
+.pc-new { color: var(--color-ok); border-color: var(--color-ok); }
+@media print { .pc-modal { display: none !important; } }
 </style>
 
 <div class="pc">
@@ -68,6 +120,7 @@
     <button class="pc-tab" role="tab" data-tab="costes" aria-selected="false">Costes</button>
     <button class="pc-tab" role="tab" data-tab="estado" aria-selected="false">Estado</button>
     <button class="pc-tab" role="tab" data-tab="mejoras" aria-selected="false">Mejoras</button>
+    <button class="pc-tab" role="tab" data-tab="fuera" aria-selected="false">Ideas de fuera</button>
   </nav>
 
   <!-- RESUMEN -->
@@ -128,9 +181,21 @@
         <option>2D</option>
         <option>3D</option>
       </select>
+      <select class="dash-select" id="f-orden" aria-label="Ordenar">
+        <option value="publicacion:-1">Más recientes</option>
+        <option value="vistas:-1">Más vistas</option>
+        <option value="vph:-1">Más vistas/h</option>
+        <option value="pct_visto:-1">Más % visto</option>
+        <option value="mejoras_n:-1">Más mejoras pendientes</option>
+      </select>
       <span class="pc-muted" data-draw="cuenta">—</span>
+      <div class="pc-seg" role="group" aria-label="Vista">
+        <button type="button" class="pc-segb" data-vista="tarjetas" aria-pressed="true">Tarjetas</button>
+        <button type="button" class="pc-segb" data-vista="lista" aria-pressed="false">Lista</button>
+      </div>
     </div>
-    <div class="pc-tablewrap">
+    <div class="pc-cards" id="vista-tarjetas" data-draw="tarjetas" data-source="videos"></div>
+    <div class="pc-tablewrap" id="vista-lista" hidden>
       <table class="pc-table" id="tabla-videos" data-source="videos" data-row-key="guion">
         <thead><tr>
           <th data-field="num" data-sort="num">N.º</th>
@@ -220,6 +285,25 @@
     <p>Ideas sacadas de los datos del canal, ordenadas por impacto, y las propuestas de la oficina de diseño. Pídeme cualquiera y la preparo.</p>
     <div class="pc-ideas" data-draw="ideas" data-source="ideas"></div>
   </section>
+
+  <!-- IDEAS DE FUERA -->
+  <section class="pc-sec" id="fuera" hidden>
+    <div class="pc-tools" style="justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h2>Lo que funciona en otros canales</h2>
+        <p class="pc-muted">Shorts de fútbol de los últimos 7 días que más superan la media de su canal. Gemini propone cómo adaptar cada uno a DatoCrack. Se buscan solos cada 24 h al pulsar «Actualizar» (unas 700 unidades de cuota). <span data-draw="fuera-fecha"></span></p>
+      </div>
+      <button type="button" class="pc-btn2" id="buscar-ideas">Buscar ideas ahora</button>
+    </div>
+    <div class="pc-ext" data-draw="externas" data-source="externas"></div>
+  </section>
+</div>
+
+<div class="pc-modal" id="detalle" hidden>
+  <div class="pc-modal-box" role="dialog" aria-modal="true" aria-label="Detalle del vídeo">
+    <button type="button" class="pc-close" id="cerrar-detalle" aria-label="Cerrar">×</button>
+    <div data-draw="detalle"></div>
+  </div>
 </div>
 
 <script>
@@ -581,4 +665,225 @@ dash.draw('ideas', (el) => {
     c.append(chips, h, p, o); return c;
   }));
 });
+
+// ---------- vídeos: tarjetas y detalle
+(function () {
+  document.querySelectorAll('.pc-segb').forEach((b) => b.addEventListener('click', () => {
+    const v = b.dataset.vista;
+    document.querySelectorAll('.pc-segb').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    const t = document.getElementById('vista-tarjetas'), l = document.getElementById('vista-lista');
+    if (t) t.hidden = v !== 'tarjetas';
+    if (l) l.hidden = v !== 'lista';
+    dash.draw('tarjetas'); dash.draw('tabla');
+  }));
+  const o = document.getElementById('f-orden');
+  if (o) o.addEventListener('change', () => { const [k, d] = o.value.split(':'); window.pcSort = { key: k, dir: +d }; dash.draw('tarjetas'); dash.draw('tabla'); });
+  ['f-buscar', 'f-estado', 'f-estilo'].forEach((id) => { const e = document.getElementById(id); if (e) e.addEventListener('input', () => dash.draw('tarjetas')); });
+  const m = document.getElementById('detalle');
+  const close = () => { if (m) m.hidden = true; };
+  const c = document.getElementById('cerrar-detalle'); if (c) c.addEventListener('click', close);
+  if (m) m.addEventListener('click', (e) => { if (e.target === m) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();
+window.pcOpen = function (guion) {
+  window.pcDet = guion;
+  const m = document.getElementById('detalle'); if (!m) return;
+  m.hidden = false; dash.draw('detalle');
+};
+window.pcMedians = function () {
+  const d = dash.data('videos'); if (d.status !== 'ok') return {};
+  const pub = d.data.filter((v) => v.estado === 'Publicado');
+  const young = pub.filter((v) => v.edad_h >= 24 && v.edad_h <= 96);
+  return { vistas: pc.med(pub.map((v) => v.vistas)), vph: pc.med(young.map((v) => v.vph)), pct_visto: pc.med(pub.map((v) => v.pct_visto)),
+    likes_pct: pc.med(pub.map((v) => v.likes_pct)), subs: pc.med(pub.map((v) => v.subs)) };
+};
+const NIVEL = { alta: 'bad', media: 'warn', baja: '', bien: 'ok', info: 'info' };
+const NIVEL_TXT = { alta: 'Prioridad alta', media: 'Mejorable', baja: 'Detalle', bien: 'Funciona', info: 'Info' };
+function pcThumb(v, big) {
+  const box = document.createElement('div'); box.className = 'pc-thumb';
+  if (v.miniatura && /^https:\/\//.test(v.miniatura)) { const img = document.createElement('img'); img.src = v.miniatura; img.alt = ''; img.loading = 'lazy'; img.onerror = () => { const n = document.createElement('div'); n.className = 'pc-noimg'; n.textContent = 'Sin miniatura'; img.replaceWith(n); }; box.appendChild(img); }
+  else { const n = document.createElement('div'); n.className = 'pc-noimg'; n.textContent = v.estado === 'Solo TikTok' ? 'Solo en TikTok' : 'Sin miniatura'; box.appendChild(n); }
+  if (!big) {
+    const p = document.createElement('span'); p.className = 'pc-pill'; p.textContent = v.estado; box.appendChild(p);
+    if (v.duracion_s) { const d = document.createElement('span'); d.className = 'pc-dur'; d.textContent = v.duracion_s + ' s'; box.appendChild(d); }
+    if (v.num && v.num !== '—') { const n = document.createElement('span'); n.className = 'pc-num'; n.textContent = '#' + v.num; box.appendChild(n); }
+  }
+  return box;
+}
+function pcRetLine(el, id, h, axes) {
+  const r = dash.data('retencion'), cm = dash.data('curva_media');
+  el.replaceChildren();
+  if (r.status !== 'ok' || cm.status !== 'ok') return false;
+  const rows = r.data.filter((x) => x.id === id).sort((a, b) => a.t - b.t);
+  if (!rows.length) return false;
+  const w = el.clientWidth || 220, m = axes ? { t: 8, r: 10, b: 22, l: 40 } : { t: 2, r: 2, b: 2, l: 2 };
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'img').attr('aria-label', 'Curva de retención');
+  el.appendChild(svg.node());
+  const ymax = Math.max(1.2, d3.max(rows, (d) => d.retencion), d3.max(cm.data, (d) => d.mediana));
+  const x = d3.scaleLinear().domain([0, 1]).range([m.l, w - m.r]), y = d3.scaleLinear().domain([0, ymax]).nice().range([h - m.b, m.t]);
+  if (axes) {
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(w - m.l - m.r)).tickFormat((v) => Math.round(v * 100) + ' %')).call((g) => g.select('.domain').remove());
+    svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(d3.axisBottom(x).ticks(4).tickFormat((v) => Math.round(v * 100) + ' %'));
+  }
+  const line = (k) => d3.line().x((d) => x(d.t)).y((d) => y(d[k]));
+  svg.append('path').datum(cm.data).attr('d', line('mediana')).style('fill', 'none').style('stroke', 'var(--cds-chart-muted)').style('stroke-width', 1.5).style('stroke-dasharray', '4 3');
+  svg.append('path').datum(rows).attr('d', d3.area().x((d) => x(d.t)).y0(y(0)).y1((d) => y(d.retencion))).style('fill', dash.colors[0]).style('fill-opacity', 0.12);
+  svg.append('path').datum(rows).attr('d', line('retencion')).style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+  return true;
+}
+dash.draw('tarjetas', (el) => {
+  const d = dash.data('videos');
+  if (d.status !== 'ok') { el.replaceChildren(); return; }
+  const rows = window.pcFiltered();
+  el.replaceChildren(...rows.map((v) => {
+    const c = document.createElement('button'); c.type = 'button'; c.className = 'pc-vc';
+    c.addEventListener('click', () => window.pcOpen(v.guion));
+    c.appendChild(pcThumb(v));
+    const b = document.createElement('div'); b.className = 'pc-vbody';
+    const t = document.createElement('div'); t.className = 'pc-vt'; t.textContent = v.titulo.replace(/#shorts/ig, '').trim(); b.appendChild(t);
+    if (v.estado === 'Publicado') {
+      const m = document.createElement('div'); m.className = 'pc-vm';
+      [[pc.short(v.vistas), 'vistas'], [v.vph == null ? '—' : pc.fmt(v.vph), 'vistas/h'], [v.pct_visto == null ? '—' : pc.fmt(v.pct_visto) + ' %', 'visto']].forEach(([a, l]) => {
+        const x = document.createElement('div'); const bb = document.createElement('b'); bb.textContent = a; const s = document.createElement('span'); s.textContent = l; x.append(bb, s); m.appendChild(x);
+      });
+      b.appendChild(m);
+      const sp = document.createElement('div'); sp.className = 'pc-spark'; b.appendChild(sp);
+      requestAnimationFrame(() => { if (!pcRetLine(sp, v.id, 34, false)) { sp.textContent = 'Retención: pendiente de Analytics'; sp.className = 'pc-muted'; } });
+    } else if (v.estado === 'Programado' && v.publicacion) {
+      const s = document.createElement('div'); s.className = 'pc-muted';
+      s.textContent = 'Sale el ' + v.publicacion.slice(8, 10) + '/' + v.publicacion.slice(5, 7) + ' a las ' + v.publicacion.slice(11, 16) + ' UTC'; b.appendChild(s);
+    }
+    const chips = document.createElement('div'); chips.className = 'pc-chips';
+    const mej = (v.mejoras || []);
+    const worst = ['alta', 'media', 'baja'].find((n) => mej.some((x) => x.nivel === n));
+    if (v.mejoras_n) { const p = document.createElement('span'); p.className = 'pc-pill ' + (NIVEL[worst] || ''); p.textContent = v.mejoras_n + (v.mejoras_n === 1 ? ' mejora' : ' mejoras'); chips.appendChild(p); }
+    const good = mej.filter((x) => x.nivel === 'bien').length;
+    if (good) { const p = document.createElement('span'); p.className = 'pc-pill ok'; p.textContent = good + ' funciona'; chips.appendChild(p); }
+    if (v.formato && v.formato !== '?' && v.formato !== '-') { const p = document.createElement('span'); p.className = 'pc-pill'; p.textContent = v.formato + ' · ' + v.estilo; chips.appendChild(p); }
+    b.appendChild(chips);
+    c.appendChild(b);
+    return c;
+  }));
+});
+dash.draw('detalle', (el) => {
+  const d = dash.data('videos');
+  const v = d.status === 'ok' ? d.data.find((x) => x.guion === window.pcDet) : null;
+  if (!v) { el.replaceChildren(); return; }
+  const med = window.pcMedians();
+  const wrap = document.createElement('div'); wrap.className = 'pc-det';
+  const left = document.createElement('div'); left.style.display = 'flex'; left.style.flexDirection = 'column'; left.style.gap = '10px';
+  left.appendChild(pcThumb(v, true));
+  if (v.url && /^https:\/\//.test(v.url)) { const a = document.createElement('a'); a.href = v.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Abrir en YouTube ↗'; a.className = 'pc-btn2'; a.style.textAlign = 'center'; a.style.textDecoration = 'none'; left.appendChild(a); }
+  const meta = document.createElement('div'); meta.className = 'pc-muted';
+  meta.textContent = [v.num !== '—' ? '#' + v.num : '', v.formato, v.estilo, v.experimento !== '-' ? v.experimento : '', v.duracion_s ? v.duracion_s + ' s' : '', 'TikTok: ' + v.tiktok].filter(Boolean).join(' · ');
+  left.appendChild(meta);
+  const right = document.createElement('div'); right.style.display = 'flex'; right.style.flexDirection = 'column'; right.style.gap = '16px'; right.style.minWidth = '0';
+  const h = document.createElement('h2'); h.textContent = v.titulo.replace(/#shorts/ig, '').trim(); right.appendChild(h);
+  const sub = document.createElement('div'); sub.className = 'pc-chips';
+  const p = document.createElement('span'); p.className = 'pc-pill ' + (PILL[v.estado] || ''); p.textContent = v.estado; sub.appendChild(p);
+  if (v.publicacion) { const q = document.createElement('span'); q.className = 'pc-muted'; q.textContent = (v.estado === 'Programado' ? 'Sale el ' : 'Publicado el ') + v.publicacion.slice(0, 16).replace('T', ' ') + ' UTC'; sub.appendChild(q); }
+  right.appendChild(sub);
+  if (v.estado === 'Publicado') {
+    const k = document.createElement('div'); k.className = 'pc-kpis';
+    const kpi = (label, val, key, fmtv) => {
+      const x = document.createElement('div'); x.className = 'pc-kpi';
+      const b = document.createElement('b'); b.textContent = val == null ? '—' : fmtv(val);
+      const s = document.createElement('span'); s.textContent = label;
+      x.append(b, s);
+      const m = med[key];
+      if (val != null && m) { const dd = document.createElement('span'); const r = (val / m - 1) * 100; dd.className = r >= 0 ? 'up' : 'down'; dd.textContent = (r >= 0 ? '+' : '') + Math.round(r) + ' % vs mediana'; x.appendChild(dd); }
+      k.appendChild(x);
+    };
+    kpi('Vistas', v.vistas, 'vistas', pc.fmt);
+    kpi('Vistas/h', v.vph, 'vph', pc.fmt1);
+    kpi('% visto', v.pct_visto, 'pct_visto', (x) => pc.fmt1(x) + ' %');
+    kpi('% likes', v.likes_pct, 'likes_pct', (x) => pc.fmt1(x) + ' %');
+    kpi('Suscriptores', v.subs, 'subs', pc.fmt);
+    kpi('Comentarios', v.comentarios, null, pc.fmt);
+    right.appendChild(k);
+    const rt = document.createElement('div');
+    const rh = document.createElement('h3'); rh.textContent = 'Retención'; rt.appendChild(rh);
+    const leg = document.createElement('div'); leg.className = 'pc-legend';
+    const l1 = document.createElement('span'); const i1 = document.createElement('i'); i1.style.background = dash.colors[0]; l1.append(i1, 'Este vídeo');
+    const l2 = document.createElement('span'); const i2 = document.createElement('i'); i2.className = 'dash'; l2.append(i2, 'Mediana del canal');
+    leg.append(l1, l2); rt.appendChild(leg);
+    const ch = document.createElement('div'); ch.className = 'pc-chart'; ch.style.minHeight = '180px'; rt.appendChild(ch);
+    right.appendChild(rt);
+    requestAnimationFrame(() => { if (!pcRetLine(ch, v.id, 180, true)) { ch.style.minHeight = ''; ch.textContent = 'YouTube Analytics aún no tiene la curva de este vídeo (tarda 2-3 días).'; ch.className = 'pc-muted'; } });
+    const hist = dash.data('historial');
+    const pts = hist.status === 'ok' ? hist.data.filter((x) => x.id === v.id).map((x) => ({ ...x, date: new Date(x.t) })).sort((a, b) => a.date - b.date) : [];
+    if (pts.length >= 2) {
+      const gh = document.createElement('h3'); gh.textContent = 'Vistas en cada actualización'; right.appendChild(gh);
+      const gc = document.createElement('div'); gc.className = 'pc-chart'; gc.style.minHeight = '150px'; right.appendChild(gc);
+      requestAnimationFrame(() => {
+        const w = gc.clientWidth || 500, hh = 150, m = { t: 8, r: 10, b: 22, l: 48 };
+        const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${hh}`).attr('height', hh).attr('role', 'img').attr('aria-label', 'Vistas acumuladas');
+        gc.replaceChildren(svg.node());
+        const x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.date)).range([m.l, w - m.r]);
+        const y = d3.scaleLinear().domain([d3.min(pts, (p) => p.vistas) * 0.98, d3.max(pts, (p) => p.vistas)]).nice().range([hh - m.b, m.t]);
+        svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(3).tickSize(-(w - m.l - m.r)).tickFormat(pc.short)).call((g) => g.select('.domain').remove());
+        svg.append('g').attr('transform', `translate(0,${hh - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(w / 110))).tickFormat(d3.utcFormat('%d/%m %H:%M')));
+        svg.append('path').datum(pts).attr('d', d3.line().x((p) => x(p.date)).y((p) => y(p.vistas))).style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+        svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', (p) => x(p.date)).attr('cy', (p) => y(p.vistas)).attr('r', 3).style('fill', dash.colors[0]);
+      });
+    }
+  }
+  const mh = document.createElement('h3'); mh.textContent = 'Mejoras para este vídeo'; right.appendChild(mh);
+  const ul = document.createElement('ul'); ul.className = 'pc-mej';
+  const order = { alta: 0, media: 1, baja: 2, bien: 3, info: 4 };
+  const mej = (v.mejoras || []).slice().sort((a, b) => order[a.nivel] - order[b.nivel]);
+  if (!mej.length) { const li = document.createElement('li'); li.dataset.n = 'info'; li.append(Object.assign(document.createElement('b'), { textContent: 'Info' }), 'Sin sugerencias para este vídeo.'); ul.appendChild(li); }
+  mej.forEach((x) => {
+    const li = document.createElement('li'); li.dataset.n = x.nivel;
+    const tag = document.createElement('div');
+    const b = document.createElement('b'); b.textContent = x.tema; b.style.display = 'block';
+    const s = document.createElement('span'); s.className = 'pc-pill ' + (NIVEL[x.nivel] || ''); s.textContent = NIVEL_TXT[x.nivel] || x.nivel; s.style.fontSize = '10px';
+    tag.append(b, s);
+    const t = document.createElement('div'); t.textContent = x.texto;
+    li.append(tag, t); ul.appendChild(li);
+  });
+  right.appendChild(ul);
+  wrap.append(left, right);
+  el.replaceChildren(wrap);
+});
+
+// ---------- ideas de fuera
+dash.draw('fuera-fecha', (el) => { const f = window.pcExternasFecha; el.textContent = f ? 'Última búsqueda: ' + f.replace('T', ' ').slice(0, 16) + ' UTC.' : 'Aún no se ha buscado ninguna vez.'; });
+dash.draw('externas', (el) => {
+  const d = dash.data('externas');
+  if (d.status !== 'ok') { el.replaceChildren(); return; }
+  if (!d.data.length) { el.replaceChildren(Object.assign(document.createElement('p'), { className: 'pc-muted', textContent: 'Todavía no hay ideas. Pulsa «Buscar ideas ahora».' })); return; }
+  const last = d.data[0].encontrada;
+  el.replaceChildren(...d.data.map((x) => {
+    const c = document.createElement('article'); c.className = 'pc-xc';
+    const a = document.createElement('a'); if (/^https:\/\//.test(x.url)) { a.href = x.url; a.target = '_blank'; a.rel = 'noopener'; }
+    a.appendChild(pcThumb({ miniatura: x.miniatura, estado: '' }, true)); c.appendChild(a);
+    const b = document.createElement('div'); b.style.display = 'flex'; b.style.flexDirection = 'column'; b.style.gap = '6px'; b.style.minWidth = '0';
+    const chips = document.createElement('div'); chips.className = 'pc-chips';
+    if (x.encontrada === last) { const n = document.createElement('span'); n.className = 'pc-pill pc-new'; n.textContent = 'Nueva'; chips.appendChild(n); }
+    if (x.formato) { const f = document.createElement('span'); f.className = 'pc-pill'; f.textContent = x.formato; chips.appendChild(f); }
+    if (x.veces_media) { const f = document.createElement('span'); f.className = 'pc-pill ok'; f.textContent = pc.fmt1(x.veces_media) + '× su media'; chips.appendChild(f); }
+    b.appendChild(chips);
+    const h = document.createElement('h3'); h.textContent = x.titulo; b.appendChild(h);
+    const m = document.createElement('div'); m.className = 'pc-muted'; m.textContent = `${x.canal} · ${pc.short(x.vistas)} vistas · ${pc.fmt(x.vph)} vistas/h · ${x.duracion_s} s`; b.appendChild(m);
+    if (x.por_que) { const p = document.createElement('p'); const s = document.createElement('b'); s.textContent = 'Por qué funciona: '; p.append(s, x.por_que); b.appendChild(p); }
+    if (x.idea) {
+      const box = document.createElement('div'); box.className = 'pc-idea-box';
+      const s = document.createElement('b'); s.textContent = 'Idea para DatoCrack'; s.style.display = 'block';
+      const p = document.createElement('p'); p.textContent = x.idea;
+      box.append(s, p);
+      if (x.titulo_propuesto) { const t = document.createElement('p'); t.className = 'pc-muted'; t.textContent = 'Título: «' + x.titulo_propuesto + '»'; box.appendChild(t); }
+      b.appendChild(box);
+    }
+    c.appendChild(b); return c;
+  }));
+});
+(function () {
+  const b = document.getElementById('buscar-ideas'); if (!b) return;
+  b.addEventListener('click', async () => {
+    if (!window.pcBuscarIdeas) return;
+    b.disabled = true; const t = b.textContent; b.textContent = 'Buscando… (≈1 min)';
+    try { await window.pcBuscarIdeas(); } finally { b.disabled = false; b.textContent = t; }
+  });
+})();
 </script>

@@ -21,7 +21,7 @@ jobs:
         run: >
           pyinstaller --noconfirm --onefile --windowed --name DatoCrackPanel
           --add-data "ytauto/app/web;ytauto/app/web"
-          --hidden-import ytauto.panel --hidden-import ytauto.tts_gemini --hidden-import ytauto.tiktok
+          --hidden-import ytauto.panel --hidden-import ytauto.tts_gemini --hidden-import ytauto.tiktok --hidden-import ytauto.ideas_externas
           DatoCrackPanel.py
       - name: Comprobar que arranca el módulo
         run: python -c "import ytauto.app, ytauto.panel; print('ok')"

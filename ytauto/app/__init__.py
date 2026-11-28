@@ -28,7 +28,8 @@ if getattr(sys, "frozen", False):  # .exe de PyInstaller: el repo es la carpeta 
 else:
     ROOT = Path(os.environ.get("YT_REPO_DIR") or Path(__file__).resolve().parents[2])
     WEB = Path(__file__).resolve().parent / "web"
-NAMES = ["videos", "retencion", "costes", "diario", "trafico", "paises", "canal", "tiktok", "ideas"]
+NAMES = ["videos", "retencion", "costes", "diario", "trafico", "paises", "canal", "tiktok", "ideas",
+         "historial", "externas"]
 
 
 class Api:
@@ -41,6 +42,12 @@ class Api:
         out = ROOT / "reports" / "panel"
         data: dict = {}
         for n in NAMES:
+            if n == "externas":
+                p = ROOT / "data" / "ideas_externas.json"
+                ext = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"fecha": None, "items": []}
+                data[n] = ext["items"]
+                data["externas_fecha"] = ext["fecha"]
+                continue
             p = ROOT / "data" / "ideas.json" if n == "ideas" else out / f"{n}.json"
             data[n] = json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
         if data["canal"] is None:
@@ -55,10 +62,33 @@ class Api:
                 return {"error": f"No encuentro data/uploads.json en {ROOT}. "
                                  "Pon el .exe en la carpeta del repo yt-auto."}
             _collect()
-            return self.datos()
+            data = self.datos()
+            try:  # ideas de otros canales: como mucho una búsqueda cada 24 h
+                from .. import ideas_externas
+                if ideas_externas.due():
+                    ideas_externas.run()
+                    data = self.datos()
+            except Exception as e:
+                traceback.print_exc()
+                data["aviso"] = f"No se pudieron buscar ideas de otros canales: {e}"
+            return data
         except Exception as e:
             traceback.print_exc()
             return {"error": f"No se pudo actualizar: {e}"}
+        finally:
+            self._lock.release()
+
+
+    def buscar_ideas(self) -> dict:
+        if not self._lock.acquire(blocking=False):
+            return {"error": "Ya se está actualizando."}
+        try:
+            from .. import ideas_externas
+            ideas_externas.run(force=True)
+            return self.datos()
+        except Exception as e:
+            traceback.print_exc()
+            return {"error": f"No se pudieron buscar ideas: {e}"}
         finally:
             self._lock.release()
 

@@ -116,14 +116,19 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); fon
     if (!r || r.error) { estado.textContent = r ? r.error : 'Sin respuesta.'; estado.classList.add('err'); if (!ok) window.__dashError(); return; }
     estado.classList.remove('err');
     const f = r.canal && r.canal[0] ? r.canal[0].fecha.replace('T', ' ').slice(0, 16) : '';
-    estado.textContent = ok + (f ? ` · datos del ${f} UTC` : '');
+    estado.textContent = ok + (f ? ` · datos del ${f} UTC` : '') + (r.aviso ? ' · ' + r.aviso : '');
+    window.pcExternasFecha = r.externas_fecha || null;
     window.__dashSet(r);
   };
   const a = await api();
   show(await a.datos(), 'Datos guardados');
+  window.pcBuscarIdeas = async () => {
+    estado.classList.remove('err'); estado.textContent = 'Buscando Shorts que funcionan en otros canales…';
+    show(await a.buscar_ideas(), 'Ideas actualizadas');
+  };
   btn.addEventListener('click', async () => {
     btn.disabled = true; estado.classList.remove('err');
-    estado.textContent = 'Pidiendo datos a YouTube y TikTok… (unos 40 s)';
+    estado.textContent = 'Pidiendo datos a YouTube y TikTok… (unos 40 s; si toca buscar ideas de otros canales, 1 min más)';
     try { show(await a.actualizar(), 'Actualizado'); } finally { btn.disabled = false; }
   });
 })();

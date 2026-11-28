@@ -127,6 +127,116 @@ def _tiktok() -> tuple[list[dict], dict]:
         return [], {}
 
 
+def _channel_video_ids() -> list[str]:
+    """Ids de todos los vídeos del canal (lista de subidas, incluye privados y programados)."""
+    ch = _yt("channels", part="contentDetails", mine="true")["items"][0]
+    playlist = ch["contentDetails"]["relatedPlaylists"]["uploads"]
+    out, token = [], None
+    for _ in range(20):
+        d = _yt("playlistItems", part="contentDetails", playlistId=playlist, maxResults=50,
+                **({"pageToken": token} if token else {}))
+        out += [it["contentDetails"]["videoId"] for it in d.get("items", [])]
+        token = d.get("nextPageToken")
+        if not token:
+            break
+    return out
+
+
+def _thumb(v: dict | None) -> str:
+    th = (v or {}).get("snippet", {}).get("thumbnails", {})
+    return (th.get("high") or th.get("medium") or th.get("default") or {}).get("url", "")
+
+
+def _median(xs):
+    xs = sorted(x for x in xs if x is not None)
+    if not xs:
+        return None
+    k = len(xs) // 2
+    return xs[k] if len(xs) % 2 else (xs[k - 1] + xs[k]) / 2
+
+
+def _at(curve: dict, t: float):
+    """Valor de la curva de retención en el punto más cercano a t (0-1)."""
+    if not curve:
+        return None
+    k = min(curve, key=lambda x: abs(x - t))
+    return curve[k]
+
+
+def consejos(videos: list[dict], retention: list[dict]) -> None:
+    """Añade a cada vídeo una lista de mejoras concretas, comparándolo con la mediana del canal."""
+    curves: dict[str, dict] = {}
+    for r in retention:
+        curves.setdefault(r["id"], {})[r["t"]] = r["retencion"]
+    pub = [v for v in videos if v["estado"] == "Publicado"]
+    med = {
+        "gancho": _median(_at(c, 0.1) for c in curves.values()),
+        "mitad": _median(_at(c, 0.5) for c in curves.values()),
+        "final": _median(_at(c, 1.0) for c in curves.values()),
+        "pct": _median(v["pct_visto"] for v in pub),
+        "likes": _median(v["likes_pct"] for v in pub),
+        "vph": _median(v["vph"] for v in pub if v["edad_h"] and 24 <= v["edad_h"] <= 96),
+        "subs": _median(v["subs"] for v in pub),
+    }
+    for v in videos:
+        out = []
+        add = lambda nivel, tema, texto: out.append({"nivel": nivel, "tema": tema, "texto": texto})
+        c = curves.get(v["id"], {})
+        if v["estado"] == "Programado":
+            add("info", "Estado", "Programado. Las mejoras aparecerán cuando tenga datos.")
+        elif v["estado"] == "Publicado":
+            if v["pct_visto"] is None:
+                add("info", "Datos", "YouTube Analytics aún no tiene datos de retención (tarda 2-3 días).")
+            g, m, f = _at(c, 0.1), _at(c, 0.5), _at(c, 1.0)
+            if g is not None and med["gancho"] and g < med["gancho"] * 0.92:
+                add("alta", "Gancho", f"Al 10 % del vídeo sigue el {g*100:.0f} % del público (mediana del canal: "
+                    f"{med['gancho']*100:.0f} %). Empieza por la imagen más llamativa y di el conflicto en la primera frase.")
+            if m is not None and med["mitad"] and m < med["mitad"] * 0.85:
+                add("media", "Ritmo", f"A mitad del vídeo queda el {m*100:.0f} % (mediana: {med['mitad']*100:.0f} %). "
+                    "Recorta la parte central o mete un giro a mitad.")
+            if f is not None and med["final"] and f < med["final"] * 0.85:
+                add("media", "Final", f"Solo llega al final el {f*100:.0f} % (mediana: {med['final']*100:.0f} %). "
+                    "Prueba un cierre en bucle que enlace con la primera frase.")
+            elif f is not None and med["final"] and f > med["final"] * 1.3:
+                add("bien", "Final", f"Llega al final el {f*100:.0f} %, muy por encima de la mediana. Repite este tipo de cierre.")
+            if v["likes_pct"] is not None and med["likes"] and v["vistas"] >= 300 and v["likes_pct"] < med["likes"] * 0.7:
+                add("media", "Likes", f"{v['likes_pct']:.1f} % de likes por vista (mediana: {med['likes']:.1f} %). "
+                    "Pide una reacción concreta en el vídeo («dale like si lo sabías»).")
+            if v["comentarios"] == 0 and v["vistas"] >= 500:
+                add("baja", "Comentarios", "0 comentarios. Fija un comentario con una pregunta para abrir conversación.")
+            if v["vph"] and med["vph"] and v["edad_h"] and 24 <= v["edad_h"] <= 96:
+                if v["vph"] < med["vph"] * 0.5:
+                    add("alta", "Alcance", f"{v['vph']:.0f} vistas/h, menos de la mitad de la mediana ({med['vph']:.0f}). "
+                        "Prueba otro título y que la primera imagen sea distinta.")
+                elif v["vph"] > med["vph"] * 1.5:
+                    add("bien", "Alcance", f"{v['vph']:.0f} vistas/h, por encima de la mediana ({med['vph']:.0f}). "
+                        "Haz una segunda parte o el mismo formato con otro tema.")
+            if v["subs"] is not None and med["subs"] is not None and v["subs"] > max(3, med["subs"] * 2):
+                add("bien", "Suscriptores", f"Ha traído {v['subs']} suscriptores (mediana: {med['subs']:.0f}). Es un formato que fideliza.")
+            if v["tiktok"] == "No subido" and v["edad_h"] and v["edad_h"] <= 14 * 24:
+                add("baja", "TikTok", "No está en TikTok. Súbelo: ahí cada vídeo suma 200-1.700 vistas más.")
+        v["mejoras"] = out
+        v["mejoras_n"] = sum(1 for x in out if x["nivel"] in ("alta", "media", "baja"))
+
+
+def historial(videos: list[dict], now: datetime) -> list[dict]:
+    """Guarda una foto de las vistas de cada vídeo en cada actualización y devuelve el historial."""
+    path = Path("data/panel_historial.jsonl")
+    snap = {"t": now.isoformat(timespec="minutes"),
+            "v": {x["id"]: [x["vistas"], x["likes"]] for x in videos if x["id"] and x["estado"] == "Publicado"}}
+    with path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(snap) + "\n")
+    rows = []
+    for line in path.read_text(encoding="utf-8").splitlines()[-500:]:
+        try:
+            s = json.loads(line)
+        except ValueError:
+            continue
+        for vid, (views, likes) in s["v"].items():
+            rows.append({"id": vid, "t": s["t"], "vistas": views, "likes": likes})
+    return rows
+
+
 def collect() -> dict[str, list]:
     uploads = json.loads(Path("data/uploads.json").read_text(encoding="utf-8"))
     retired = json.loads(Path("data/uploads_retirados.json").read_text(encoding="utf-8")) \
@@ -134,6 +244,13 @@ def collect() -> dict[str, list]:
     tt_log = json.loads(Path("data/tiktok_uploads.json").read_text(encoding="utf-8")) \
         if Path("data/tiktok_uploads.json").exists() else {}
     now = datetime.now(timezone.utc)
+
+    # --- Vídeos del canal: la lista sale de YouTube, no solo del registro local, para que
+    # los vídeos subidos desde otro equipo aparezcan aunque data/uploads.json esté atrasado.
+    known = {v["id"] for v in uploads.values()}
+    for vid in _channel_video_ids():
+        if vid not in known:
+            uploads[f"canal/{vid}"] = {"id": vid}
 
     # --- YouTube Data API
     ids = {v["id"]: s for s, v in uploads.items()}
@@ -156,8 +273,14 @@ def collect() -> dict[str, list]:
     retired_paths = {k.split("#")[0] for k in retired}
     scripts = sorted({*uploads, *(str(p) for p in Path("guiones").glob("*.yaml"))} - (retired_paths - set(uploads)))
     for script in scripts:
+        if script.startswith("canal/"):
+            v0 = yt.get(uploads[script]["id"])
+            st0 = (v0 or {}).get("status", {})
+            # De lo que no está en el registro solo interesa lo público o programado
+            if not v0 or not (st0.get("privacyStatus") == "public" or st0.get("publishAt")):
+                continue
         p = Path(script)
-        stem, num = p.stem, p.stem.split("_")[0]
+        stem, num = p.stem, ("—" if script.startswith("canal/") else p.stem.split("_")[0])
         spec = _spec(p)
         up = uploads.get(script)
         v = yt.get(up["id"]) if up else None
@@ -216,6 +339,7 @@ def collect() -> dict[str, list]:
             "minutos_vistos": an.get("estimatedMinutesWatched"), "subs": an.get("subscribersGained"),
             "vph": round(views / age_h, 1) if public and age_h and age_h > 0 else None,
             "likes_pct": round(100 * int(st.get("likeCount", 0)) / views, 2) if views else None,
+            "miniatura": _thumb(v),
         })
 
         # Costes estimados
@@ -267,6 +391,9 @@ def collect() -> dict[str, list]:
                       "tokens_voz_out": 0, "fotogramas_3d": 0,
                       "cuota_youtube": QUOTA_UPLOAD + QUOTA_THUMB, "usd_voz": 0.0})
 
+    consejos(videos, retention)
+    hist = historial(videos, now)
+
     daily = _an(metrics="views,engagedViews,likes,shares,subscribersGained,subscribersLost,"
                         "estimatedMinutesWatched", dimensions="day", sort="day")
     traffic = _an(metrics="views", dimensions="insightTrafficSourceType", sort="-views")
@@ -280,7 +407,8 @@ def collect() -> dict[str, list]:
               "tiktok_likes": tt_user.get("likes_count"),
               "tiktok_videos": tt_user.get("video_count")}]
     return dict(videos=videos, costes=costs, retencion=retention, diario=daily,
-                trafico=traffic, paises=countries, canal=canal, tiktok=tt_rows)
+                trafico=traffic, paises=countries, canal=canal, tiktok=tt_rows,
+                historial=hist)
 
 
 def main() -> None:
