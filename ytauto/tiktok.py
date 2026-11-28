@@ -9,6 +9,7 @@ Credenciales en /mnt/project-files/yt-auto/secrets/ (tiktok.env, tiktok_token.js
 from __future__ import annotations
 
 import json
+import os
 import secrets as _sec
 import sys
 import time
@@ -17,7 +18,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
 
-SECRETS = Path("/mnt/project-files/yt-auto/secrets")
+SECRETS = Path(os.environ.get("YT_SECRETS_DIR", "/mnt/project-files/yt-auto/secrets"))
 ENV = SECRETS / "tiktok.env"
 TOKEN = SECRETS / "tiktok_token.json"
 LOG = Path("data/tiktok_uploads.json")

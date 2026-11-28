@@ -16,6 +16,7 @@ YouTube por llamada. Los precios están en PRICES y se cambian aquí.
 from __future__ import annotations
 
 import json
+import os
 import re
 import wave
 from datetime import date, datetime, timedelta, timezone
@@ -28,7 +29,7 @@ from .cli import load_env
 from .publish import API, _h
 
 ANALYTICS = "https://youtubeanalytics.googleapis.com/v2/reports"
-PROJECT = Path("/mnt/project-files/yt-auto")
+PROJECT = Path(os.environ.get("YT_PROJECT_DIR", "/mnt/project-files/yt-auto"))
 OUT = Path("reports/panel")
 START = "2026-11-01"
 

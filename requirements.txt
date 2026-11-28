@@ -5,3 +5,4 @@ kokoro-onnx>=0.4
 soundfile>=0.12
 piper-tts>=1.2
 faster-whisper>=1.0
+pywebview>=5.0
