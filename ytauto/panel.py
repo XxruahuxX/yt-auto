@@ -128,10 +128,10 @@ def _tiktok() -> tuple[list[dict], dict]:
 
 
 def collect() -> dict[str, list]:
-    uploads = json.loads(Path("data/uploads.json").read_text())
-    retired = json.loads(Path("data/uploads_retirados.json").read_text()) \
+    uploads = json.loads(Path("data/uploads.json").read_text(encoding="utf-8"))
+    retired = json.loads(Path("data/uploads_retirados.json").read_text(encoding="utf-8")) \
         if Path("data/uploads_retirados.json").exists() else {}
-    tt_log = json.loads(Path("data/tiktok_uploads.json").read_text()) \
+    tt_log = json.loads(Path("data/tiktok_uploads.json").read_text(encoding="utf-8")) \
         if Path("data/tiktok_uploads.json").exists() else {}
     now = datetime.now(timezone.utc)
 

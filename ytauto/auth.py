@@ -50,13 +50,13 @@ def exchange(redirected_url_or_code: str) -> dict:
         raise RuntimeError(f"Error al canjear el código: {resp.status_code} {resp.text[:300]}")
     tok = resp.json()
     tok["expires_at"] = time.time() + tok.get("expires_in", 3600) - 60
-    TOKEN_FILE.write_text(json.dumps(tok))
+    TOKEN_FILE.write_text(json.dumps(tok), encoding="utf-8")
     os.chmod(TOKEN_FILE, 0o600)
     return tok
 
 
 def access_token() -> str:
-    tok = json.loads(TOKEN_FILE.read_text())
+    tok = json.loads(TOKEN_FILE.read_text(encoding="utf-8"))
     if time.time() < tok.get("expires_at", 0):
         return tok["access_token"]
     cid, secret = _client()
@@ -68,7 +68,7 @@ def access_token() -> str:
     new = resp.json()
     tok.update(access_token=new["access_token"],
                expires_at=time.time() + new.get("expires_in", 3600) - 60)
-    TOKEN_FILE.write_text(json.dumps(tok))
+    TOKEN_FILE.write_text(json.dumps(tok), encoding="utf-8")
     return tok["access_token"]
 
 
