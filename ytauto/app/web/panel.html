@@ -1,0 +1,889 @@
+<meta name="dash-one-writer">
+<meta name="dash-form" content="dashboard">
+<style>
+.pc { display: flex; flex-direction: column; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+.pc h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.pc h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.pc h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.pc p { margin: 0; line-height: 1.5; max-width: 72ch; }
+.pc-muted { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pc-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); }
+.pc-tab { appearance: none; border: 0; background: none; color: var(--color-fg-muted); font: inherit; padding: var(--cds-pad-sm) var(--cds-pad-md); border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+.pc-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.pc-tab:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.pc-sec { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.pc-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+.pc-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); min-width: 0; }
+.pc-tile .pc-num { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
+.pc-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--cds-gap-lg); }
+.pc-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.pc-chart { position: relative; width: 100%; min-height: 220px; }
+.pc-chart svg { display: block; width: 100%; overflow: visible; }
+.pc-chart text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+.pc-chart .grid line { stroke: var(--cds-chart-grid); }
+.pc-chart .domain { stroke: var(--cds-chart-axis); }
+.pc-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 2; }
+.pc-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.pc-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.pc-legend i.dash { height: 0; border-top: 2px dashed var(--cds-chart-muted); border-radius: 0; width: 14px; }
+.pc-tools { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; }
+.pc-input { font: inherit; padding: 6px 10px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); color: var(--color-fg); min-width: 0; }
+.pc-tablewrap { overflow-x: auto; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); }
+.pc-table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.pc-table th, .pc-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.pc-table th { background: var(--color-panel); font-weight: var(--cds-font-weight-medium); position: sticky; top: 0; }
+.pc-table th[data-sort] { cursor: pointer; }
+.pc-table th[aria-sort="descending"]::after { content: " ↓"; }
+.pc-table th[aria-sort="ascending"]::after { content: " ↑"; }
+.pc-table td.n, .pc-table th.n { text-align: right; }
+.pc-table td.t { white-space: normal; min-width: 220px; max-width: 360px; }
+.pc-table a { color: inherit; }
+.pc-pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); white-space: nowrap; }
+.pc-pill.ok { color: var(--color-ok); border-color: var(--color-ok); }
+.pc-pill.warn { color: var(--color-warn); border-color: var(--color-warn); }
+.pc-pill.bad { color: var(--color-bad); border-color: var(--color-bad); }
+.pc-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--cds-gap-md); align-items: start; }
+.pc-col { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.pc-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--cds-gap-xs); max-height: 420px; overflow-y: auto; }
+.pc-col li { font-size: var(--cds-font-size-caption); line-height: 1.35; padding: 6px 8px; border-radius: 6px; background: var(--color-bg); border: 1px solid var(--color-border-line); }
+.pc-col li b { font-variant-numeric: tabular-nums; }
+.pc-ideas { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--cds-gap-md); }
+.pc-idea { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; }
+.pc-idea .pc-chips { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); }
+.pc-note { border-left: 3px solid var(--cds-chart-muted); padding-left: var(--cds-pad-md); }
+@media print { .pc-tabs { display: none; } .pc-sec[hidden] { display: flex !important; break-before: page; } }
+.pc-seg { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; margin-left: auto; }
+.pc-segb { font: inherit; border: 0; background: none; color: var(--color-fg-muted); padding: 6px 12px; cursor: pointer; }
+.pc-segb[aria-pressed="true"] { background: var(--color-panel); color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.pc-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--cds-gap-lg); }
+.pc-vc { appearance: none; text-align: left; font: inherit; color: inherit; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; min-width: 0; }
+.pc-vc:hover { transform: translateY(-2px); box-shadow: var(--cds-shadow-popover); }
+.pc-vc:focus-visible { outline: 2px solid var(--accent, var(--color-fg)); outline-offset: 2px; }
+.pc-thumb { position: relative; aspect-ratio: 4 / 5; background: var(--color-border-line); overflow: hidden; }
+.pc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-thumb .pc-pill { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.65); color: #fff; border-color: transparent; }
+.pc-thumb .pc-dur { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.pc-thumb .pc-num { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,.7); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.pc-thumb .pc-noimg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-fg-muted); font-size: 12px; padding: 12px; text-align: center; }
+.pc-vbody { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.pc-vt { font-weight: var(--cds-font-weight-medium); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+.pc-vm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; font-variant-numeric: tabular-nums; }
+.pc-vm div { display: flex; flex-direction: column; }
+.pc-vm b { font-size: 15px; }
+.pc-vm span { font-size: 11px; color: var(--color-fg-muted); }
+.pc-spark { height: 34px; }
+.pc-spark svg { width: 100%; height: 34px; display: block; }
+.pc-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.pc-pill.info { color: var(--color-fg-muted); }
+.pc-modal { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.55); display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+.pc-modal-box { position: relative; background: var(--color-bg); color: var(--color-fg); border: 1px solid var(--color-border-line); border-radius: 14px; width: min(980px, 100%); padding: 24px; box-shadow: var(--cds-shadow-popover); }
+.pc-close { position: absolute; top: 10px; right: 12px; font-size: 26px; line-height: 1; border: 0; background: none; color: var(--color-fg-muted); cursor: pointer; }
+.pc-det { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+@media (max-width: 700px) { .pc-det { grid-template-columns: 1fr; } }
+.pc-det .pc-thumb { border-radius: 10px; }
+.pc-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.pc-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.pc-kpi b { font-size: 20px; font-family: var(--font-anthropic-serif); font-weight: 400; font-variant-numeric: tabular-nums; }
+.pc-kpi span { font-size: 11px; color: var(--color-fg-muted); }
+.pc-kpi .up { color: var(--color-ok); } .pc-kpi .down { color: var(--color-bad); }
+.pc-mej { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pc-mej li { display: grid; grid-template-columns: 86px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border: 1px solid var(--color-border-line); border-radius: 8px; background: var(--color-panel); line-height: 1.45; }
+.pc-mej li[data-n="alta"] { border-left: 4px solid var(--color-bad); }
+.pc-mej li[data-n="media"] { border-left: 4px solid var(--color-warn); }
+.pc-mej li[data-n="baja"] { border-left: 4px solid var(--cds-chart-muted); }
+.pc-mej li[data-n="bien"] { border-left: 4px solid var(--color-ok); }
+.pc-mej li[data-n="info"] { border-left: 4px solid var(--color-border-line); }
+.pc-btn2 { font: inherit; padding: 6px 14px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); cursor: pointer; white-space: nowrap; }
+.pc-btn2:disabled { opacity: .6; cursor: progress; }
+.pc-ext { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--cds-gap-lg); }
+.pc-xc { display: grid; grid-template-columns: 110px 1fr; gap: 12px; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 12px; padding: 12px; min-width: 0; }
+.pc-xc .pc-thumb { border-radius: 8px; aspect-ratio: 9 / 16; }
+.pc-xc a { color: inherit; }
+.pc-xc h3 { font-size: 14px; line-height: 1.3; }
+.pc-xc p { font-size: 13px; line-height: 1.45; margin: 0; }
+.pc-idea-box { background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: 8px; padding: 8px 10px; }
+.pc-new { color: var(--color-ok); border-color: var(--color-ok); }
+@media print { .pc-modal { display: none !important; } }
+</style>
+
+<div class="pc">
+  <header style="display:flex;flex-direction:column;gap:var(--cds-gap-sm)">
+    <h1 id="titulo">DatoCrack · Panel del canal</h1>
+    <p data-draw="takeaway" class="dash-skeleton"></p>
+    <p class="pc-muted">Datos de YouTube Data API y YouTube Analytics (que va unos 2 días por detrás), TikTok y el registro del repo. Actualizado <span data-draw="fecha" data-source="canal" data-field="fecha" data-row="0">—</span> UTC.</p>
+  </header>
+
+  <nav class="pc-tabs" role="tablist" aria-label="Apartados">
+    <button class="pc-tab" role="tab" data-tab="resumen" aria-selected="true">Resumen</button>
+    <button class="pc-tab" role="tab" data-tab="videos" aria-selected="false">Vídeos</button>
+    <button class="pc-tab" role="tab" data-tab="retencion" aria-selected="false">Retención</button>
+    <button class="pc-tab" role="tab" data-tab="costes" aria-selected="false">Costes</button>
+    <button class="pc-tab" role="tab" data-tab="estado" aria-selected="false">Estado</button>
+    <button class="pc-tab" role="tab" data-tab="mejoras" aria-selected="false">Mejoras</button>
+    <button class="pc-tab" role="tab" data-tab="fuera" aria-selected="false">Ideas de fuera</button>
+  </nav>
+
+  <!-- RESUMEN -->
+  <section class="pc-sec" id="resumen">
+    <div class="pc-tiles">
+      <div class="pc-tile" id="t-subs"><span class="pc-muted">Suscriptores</span><span class="pc-num" data-draw="kpi" data-k="suscriptores" data-source="canal" data-field="suscriptores" data-row="0">—</span><span class="pc-muted">YouTube, total</span></div>
+      <div class="pc-tile" id="t-vistas"><span class="pc-muted">Vistas</span><span class="pc-num" data-draw="kpi" data-k="vistas_totales" data-source="canal" data-field="vistas_totales" data-row="0">—</span><span class="pc-muted">YouTube, desde el inicio</span></div>
+      <div class="pc-tile" id="t-pct"><span class="pc-muted">% medio visto</span><span class="pc-num" data-draw="kpi2" data-k="mediana_pct" data-source="resumen" data-field="mediana_pct" data-row="0">—</span><span class="pc-muted">Mediana de los vídeos públicos</span></div>
+      <div class="pc-tile" id="t-pub"><span class="pc-muted">Publicados</span><span class="pc-num" data-draw="kpi2" data-k="publicados" data-source="resumen" data-field="publicados" data-row="0">—</span><span class="pc-muted"><span data-draw="kpi2" data-k="programados" data-source="resumen" data-field="programados" data-row="0">—</span> programados</span></div>
+      <div class="pc-tile" id="t-tt"><span class="pc-muted">TikTok</span><span class="pc-num" data-draw="kpi" data-k="tiktok_seguidores" data-source="canal" data-field="tiktok_seguidores" data-row="0">—</span><span class="pc-muted">seguidores · <span data-draw="kpi" data-k="tiktok_likes" data-source="canal" data-field="tiktok_likes" data-row="0">—</span> likes</span></div>
+    </div>
+
+    <div class="pc-card" id="c-diario">
+      <h2>Vistas por día</h2>
+      <p class="pc-muted">Vistas comprometidas: las que no se saltan en los primeros segundos.</p>
+      <div class="pc-legend"><span><i style="background:var(--cds-chart-muted)"></i>Vistas</span><span><i data-draw="sw0"></i>Vistas comprometidas</span></div>
+      <div class="pc-chart dash-skeleton" data-draw="diario" data-source="diario"></div>
+    </div>
+
+    <div class="pc-grid2">
+      <div class="pc-card" id="c-formato">
+        <h2>Vistas medianas por formato</h2>
+        <p class="pc-muted">Vídeos públicos. Entre paréntesis, cuántos vídeos hay.</p>
+        <div class="pc-chart dash-skeleton" data-draw="formatos" data-source="por_formato"></div>
+      </div>
+      <div class="pc-card" id="c-trafico">
+        <h2>De dónde vienen las vistas</h2>
+        <p class="pc-muted">Desde el 1 de noviembre.</p>
+        <div class="pc-chart dash-skeleton" data-draw="trafico" data-source="trafico"></div>
+      </div>
+      <div class="pc-card" id="c-paises">
+        <h2>Países</h2>
+        <p class="pc-muted">Vistas desde el 1 de noviembre.</p>
+        <div class="pc-chart dash-skeleton" data-draw="paises" data-source="paises"></div>
+      </div>
+      <div class="pc-card" id="c-tiktok">
+        <h2>TikTok, vistas por vídeo</h2>
+        <p class="pc-muted">TikTok no devuelve el texto de cada vídeo, así que no se emparejan con los guiones.</p>
+        <div class="pc-chart dash-skeleton" data-draw="tiktok" data-source="tiktok"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section class="pc-sec" id="videos" hidden>
+    <div class="pc-tools">
+      <input class="pc-input" id="f-buscar" type="search" placeholder="Buscar título o guion" aria-label="Buscar">
+      <select class="dash-select" id="f-estado" aria-label="Estado">
+        <option value="">Todos los estados</option>
+        <option>Publicado</option>
+        <option>Programado</option>
+        <option>Solo TikTok</option>
+        <option>Renderizado sin subir</option>
+        <option>Retirado</option>
+      </select>
+      <select class="dash-select" id="f-estilo" aria-label="Estilo">
+        <option value="">2D y 3D</option>
+        <option>2D</option>
+        <option>3D</option>
+      </select>
+      <select class="dash-select" id="f-orden" aria-label="Ordenar">
+        <option value="publicacion:-1">Más recientes</option>
+        <option value="vistas:-1">Más vistas</option>
+        <option value="vph:-1">Más vistas/h</option>
+        <option value="pct_visto:-1">Más % visto</option>
+        <option value="mejoras_n:-1">Más mejoras pendientes</option>
+      </select>
+      <span class="pc-muted" data-draw="cuenta">—</span>
+      <div class="pc-seg" role="group" aria-label="Vista">
+        <button type="button" class="pc-segb" data-vista="tarjetas" aria-pressed="true">Tarjetas</button>
+        <button type="button" class="pc-segb" data-vista="lista" aria-pressed="false">Lista</button>
+      </div>
+    </div>
+    <div class="pc-cards" id="vista-tarjetas" data-draw="tarjetas" data-source="videos"></div>
+    <div class="pc-tablewrap" id="vista-lista" hidden>
+      <table class="pc-table" id="tabla-videos" data-source="videos" data-row-key="guion">
+        <thead><tr>
+          <th data-field="num" data-sort="num">N.º</th>
+          <th data-field="titulo" data-sort="titulo">Título</th>
+          <th data-field="formato" data-sort="formato">Formato</th>
+          <th data-field="estilo" data-sort="estilo">Estilo</th>
+          <th data-field="estado" data-sort="estado">Estado</th>
+          <th data-field="publicacion" data-sort="publicacion">Publicación (UTC)</th>
+          <th class="n" data-field="vistas" data-sort="vistas">Vistas</th>
+          <th class="n" data-field="vph" data-sort="vph">Vistas/h</th>
+          <th class="n" data-field="pct_visto" data-sort="pct_visto">% visto</th>
+          <th class="n" data-field="likes_pct" data-sort="likes_pct">% likes</th>
+          <th class="n" data-field="subs" data-sort="subs">Subs</th>
+          <th class="n" data-field="duracion_s" data-sort="duracion_s">Seg.</th>
+          <th data-field="tiktok" data-sort="tiktok">TikTok</th>
+        </tr></thead>
+        <tbody data-draw="tabla"></tbody>
+      </table>
+    </div>
+    <p class="pc-muted">Vistas/h: vistas entre horas desde la publicación. % visto, subs y compartidos salen de YouTube Analytics y aparecen unos 2 días después de publicar.</p>
+  </section>
+
+  <!-- RETENCION -->
+  <section class="pc-sec" id="retencion" hidden>
+    <div class="pc-card" id="c-curva">
+      <div class="pc-tools" style="justify-content:space-between">
+        <h2>Curva de retención</h2>
+        <select class="dash-select" data-draw="sel-video" aria-label="Vídeo" data-source="videos"></select>
+      </div>
+      <p class="pc-muted">Porcentaje del público que sigue viendo en cada punto del vídeo. Más del 100 % significa que lo vuelven a ver. La línea discontinua es la mediana del canal.</p>
+      <div class="pc-legend"><span><i data-draw="sw0"></i>Vídeo elegido</span><span><i class="dash"></i>Mediana del canal</span></div>
+      <div class="pc-chart dash-skeleton" data-draw="curva" data-source="retencion curva_media" style="min-height:260px"></div>
+      <p data-draw="curva-nota" class="pc-muted"></p>
+    </div>
+    <div class="pc-grid2">
+      <div class="pc-card" id="c-ret-formato">
+        <h2>% medio visto por formato</h2>
+        <p class="pc-muted">Mediana de los vídeos públicos con datos de Analytics.</p>
+        <div class="pc-chart dash-skeleton" data-draw="ret-formato" data-source="por_formato"></div>
+      </div>
+      <div class="pc-card" id="c-final">
+        <h2>Quién llega al final</h2>
+        <p class="pc-muted">Público que sigue en el último segundo. Los 10 mejores.</p>
+        <div class="pc-chart dash-skeleton" data-draw="final" data-source="final"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COSTES -->
+  <section class="pc-sec" id="costes" hidden>
+    <p class="pc-note">Estimaciones. Voz Gemini: tokens de entrada por caracteres del guion más la instrucción de estilo, y de salida a 32 tokens por segundo de audio. El dólar supone la tarifa de pago (0,50 $ y 10 $ por millón); en la capa gratuita es 0. Los tokens de guion son solo el texto final del YAML, no la conversación que lo escribe.</p>
+    <div class="pc-tiles">
+      <div class="pc-tile" id="t-tok"><span class="pc-muted">Tokens de voz</span><span class="pc-num" data-draw="ct" data-k="tokens_voz" data-source="costes_total" data-field="tokens_voz" data-row="0">—</span><span class="pc-muted">Gemini, entrada + salida</span></div>
+      <div class="pc-tile" id="t-usd"><span class="pc-muted">Voz si fuera de pago</span><span class="pc-num" data-draw="ct" data-k="usd" data-source="costes_total" data-field="usd" data-row="0">—</span><span class="pc-muted">USD, todos los vídeos</span></div>
+      <div class="pc-tile" id="t-guion"><span class="pc-muted">Tokens de guion</span><span class="pc-num" data-draw="ct" data-k="tokens_guion" data-source="costes_total" data-field="tokens_guion" data-row="0">—</span><span class="pc-muted">Texto final de los YAML</span></div>
+      <div class="pc-tile" id="t-frames"><span class="pc-muted">Fotogramas 3D</span><span class="pc-num" data-draw="ct" data-k="fotogramas" data-source="costes_total" data-field="fotogramas" data-row="0">—</span><span class="pc-muted">Renderizados en Blender</span></div>
+      <div class="pc-tile" id="t-cuota"><span class="pc-muted">Cuota YouTube</span><span class="pc-num" data-draw="ct" data-k="cuota" data-source="costes_total" data-field="cuota" data-row="0">—</span><span class="pc-muted">Unidades en subidas (10.000/día gratis)</span></div>
+    </div>
+    <div class="pc-tablewrap">
+      <table class="pc-table" id="tabla-costes" data-source="costes" data-row-key="guion">
+        <thead><tr>
+          <th data-field="guion">Guion</th>
+          <th data-field="estilo">Estilo</th>
+          <th data-field="motor_voz">Voz</th>
+          <th class="n" data-field="tokens_guion">Tokens guion</th>
+          <th class="n" data-field="caracteres_voz">Caracteres voz</th>
+          <th class="n" data-field="audio_s">Audio (s)</th>
+          <th class="n" data-field="tokens_voz_in">Tokens voz entrada</th>
+          <th class="n" data-field="tokens_voz_out">Tokens voz salida</th>
+          <th class="n" data-field="fotogramas_3d">Fotogramas 3D</th>
+          <th class="n" data-field="cuota_youtube">Cuota YouTube</th>
+          <th class="n" data-field="usd_voz">USD voz</th>
+        </tr></thead>
+        <tbody data-draw="tabla-costes"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ESTADO -->
+  <section class="pc-sec" id="estado" hidden>
+    <p class="pc-muted">Cada vídeo en su punto del proceso. Programado: privado con fecha de publicación futura en YouTube.</p>
+    <div class="pc-board" data-draw="tablero" data-source="videos"></div>
+  </section>
+
+  <!-- MEJORAS -->
+  <section class="pc-sec" id="mejoras" hidden>
+    <p>Ideas sacadas de los datos del canal, ordenadas por impacto, y las propuestas de la oficina de diseño. Pídeme cualquiera y la preparo.</p>
+    <div class="pc-ideas" data-draw="ideas" data-source="ideas"></div>
+  </section>
+
+  <!-- IDEAS DE FUERA -->
+  <section class="pc-sec" id="fuera" hidden>
+    <div class="pc-tools" style="justify-content:space-between">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h2>Lo que funciona en otros canales</h2>
+        <p class="pc-muted">Shorts de fútbol de los últimos 7 días que más superan la media de su canal. Gemini propone cómo adaptar cada uno a DatoCrack. Se buscan solos cada 24 h al pulsar «Actualizar» (unas 700 unidades de cuota). <span data-draw="fuera-fecha"></span></p>
+      </div>
+      <button type="button" class="pc-btn2" id="buscar-ideas">Buscar ideas ahora</button>
+    </div>
+    <div class="pc-ext" data-draw="externas" data-source="externas"></div>
+  </section>
+</div>
+
+<div class="pc-modal" id="detalle" hidden>
+  <div class="pc-modal-box" role="dialog" aria-modal="true" aria-label="Detalle del vídeo">
+    <button type="button" class="pc-close" id="cerrar-detalle" aria-label="Cerrar">×</button>
+    <div data-draw="detalle"></div>
+  </div>
+</div>
+
+<script>
+// ---------- utilidades compartidas
+window.pc = (function () {
+  const fmt = (n) => n == null ? '—' : d3.format(',')(Math.round(n)).replace(/,/g, '.');
+  const fmt1 = (n) => n == null ? '—' : d3.format(',.1f')(n).replace(/,/g, '_').replace('.', ',').replace(/_/g, '.');
+  const short = (n) => n == null ? '—' : (Math.abs(n) >= 1e4 ? d3.format('.3~s')(n).replace('k', ' mil').replace('M', ' M').replace('.', ',') : fmt(n));
+  const med = (a) => { const v = a.filter((x) => x != null).sort(d3.ascending); return v.length ? d3.median(v) : null; };
+  const ok = (id) => dash.data(id).status === 'ok';
+  function tip(el) {
+    let t = el.querySelector(':scope > .pc-tip');
+    if (!t) { t = document.createElement('div'); t.className = 'pc-tip'; t.hidden = true; el.appendChild(t); }
+    return {
+      show(lines, x, y) {
+        t.replaceChildren(...lines.map((l, i) => { const d = document.createElement('div'); d.textContent = l; if (i === 0) d.style.fontWeight = '600'; return d; }));
+        t.hidden = false;
+        const w = el.clientWidth, tw = t.offsetWidth;
+        t.style.left = Math.max(0, Math.min(w - tw, x + 12)) + 'px';
+        t.style.top = Math.max(0, y - 10) + 'px';
+      },
+      hide() { t.hidden = true; }
+    };
+  }
+  function failed(el, id) {
+    const s = dash.data(id).status;
+    if (s === 'error') { el.classList.remove('dash-skeleton'); el.replaceChildren(Object.assign(document.createElement('p'), { className: 'pc-muted', textContent: 'No se pudieron cargar estos datos.' })); return true; }
+    return s !== 'ok';
+  }
+  // barras horizontales
+  function barsH(el, rows, label, value, fmtv, color) {
+    el.classList.remove('dash-skeleton');
+    el.style.minHeight = '';
+    const w = el.clientWidth || 300, rowH = 26;
+    const svg = d3.create('svg').attr('role', 'img').attr('aria-label', 'Gráfico de barras');
+    el.replaceChildren(svg.node());
+    const labels = svg.append('g');
+    labels.selectAll('text').data(rows).join('text').text((d) => label(d));
+    let lw = 0; labels.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); });
+    labels.remove();
+    lw = Math.min(lw, w * 0.45);
+    const valW = 64, h = rows.length * rowH;
+    svg.attr('viewBox', `0 0 ${w} ${h}`).attr('height', h);
+    const x = d3.scaleLinear().domain([0, d3.max(rows, value) || 1]).range([0, Math.max(10, w - lw - valW - 16)]);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (d, i) => `translate(0,${i * rowH})`);
+    g.append('text').attr('x', lw).attr('y', rowH / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => label(d));
+    g.append('rect').attr('x', lw + 8).attr('y', 5).attr('height', rowH - 10).attr('rx', 3).attr('width', (d) => Math.max(1, x(value(d)))).style('fill', color || dash.colors[0]);
+    g.append('text').attr('x', (d) => lw + 12 + x(value(d))).attr('y', rowH / 2).attr('dy', '0.35em').text((d) => fmtv(value(d)));
+  }
+  return { fmt, fmt1, short, med, ok, tip, failed, barsH };
+})();
+
+// ---------- cálculos (se ven en Fuentes)
+dash.calc('resumen', {
+  title: 'Resumen de vídeos', description: 'Publicados, programados y medianas de los vídeos públicos.',
+  inputs: ['videos'],
+  fn: (videos) => {
+    const pub = videos.filter((v) => v.estado === 'Publicado');
+    const m = (a) => { const s = a.filter((x) => x != null).sort((p, q) => p - q); if (!s.length) return null; const k = Math.floor(s.length / 2); return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; };
+    return [{ publicados: pub.length, programados: videos.filter((v) => v.estado === 'Programado').length,
+      mediana_pct: Math.round(10 * m(pub.map((v) => v.pct_visto))) / 10, mediana_vistas: m(pub.map((v) => v.vistas)) }];
+  }
+});
+dash.calc('por_formato', {
+  title: 'Por formato', description: 'Medianas de vistas, vistas/hora y % visto de los vídeos públicos, por formato.',
+  inputs: ['videos'],
+  fn: (videos) => {
+    const m = (a) => { const s = a.filter((x) => x != null).sort((p, q) => p - q); if (!s.length) return null; const k = Math.floor(s.length / 2); return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; };
+    const g = {};
+    videos.filter((v) => v.estado === 'Publicado').forEach((v) => { (g[v.formato] = g[v.formato] || []).push(v); });
+    return Object.entries(g).map(([formato, vs]) => ({ formato, videos: vs.length,
+      mediana_vistas: m(vs.map((v) => v.vistas)), mediana_vph: m(vs.map((v) => v.vph)),
+      mediana_pct: m(vs.map((v) => v.pct_visto)) == null ? null : Math.round(10 * m(vs.map((v) => v.pct_visto))) / 10 }))
+      .sort((a, b) => b.mediana_vistas - a.mediana_vistas);
+  }
+});
+dash.calc('curva_media', {
+  title: 'Retención mediana del canal', description: 'Mediana, en cada punto del vídeo, de las curvas de retención de todos los vídeos con datos.',
+  inputs: ['retencion'],
+  fn: (retencion) => {
+    const g = {};
+    retencion.forEach((r) => { (g[r.t] = g[r.t] || []).push(r.retencion); });
+    return Object.entries(g).map(([t, a]) => { a.sort((p, q) => p - q); const k = Math.floor(a.length / 2); return { t: +t, mediana: a.length % 2 ? a[k] : (a[k - 1] + a[k]) / 2 }; }).sort((a, b) => a.t - b.t);
+  }
+});
+dash.calc('final', {
+  title: 'Retención en el último segundo', description: 'Público que sigue viendo al final de cada vídeo (último punto de la curva).',
+  inputs: ['retencion', 'videos'],
+  fn: (retencion, videos) => {
+    const tit = {}; videos.forEach((v) => { if (v.id) tit[v.id] = v.titulo; });
+    return retencion.filter((r) => r.t === 1).map((r) => ({ num: r.num, id: r.id, titulo: tit[r.id] || r.num, final_pct: Math.round(1000 * r.retencion) / 10 }))
+      .sort((a, b) => b.final_pct - a.final_pct);
+  }
+});
+dash.calc('costes_total', {
+  title: 'Costes totales', description: 'Suma de las estimaciones de coste de todos los guiones.',
+  inputs: ['costes'],
+  fn: (costes) => {
+    const s = (k) => costes.reduce((a, c) => a + (c[k] || 0), 0);
+    return [{ tokens_voz: s('tokens_voz_in') + s('tokens_voz_out'), usd: Math.round(100 * s('usd_voz')) / 100,
+      tokens_guion: s('tokens_guion'), fotogramas: s('fotogramas_3d'), cuota: s('cuota_youtube') }];
+  }
+});
+
+// ---------- pestañas
+(function () {
+  const tabs = document.querySelectorAll('.pc-tab');
+  function open(name) {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    document.querySelectorAll('.pc-sec').forEach((s) => { s.hidden = s.id !== name; });
+    dash.setLink(name);
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => open(t.dataset.tab)));
+  const h = (location.hash || '').slice(1);
+  if (h && document.getElementById(h) && document.getElementById(h).classList.contains('pc-sec')) open(h);
+})();
+
+// ---------- cabecera
+dash.draw('takeaway', (el) => {
+  const c = dash.data('canal'), r = dash.data('resumen'), f = dash.data('por_formato');
+  if (c.status !== 'ok' || r.status !== 'ok' || f.status !== 'ok' || !c.data[0] || !r.data[0]) { el.textContent = '—'; return; }
+  el.classList.remove('dash-skeleton');
+  const best = f.data.filter((x) => x.videos >= 3)[0] || f.data[0];
+  const mk = (txt, src, field, attrs) => { const b = document.createElement('b'); b.textContent = txt; b.dataset.source = src; b.dataset.field = field; Object.entries(attrs || {}).forEach(([k, v]) => b.setAttribute(k, v)); return b; };
+  el.replaceChildren(
+    'El canal tiene ', mk(pc.fmt(c.data[0].suscriptores), 'canal', 'suscriptores', { 'data-row': '0' }), ' suscriptores y ',
+    mk(pc.fmt(r.data[0].publicados), 'resumen', 'publicados', { 'data-row': '0' }), ' vídeos publicados. El formato con más vistas medianas es «',
+    best.formato, '» (', mk(pc.fmt(best.mediana_vistas), 'por_formato', 'mediana_vistas', { 'data-where': 'formato=' + encodeURIComponent(best.formato) }),
+    ' por vídeo). Hay ', mk(pc.fmt(r.data[0].programados), 'resumen', 'programados', { 'data-row': '0' }), ' programados.');
+});
+dash.draw('fecha', (el) => { const c = dash.data('canal'); el.textContent = c.status === 'ok' && c.data[0] ? c.data[0].fecha.replace('T', ' ').slice(0, 16) : '—'; });
+dash.draw('kpi', (el) => { const c = dash.data('canal'); el.textContent = c.status === 'ok' && c.data[0] ? pc.fmt(c.data[0][el.dataset.k]) : '—'; });
+dash.draw('kpi2', (el) => {
+  const r = dash.data('resumen'); if (r.status !== 'ok' || !r.data[0]) { el.textContent = '—'; return; }
+  const v = r.data[0][el.dataset.k]; el.textContent = el.dataset.k === 'mediana_pct' ? pc.fmt1(v) + ' %' : pc.fmt(v);
+});
+dash.draw('sw0', (el) => { el.style.background = dash.colors[0]; });
+
+// ---------- resumen: gráficos
+dash.draw('diario', (el) => {
+  if (pc.failed(el, 'diario')) return;
+  el.classList.remove('dash-skeleton');
+  const parse = d3.utcParse('%Y-%m-%d'), all = dash.data('diario').data, first = all.findIndex((d) => d.views >= 50), rows = all.slice(Math.max(0, first)).map((d) => ({ ...d, date: parse(d.day) }));
+  const w = el.clientWidth || 600, h = 220, m = { t: 10, r: 10, b: 24, l: 44 };
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'img').attr('aria-label', 'Vistas y vistas comprometidas por día');
+  el.replaceChildren(svg.node());
+  const x = d3.scaleBand().domain(rows.map((d) => d.day)).range([m.l, w - m.r]).padding(0.2);
+  const y = d3.scaleLinear().domain([0, d3.max(rows, (d) => d.views) || 1]).nice().range([h - m.b, m.t]);
+  svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(w - m.l - m.r)).tickFormat((v) => pc.short(v))).call((g) => g.select('.domain').remove());
+  const every = Math.ceil(rows.length / Math.max(2, Math.floor((w - m.l) / 70)));
+  svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(d3.axisBottom(x).tickValues(rows.filter((d, i) => i % every === 0).map((d) => d.day)).tickFormat((d) => d3.utcFormat('%d/%m')(parse(d))));
+  svg.append('g').selectAll('rect').data(rows).join('rect').attr('x', (d) => x(d.day)).attr('width', x.bandwidth()).attr('y', (d) => y(d.views)).attr('height', (d) => y(0) - y(d.views)).attr('rx', 2).style('fill', 'var(--cds-chart-muted)');
+  svg.append('g').selectAll('rect').data(rows).join('rect').attr('x', (d) => x(d.day) + x.bandwidth() * 0.2).attr('width', x.bandwidth() * 0.6).attr('y', (d) => y(d.engagedViews || 0)).attr('height', (d) => y(0) - y(d.engagedViews || 0)).attr('rx', 2).style('fill', dash.colors[0]);
+  const tp = pc.tip(el);
+  svg.append('g').selectAll('rect').data(rows).join('rect').attr('x', (d) => x(d.day)).attr('width', x.bandwidth()).attr('y', m.t).attr('height', h - m.t - m.b).style('fill', 'transparent')
+    .on('pointermove', (e, d) => { const [px, py] = d3.pointer(e, el); tp.show([d3.utcFormat('%d/%m/%Y')(d.date), `${pc.fmt(d.views)} vistas`, `${pc.fmt(d.engagedViews)} comprometidas`, `+${pc.fmt(d.subscribersGained)} subs · ${pc.fmt(d.likes)} likes`], px, py); })
+    .on('pointerleave', () => tp.hide());
+});
+dash.draw('formatos', (el) => {
+  if (pc.failed(el, 'por_formato')) return;
+  pc.barsH(el, dash.data('por_formato').data, (d) => `${d.formato} (${d.videos})`, (d) => d.mediana_vistas, pc.fmt);
+});
+const TRAF = { SHORTS: 'Feed de Shorts', YT_SEARCH: 'Búsqueda', YT_CHANNEL: 'Página del canal', YT_OTHER_PAGE: 'Otras páginas de YouTube', EXT_URL: 'Webs externas', SUBSCRIBER: 'Suscripciones', NO_LINK_OTHER: 'Directo', SOUND_PAGE: 'Página del sonido', PLAYLIST: 'Listas', RELATED_VIDEO: 'Vídeos sugeridos' };
+dash.draw('trafico', (el) => {
+  if (pc.failed(el, 'trafico')) return;
+  pc.barsH(el, dash.data('trafico').data, (d) => TRAF[d.insightTrafficSourceType] || d.insightTrafficSourceType, (d) => d.views, pc.short);
+});
+const PAIS = { MX: 'México', AR: 'Argentina', ES: 'España', CO: 'Colombia', CL: 'Chile', PE: 'Perú', EC: 'Ecuador', VE: 'Venezuela', US: 'Estados Unidos', BO: 'Bolivia', GT: 'Guatemala', UY: 'Uruguay', PY: 'Paraguay', DO: 'Rep. Dominicana', CR: 'Costa Rica', HN: 'Honduras', SV: 'El Salvador', PA: 'Panamá', NI: 'Nicaragua' };
+dash.draw('paises', (el) => {
+  if (pc.failed(el, 'paises')) return;
+  pc.barsH(el, dash.data('paises').data, (d) => PAIS[d.country] || d.country, (d) => d.views, pc.short);
+});
+dash.draw('tiktok', (el) => {
+  if (pc.failed(el, 'tiktok')) return;
+  el.classList.remove('dash-skeleton');
+  const rows = dash.data('tiktok').data.map((d) => ({ ...d, date: new Date(d.fecha) })).sort((a, b) => a.date - b.date);
+  const w = el.clientWidth || 400, h = 220, m = { t: 10, r: 10, b: 24, l: 44 };
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'img').attr('aria-label', 'Vistas de cada vídeo de TikTok por fecha');
+  el.replaceChildren(svg.node());
+  const x = d3.scaleUtc().domain(d3.extent(rows, (d) => d.date)).range([m.l + 6, w - m.r - 6]);
+  const y = d3.scaleLinear().domain([0, d3.max(rows, (d) => d.vistas) || 1]).nice().range([h - m.b, m.t]);
+  svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(w - m.l - m.r)).tickFormat((v) => pc.short(v))).call((g) => g.select('.domain').remove());
+  svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(w / 90))).tickFormat(d3.utcFormat('%d/%m')));
+  const tp = pc.tip(el);
+  svg.append('g').selectAll('circle').data(rows).join('circle').attr('cx', (d) => x(d.date)).attr('cy', (d) => y(d.vistas)).attr('r', 5).style('fill', dash.colors[0]).style('fill-opacity', 0.8)
+    .on('pointermove', (e, d) => { const [px, py] = d3.pointer(e, el); tp.show([d3.utcFormat('%d/%m %H:%M')(d.date), `${pc.fmt(d.vistas)} vistas`, `${pc.fmt(d.likes)} likes · ${pc.fmt(d.comentarios)} coment.`], px, py); })
+    .on('pointerleave', () => tp.hide());
+});
+
+// ---------- vídeos: tabla
+window.pcSort = { key: 'publicacion', dir: -1 };
+(function () {
+  document.querySelectorAll('#tabla-videos th[data-sort]').forEach((th) => th.addEventListener('click', () => {
+    const k = th.dataset.sort;
+    window.pcSort = { key: k, dir: window.pcSort.key === k ? -window.pcSort.dir : (['titulo', 'formato', 'estilo', 'estado', 'tiktok', 'num'].includes(k) ? 1 : -1) };
+    document.querySelectorAll('#tabla-videos th[data-sort]').forEach((o) => o.removeAttribute('aria-sort'));
+    th.setAttribute('aria-sort', window.pcSort.dir < 0 ? 'descending' : 'ascending');
+    dash.draw('tabla'); dash.draw('cuenta');
+  }));
+  ['f-buscar', 'f-estado', 'f-estilo'].forEach((id) => { const e = document.getElementById(id); if (e) e.addEventListener('input', () => { dash.draw('tabla'); dash.draw('cuenta'); }); });
+})();
+window.pcFiltered = function () {
+  const d = dash.data('videos'); if (d.status !== 'ok') return [];
+  const q = ((document.getElementById('f-buscar') || {}).value || '').toLowerCase();
+  const es = (document.getElementById('f-estado') || {}).value || '';
+  const st = (document.getElementById('f-estilo') || {}).value || '';
+  const { key, dir } = window.pcSort;
+  return d.data.filter((v) => (!es || v.estado === es) && (!st || v.estilo === st) && (!q || (v.titulo + ' ' + v.guion).toLowerCase().includes(q)))
+    .sort((a, b) => { const x = a[key], y = b[key]; if (x == null && y == null) return 0; if (x == null || x === '') return 1; if (y == null || y === '') return -1; return (x < y ? -1 : x > y ? 1 : 0) * dir; });
+};
+const PILL = { 'Publicado': 'ok', 'Programado': 'warn', 'Renderizado sin subir': 'warn', 'Privado sin programar': 'bad', 'Retirado': '', 'Solo TikTok': '' };
+dash.draw('cuenta', (el) => { const d = dash.data('videos'); el.textContent = d.status === 'ok' ? `${pc.fmt(window.pcFiltered().length)} de ${pc.fmt(d.data.length)} vídeos` : '—'; });
+dash.draw('tabla', (tb) => {
+  const d = dash.data('videos');
+  if (d.status !== 'ok') { tb.replaceChildren(); if (d.status === 'error') { const tr = tb.insertRow(); const td = tr.insertCell(); td.colSpan = 13; td.textContent = 'No se pudieron cargar los vídeos.'; } return; }
+  const fmtDate = (s) => s ? s.slice(0, 16).replace('T', ' ') : '';
+  tb.replaceChildren(...window.pcFiltered().map((v) => {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(v.guion);
+    const cell = (txt, cls) => { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = txt; tr.appendChild(td); return td; };
+    cell(v.num);
+    const t = cell('', 't');
+    if (v.url && /^https:\/\//.test(v.url)) { const a = document.createElement('a'); a.href = v.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = v.titulo; t.appendChild(a); } else t.textContent = v.titulo;
+    cell(v.formato); cell(v.estilo);
+    const e = cell(''); const p = document.createElement('span'); p.className = 'pc-pill ' + (PILL[v.estado] || ''); p.textContent = v.estado; e.appendChild(p);
+    cell(fmtDate(v.publicacion));
+    cell(v.estado === 'Publicado' || v.vistas ? pc.fmt(v.vistas) : '', 'n');
+    cell(v.vph == null ? '' : pc.fmt1(v.vph), 'n');
+    cell(v.pct_visto == null ? '' : pc.fmt1(v.pct_visto), 'n');
+    cell(v.likes_pct == null ? '' : pc.fmt1(v.likes_pct), 'n');
+    cell(v.subs == null ? '' : pc.fmt(v.subs), 'n');
+    cell(v.duracion_s == null ? '' : String(v.duracion_s), 'n');
+    cell(v.tiktok);
+    return tr;
+  }));
+});
+
+// ---------- retención
+window.pcSel = null;
+dash.draw('sel-video', (sel) => {
+  const d = dash.data('videos'), r = dash.data('retencion');
+  if (d.status !== 'ok' || r.status !== 'ok') { sel.replaceChildren(); return; }
+  const have = new Set(r.data.map((x) => x.id));
+  const vids = d.data.filter((v) => have.has(v.id)).sort((a, b) => (b.publicacion || '').localeCompare(a.publicacion || ''));
+  sel.replaceChildren(...vids.map((v) => new Option(`${v.num} · ${v.titulo.replace(/#shorts/i, '').slice(0, 60)}`, v.id)));
+  if (!window.pcSel && vids[0]) window.pcSel = vids[0].id;
+  sel.value = window.pcSel || '';
+  sel.onchange = () => { window.pcSel = sel.value; dash.draw('curva'); dash.draw('curva-nota'); };
+});
+dash.draw('curva', (el) => {
+  if (pc.failed(el, 'retencion')) return;
+  const cm = dash.data('curva_media'); if (cm.status !== 'ok') return;
+  el.classList.remove('dash-skeleton');
+  const id = window.pcSel || (dash.data('retencion').data[0] || {}).id;
+  const rows = dash.data('retencion').data.filter((x) => x.id === id).sort((a, b) => a.t - b.t);
+  const med = cm.data;
+  const w = el.clientWidth || 600, h = 260, m = { t: 10, r: 12, b: 26, l: 44 };
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'img').attr('aria-label', 'Curva de retención del vídeo elegido frente a la mediana del canal');
+  el.replaceChildren(svg.node());
+  const x = d3.scaleLinear().domain([0, 1]).range([m.l, w - m.r]);
+  const y = d3.scaleLinear().domain([0, Math.max(1.2, d3.max(rows, (d) => d.retencion) || 1, d3.max(med, (d) => d.mediana) || 1)]).nice().range([h - m.b, m.t]);
+  svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(w - m.l - m.r)).tickFormat((v) => Math.round(v * 100) + ' %')).call((g) => g.select('.domain').remove());
+  svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(d3.axisBottom(x).ticks(5).tickFormat((v) => Math.round(v * 100) + ' %'));
+  svg.append('line').attr('x1', m.l).attr('x2', w - m.r).attr('y1', y(1)).attr('y2', y(1)).style('stroke', 'var(--cds-chart-reference)');
+  const line = (k) => d3.line().x((d) => x(d.t)).y((d) => y(d[k]));
+  svg.append('path').datum(med).attr('d', line('mediana')).style('fill', 'none').style('stroke', 'var(--cds-chart-muted)').style('stroke-width', 2).style('stroke-dasharray', '5 4');
+  svg.append('path').datum(rows).attr('d', d3.area().x((d) => x(d.t)).y0(y(0)).y1((d) => y(d.retencion))).style('fill', dash.colors[0]).style('fill-opacity', 0.12);
+  svg.append('path').datum(rows).attr('d', line('retencion')).style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+  const last = rows[rows.length - 1];
+  if (last) svg.append('circle').attr('cx', x(last.t)).attr('cy', y(last.retencion)).attr('r', 4).style('fill', dash.colors[0]);
+  const tp = pc.tip(el), dot = svg.append('circle').attr('r', 4).style('fill', dash.colors[0]).attr('opacity', 0);
+  const bis = d3.bisector((d) => d.t).center;
+  svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', w - m.l - m.r).attr('height', h - m.t - m.b).style('fill', 'transparent')
+    .on('pointermove', (e) => { const [px, py] = d3.pointer(e, el); const t = x.invert(px); const d = rows[bis(rows, t)]; const md = med[bis(med, t)]; if (!d) return; dot.attr('cx', x(d.t)).attr('cy', y(d.retencion)).attr('opacity', 1); tp.show([`${Math.round(d.t * 100)} % del vídeo`, `Vídeo: ${pc.fmt1(d.retencion * 100)} %`, `Mediana: ${md ? pc.fmt1(md.mediana * 100) : '—'} %`], px, py); })
+    .on('pointerleave', () => { tp.hide(); dot.attr('opacity', 0); });
+});
+dash.draw('curva-nota', (el) => {
+  const d = dash.data('videos'), r = dash.data('retencion');
+  if (d.status !== 'ok' || r.status !== 'ok') { el.textContent = ''; return; }
+  const id = window.pcSel || (r.data[0] || {}).id; const v = d.data.find((x) => x.id === id);
+  const end = r.data.find((x) => x.id === id && x.t === 1);
+  if (!v) { el.textContent = ''; return; }
+  const b = (txt, field) => { const s = document.createElement('b'); s.textContent = txt; s.dataset.source = 'videos'; s.dataset.field = field; s.dataset.where = 'guion=' + encodeURIComponent(v.guion); return s; };
+  el.replaceChildren('Duración ', b(String(v.duracion_s ?? '—'), 'duracion_s'), ' s · visto de media ', b(pc.fmt1(v.pct_visto), 'pct_visto'), ' % (', b(String(v.segundos_vistos ?? '—'), 'segundos_vistos'), ' s) · ', b(pc.fmt(v.vistas), 'vistas'), ' vistas · llega al final el ', end ? pc.fmt1(end.retencion * 100) : '—', ' %.');
+});
+dash.draw('ret-formato', (el) => {
+  if (pc.failed(el, 'por_formato')) return;
+  pc.barsH(el, dash.data('por_formato').data.filter((d) => d.mediana_pct != null).sort((a, b) => b.mediana_pct - a.mediana_pct), (d) => `${d.formato} (${d.videos})`, (d) => d.mediana_pct, (v) => pc.fmt1(v) + ' %');
+});
+dash.draw('final', (el) => {
+  if (pc.failed(el, 'final')) return;
+  pc.barsH(el, dash.data('final').data.slice(0, 10), (d) => `${d.num} · ${d.titulo.replace(/#shorts/i, '').slice(0, 26)}`, (d) => d.final_pct, (v) => pc.fmt1(v) + ' %');
+});
+
+// ---------- costes
+dash.draw('ct', (el) => {
+  const c = dash.data('costes_total'); if (c.status !== 'ok' || !c.data[0]) { el.textContent = '—'; return; }
+  const v = c.data[0][el.dataset.k]; el.textContent = el.dataset.k === 'usd' ? v.toFixed(2).replace('.', ',') + ' $' : pc.short(v);
+});
+dash.draw('tabla-costes', (tb) => {
+  const d = dash.data('costes'); if (d.status !== 'ok') { tb.replaceChildren(); return; }
+  const rows = d.data.filter((c) => c.cuota_youtube || c.tokens_voz_out || c.fotogramas_3d).sort((a, b) => b.num.localeCompare(a.num));
+  tb.replaceChildren(...rows.map((c) => {
+    const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(c.guion);
+    const cell = (txt, cls) => { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = txt; tr.appendChild(td); };
+    cell(c.guion); cell(c.estilo); cell(c.motor_voz);
+    cell(pc.fmt(c.tokens_guion), 'n'); cell(pc.fmt(c.caracteres_voz), 'n'); cell(pc.fmt1(c.audio_s), 'n');
+    cell(c.tokens_voz_in ? pc.fmt(c.tokens_voz_in) : '', 'n'); cell(c.tokens_voz_out ? pc.fmt(c.tokens_voz_out) : '', 'n');
+    cell(c.fotogramas_3d ? pc.fmt(c.fotogramas_3d) : '', 'n'); cell(c.cuota_youtube ? pc.fmt(c.cuota_youtube) : '', 'n');
+    cell(c.usd_voz ? String(c.usd_voz).replace('.', ',') : '', 'n');
+    return tr;
+  }));
+});
+
+// ---------- estado
+const COLS = ['Renderizado sin subir', 'Programado', 'Privado sin programar', 'Publicado', 'Solo TikTok', 'Retirado'];
+dash.draw('tablero', (el) => {
+  if (pc.failed(el, 'videos')) return;
+  el.classList.remove('dash-skeleton');
+  const vids = dash.data('videos').data;
+  const cols = COLS.filter((c) => vids.some((v) => v.estado === c));
+  el.replaceChildren(...cols.map((c) => {
+    const items = vids.filter((v) => v.estado === c).sort((a, b) => c === 'Programado' ? (a.publicacion || '').localeCompare(b.publicacion || '') : b.num.localeCompare(a.num));
+    const col = document.createElement('div'); col.className = 'pc-col';
+    const h = document.createElement('h3'); const pill = document.createElement('span'); pill.className = 'pc-pill ' + (PILL[c] || ''); pill.textContent = c;
+    const n = document.createElement('span'); n.className = 'pc-muted'; n.textContent = ' ' + items.length;
+    h.append(pill, n); col.appendChild(h);
+    const ul = document.createElement('ul');
+    items.forEach((v) => {
+      const li = document.createElement('li'); const b = document.createElement('b'); b.textContent = v.num + ' ';
+      li.append(b, v.titulo.replace(/#shorts/i, '').trim());
+      const meta = document.createElement('div'); meta.className = 'pc-muted';
+      if (c === 'Programado' && v.publicacion) meta.textContent = 'Sale el ' + v.publicacion.slice(8, 10) + '/' + v.publicacion.slice(5, 7) + ' a las ' + v.publicacion.slice(11, 16) + ' UTC';
+      else if (c === 'Publicado') meta.textContent = pc.fmt(v.vistas) + ' vistas · TikTok: ' + v.tiktok.toLowerCase();
+      else meta.textContent = 'TikTok: ' + v.tiktok.toLowerCase();
+      li.appendChild(meta); ul.appendChild(li);
+    });
+    col.appendChild(ul); return col;
+  }));
+});
+
+// ---------- mejoras
+const ORDEN = { Alta: 0, Media: 1, Baja: 2, '-': 3 };
+const IMP = { Alta: 'ok', Media: 'warn', Baja: '' };
+dash.draw('ideas', (el) => {
+  if (pc.failed(el, 'ideas')) return;
+  el.classList.remove('dash-skeleton');
+  const rows = dash.data('ideas').data.slice().sort((a, b) => (ORDEN[a.impacto] ?? 3) - (ORDEN[b.impacto] ?? 3));
+  el.replaceChildren(...rows.map((x) => {
+    const c = document.createElement('article'); c.className = 'pc-idea';
+    const chips = document.createElement('div'); chips.className = 'pc-chips';
+    const chip = (t, cls) => { const s = document.createElement('span'); s.className = 'pc-pill ' + (cls || ''); s.textContent = t; chips.appendChild(s); };
+    chip(x.area);
+    if (x.impacto !== '-') chip('Impacto ' + x.impacto.toLowerCase(), IMP[x.impacto]);
+    if (x.esfuerzo !== '-') chip('Esfuerzo ' + x.esfuerzo.toLowerCase());
+    chip(x.estado, x.estado === 'Aprobada' ? 'ok' : '');
+    const h = document.createElement('h3'); h.textContent = x.idea;
+    const p = document.createElement('p'); p.textContent = x.por_que;
+    const o = document.createElement('span'); o.className = 'pc-muted'; o.textContent = x.origen;
+    c.append(chips, h, p, o); return c;
+  }));
+});
+
+// ---------- vídeos: tarjetas y detalle
+(function () {
+  document.querySelectorAll('.pc-segb').forEach((b) => b.addEventListener('click', () => {
+    const v = b.dataset.vista;
+    document.querySelectorAll('.pc-segb').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    const t = document.getElementById('vista-tarjetas'), l = document.getElementById('vista-lista');
+    if (t) t.hidden = v !== 'tarjetas';
+    if (l) l.hidden = v !== 'lista';
+    dash.draw('tarjetas'); dash.draw('tabla');
+  }));
+  const o = document.getElementById('f-orden');
+  if (o) o.addEventListener('change', () => { const [k, d] = o.value.split(':'); window.pcSort = { key: k, dir: +d }; dash.draw('tarjetas'); dash.draw('tabla'); });
+  ['f-buscar', 'f-estado', 'f-estilo'].forEach((id) => { const e = document.getElementById(id); if (e) e.addEventListener('input', () => dash.draw('tarjetas')); });
+  const m = document.getElementById('detalle');
+  const close = () => { if (m) m.hidden = true; };
+  const c = document.getElementById('cerrar-detalle'); if (c) c.addEventListener('click', close);
+  if (m) m.addEventListener('click', (e) => { if (e.target === m) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();
+window.pcOpen = function (guion) {
+  window.pcDet = guion;
+  const m = document.getElementById('detalle'); if (!m) return;
+  m.hidden = false; dash.draw('detalle');
+};
+window.pcMedians = function () {
+  const d = dash.data('videos'); if (d.status !== 'ok') return {};
+  const pub = d.data.filter((v) => v.estado === 'Publicado');
+  const young = pub.filter((v) => v.edad_h >= 24 && v.edad_h <= 96);
+  return { vistas: pc.med(pub.map((v) => v.vistas)), vph: pc.med(young.map((v) => v.vph)), pct_visto: pc.med(pub.map((v) => v.pct_visto)),
+    likes_pct: pc.med(pub.map((v) => v.likes_pct)), subs: pc.med(pub.map((v) => v.subs)) };
+};
+const NIVEL = { alta: 'bad', media: 'warn', baja: '', bien: 'ok', info: 'info' };
+const NIVEL_TXT = { alta: 'Prioridad alta', media: 'Mejorable', baja: 'Detalle', bien: 'Funciona', info: 'Info' };
+function pcThumb(v, big) {
+  const box = document.createElement('div'); box.className = 'pc-thumb';
+  if (v.miniatura && /^https:\/\//.test(v.miniatura)) { const img = document.createElement('img'); img.src = v.miniatura; img.alt = ''; img.loading = 'lazy'; img.onerror = () => { const n = document.createElement('div'); n.className = 'pc-noimg'; n.textContent = 'Sin miniatura'; img.replaceWith(n); }; box.appendChild(img); }
+  else { const n = document.createElement('div'); n.className = 'pc-noimg'; n.textContent = v.estado === 'Solo TikTok' ? 'Solo en TikTok' : 'Sin miniatura'; box.appendChild(n); }
+  if (!big) {
+    const p = document.createElement('span'); p.className = 'pc-pill'; p.textContent = v.estado; box.appendChild(p);
+    if (v.duracion_s) { const d = document.createElement('span'); d.className = 'pc-dur'; d.textContent = v.duracion_s + ' s'; box.appendChild(d); }
+    if (v.num && v.num !== '—') { const n = document.createElement('span'); n.className = 'pc-num'; n.textContent = '#' + v.num; box.appendChild(n); }
+  }
+  return box;
+}
+function pcRetLine(el, id, h, axes) {
+  const r = dash.data('retencion'), cm = dash.data('curva_media');
+  el.replaceChildren();
+  if (r.status !== 'ok' || cm.status !== 'ok') return false;
+  const rows = r.data.filter((x) => x.id === id).sort((a, b) => a.t - b.t);
+  if (!rows.length) return false;
+  const w = el.clientWidth || 220, m = axes ? { t: 8, r: 10, b: 22, l: 40 } : { t: 2, r: 2, b: 2, l: 2 };
+  const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${h}`).attr('height', h).attr('role', 'img').attr('aria-label', 'Curva de retención');
+  el.appendChild(svg.node());
+  const ymax = Math.max(1.2, d3.max(rows, (d) => d.retencion), d3.max(cm.data, (d) => d.mediana));
+  const x = d3.scaleLinear().domain([0, 1]).range([m.l, w - m.r]), y = d3.scaleLinear().domain([0, ymax]).nice().range([h - m.b, m.t]);
+  if (axes) {
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(w - m.l - m.r)).tickFormat((v) => Math.round(v * 100) + ' %')).call((g) => g.select('.domain').remove());
+    svg.append('g').attr('transform', `translate(0,${h - m.b})`).call(d3.axisBottom(x).ticks(4).tickFormat((v) => Math.round(v * 100) + ' %'));
+  }
+  const line = (k) => d3.line().x((d) => x(d.t)).y((d) => y(d[k]));
+  svg.append('path').datum(cm.data).attr('d', line('mediana')).style('fill', 'none').style('stroke', 'var(--cds-chart-muted)').style('stroke-width', 1.5).style('stroke-dasharray', '4 3');
+  svg.append('path').datum(rows).attr('d', d3.area().x((d) => x(d.t)).y0(y(0)).y1((d) => y(d.retencion))).style('fill', dash.colors[0]).style('fill-opacity', 0.12);
+  svg.append('path').datum(rows).attr('d', line('retencion')).style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+  return true;
+}
+dash.draw('tarjetas', (el) => {
+  const d = dash.data('videos');
+  if (d.status !== 'ok') { el.replaceChildren(); return; }
+  const rows = window.pcFiltered();
+  el.replaceChildren(...rows.map((v) => {
+    const c = document.createElement('button'); c.type = 'button'; c.className = 'pc-vc';
+    c.addEventListener('click', () => window.pcOpen(v.guion));
+    c.appendChild(pcThumb(v));
+    const b = document.createElement('div'); b.className = 'pc-vbody';
+    const t = document.createElement('div'); t.className = 'pc-vt'; t.textContent = v.titulo.replace(/#shorts/ig, '').trim(); b.appendChild(t);
+    if (v.estado === 'Publicado') {
+      const m = document.createElement('div'); m.className = 'pc-vm';
+      [[pc.short(v.vistas), 'vistas'], [v.vph == null ? '—' : pc.fmt(v.vph), 'vistas/h'], [v.pct_visto == null ? '—' : pc.fmt(v.pct_visto) + ' %', 'visto']].forEach(([a, l]) => {
+        const x = document.createElement('div'); const bb = document.createElement('b'); bb.textContent = a; const s = document.createElement('span'); s.textContent = l; x.append(bb, s); m.appendChild(x);
+      });
+      b.appendChild(m);
+      const sp = document.createElement('div'); sp.className = 'pc-spark'; b.appendChild(sp);
+      requestAnimationFrame(() => { if (!pcRetLine(sp, v.id, 34, false)) { sp.textContent = 'Retención: pendiente de Analytics'; sp.className = 'pc-muted'; } });
+    } else if (v.estado === 'Programado' && v.publicacion) {
+      const s = document.createElement('div'); s.className = 'pc-muted';
+      s.textContent = 'Sale el ' + v.publicacion.slice(8, 10) + '/' + v.publicacion.slice(5, 7) + ' a las ' + v.publicacion.slice(11, 16) + ' UTC'; b.appendChild(s);
+    }
+    const chips = document.createElement('div'); chips.className = 'pc-chips';
+    const mej = (v.mejoras || []);
+    const worst = ['alta', 'media', 'baja'].find((n) => mej.some((x) => x.nivel === n));
+    if (v.mejoras_n) { const p = document.createElement('span'); p.className = 'pc-pill ' + (NIVEL[worst] || ''); p.textContent = v.mejoras_n + (v.mejoras_n === 1 ? ' mejora' : ' mejoras'); chips.appendChild(p); }
+    const good = mej.filter((x) => x.nivel === 'bien').length;
+    if (good) { const p = document.createElement('span'); p.className = 'pc-pill ok'; p.textContent = good + ' funciona'; chips.appendChild(p); }
+    if (v.formato && v.formato !== '?' && v.formato !== '-') { const p = document.createElement('span'); p.className = 'pc-pill'; p.textContent = v.formato + ' · ' + v.estilo; chips.appendChild(p); }
+    b.appendChild(chips);
+    c.appendChild(b);
+    return c;
+  }));
+});
+dash.draw('detalle', (el) => {
+  const d = dash.data('videos');
+  const v = d.status === 'ok' ? d.data.find((x) => x.guion === window.pcDet) : null;
+  if (!v) { el.replaceChildren(); return; }
+  const med = window.pcMedians();
+  const wrap = document.createElement('div'); wrap.className = 'pc-det';
+  const left = document.createElement('div'); left.style.display = 'flex'; left.style.flexDirection = 'column'; left.style.gap = '10px';
+  left.appendChild(pcThumb(v, true));
+  if (v.url && /^https:\/\//.test(v.url)) { const a = document.createElement('a'); a.href = v.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Abrir en YouTube ↗'; a.className = 'pc-btn2'; a.style.textAlign = 'center'; a.style.textDecoration = 'none'; left.appendChild(a); }
+  const meta = document.createElement('div'); meta.className = 'pc-muted';
+  meta.textContent = [v.num !== '—' ? '#' + v.num : '', v.formato, v.estilo, v.experimento !== '-' ? v.experimento : '', v.duracion_s ? v.duracion_s + ' s' : '', 'TikTok: ' + v.tiktok].filter(Boolean).join(' · ');
+  left.appendChild(meta);
+  const right = document.createElement('div'); right.style.display = 'flex'; right.style.flexDirection = 'column'; right.style.gap = '16px'; right.style.minWidth = '0';
+  const h = document.createElement('h2'); h.textContent = v.titulo.replace(/#shorts/ig, '').trim(); right.appendChild(h);
+  const sub = document.createElement('div'); sub.className = 'pc-chips';
+  const p = document.createElement('span'); p.className = 'pc-pill ' + (PILL[v.estado] || ''); p.textContent = v.estado; sub.appendChild(p);
+  if (v.publicacion) { const q = document.createElement('span'); q.className = 'pc-muted'; q.textContent = (v.estado === 'Programado' ? 'Sale el ' : 'Publicado el ') + v.publicacion.slice(0, 16).replace('T', ' ') + ' UTC'; sub.appendChild(q); }
+  right.appendChild(sub);
+  if (v.estado === 'Publicado') {
+    const k = document.createElement('div'); k.className = 'pc-kpis';
+    const kpi = (label, val, key, fmtv) => {
+      const x = document.createElement('div'); x.className = 'pc-kpi';
+      const b = document.createElement('b'); b.textContent = val == null ? '—' : fmtv(val);
+      const s = document.createElement('span'); s.textContent = label;
+      x.append(b, s);
+      const m = med[key];
+      if (val != null && m) { const dd = document.createElement('span'); const r = (val / m - 1) * 100; dd.className = r >= 0 ? 'up' : 'down'; dd.textContent = (r >= 0 ? '+' : '') + Math.round(r) + ' % vs mediana'; x.appendChild(dd); }
+      k.appendChild(x);
+    };
+    kpi('Vistas', v.vistas, 'vistas', pc.fmt);
+    kpi('Vistas/h', v.vph, 'vph', pc.fmt1);
+    kpi('% visto', v.pct_visto, 'pct_visto', (x) => pc.fmt1(x) + ' %');
+    kpi('% likes', v.likes_pct, 'likes_pct', (x) => pc.fmt1(x) + ' %');
+    kpi('Suscriptores', v.subs, 'subs', pc.fmt);
+    kpi('Comentarios', v.comentarios, null, pc.fmt);
+    right.appendChild(k);
+    const rt = document.createElement('div');
+    const rh = document.createElement('h3'); rh.textContent = 'Retención'; rt.appendChild(rh);
+    const leg = document.createElement('div'); leg.className = 'pc-legend';
+    const l1 = document.createElement('span'); const i1 = document.createElement('i'); i1.style.background = dash.colors[0]; l1.append(i1, 'Este vídeo');
+    const l2 = document.createElement('span'); const i2 = document.createElement('i'); i2.className = 'dash'; l2.append(i2, 'Mediana del canal');
+    leg.append(l1, l2); rt.appendChild(leg);
+    const ch = document.createElement('div'); ch.className = 'pc-chart'; ch.style.minHeight = '180px'; rt.appendChild(ch);
+    right.appendChild(rt);
+    requestAnimationFrame(() => { if (!pcRetLine(ch, v.id, 180, true)) { ch.style.minHeight = ''; ch.textContent = 'YouTube Analytics aún no tiene la curva de este vídeo (tarda 2-3 días).'; ch.className = 'pc-muted'; } });
+    const hist = dash.data('historial');
+    const pts = hist.status === 'ok' ? hist.data.filter((x) => x.id === v.id).map((x) => ({ ...x, date: new Date(x.t) })).sort((a, b) => a.date - b.date) : [];
+    if (pts.length >= 2) {
+      const gh = document.createElement('h3'); gh.textContent = 'Vistas en cada actualización'; right.appendChild(gh);
+      const gc = document.createElement('div'); gc.className = 'pc-chart'; gc.style.minHeight = '150px'; right.appendChild(gc);
+      requestAnimationFrame(() => {
+        const w = gc.clientWidth || 500, hh = 150, m = { t: 8, r: 10, b: 22, l: 48 };
+        const svg = d3.create('svg').attr('viewBox', `0 0 ${w} ${hh}`).attr('height', hh).attr('role', 'img').attr('aria-label', 'Vistas acumuladas');
+        gc.replaceChildren(svg.node());
+        const x = d3.scaleUtc().domain(d3.extent(pts, (p) => p.date)).range([m.l, w - m.r]);
+        const y = d3.scaleLinear().domain([d3.min(pts, (p) => p.vistas) * 0.98, d3.max(pts, (p) => p.vistas)]).nice().range([hh - m.b, m.t]);
+        svg.append('g').attr('class', 'grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(3).tickSize(-(w - m.l - m.r)).tickFormat(pc.short)).call((g) => g.select('.domain').remove());
+        svg.append('g').attr('transform', `translate(0,${hh - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(w / 110))).tickFormat(d3.utcFormat('%d/%m %H:%M')));
+        svg.append('path').datum(pts).attr('d', d3.line().x((p) => x(p.date)).y((p) => y(p.vistas))).style('fill', 'none').style('stroke', dash.colors[0]).style('stroke-width', 2);
+        svg.append('g').selectAll('circle').data(pts).join('circle').attr('cx', (p) => x(p.date)).attr('cy', (p) => y(p.vistas)).attr('r', 3).style('fill', dash.colors[0]);
+      });
+    }
+  }
+  const mh = document.createElement('h3'); mh.textContent = 'Mejoras para este vídeo'; right.appendChild(mh);
+  const ul = document.createElement('ul'); ul.className = 'pc-mej';
+  const order = { alta: 0, media: 1, baja: 2, bien: 3, info: 4 };
+  const mej = (v.mejoras || []).slice().sort((a, b) => order[a.nivel] - order[b.nivel]);
+  if (!mej.length) { const li = document.createElement('li'); li.dataset.n = 'info'; li.append(Object.assign(document.createElement('b'), { textContent: 'Info' }), 'Sin sugerencias para este vídeo.'); ul.appendChild(li); }
+  mej.forEach((x) => {
+    const li = document.createElement('li'); li.dataset.n = x.nivel;
+    const tag = document.createElement('div');
+    const b = document.createElement('b'); b.textContent = x.tema; b.style.display = 'block';
+    const s = document.createElement('span'); s.className = 'pc-pill ' + (NIVEL[x.nivel] || ''); s.textContent = NIVEL_TXT[x.nivel] || x.nivel; s.style.fontSize = '10px';
+    tag.append(b, s);
+    const t = document.createElement('div'); t.textContent = x.texto;
+    li.append(tag, t); ul.appendChild(li);
+  });
+  right.appendChild(ul);
+  wrap.append(left, right);
+  el.replaceChildren(wrap);
+});
+
+// ---------- ideas de fuera
+dash.draw('fuera-fecha', (el) => { const f = window.pcExternasFecha; el.textContent = f ? 'Última búsqueda: ' + f.replace('T', ' ').slice(0, 16) + ' UTC.' : 'Aún no se ha buscado ninguna vez.'; });
+dash.draw('externas', (el) => {
+  const d = dash.data('externas');
+  if (d.status !== 'ok') { el.replaceChildren(); return; }
+  if (!d.data.length) { el.replaceChildren(Object.assign(document.createElement('p'), { className: 'pc-muted', textContent: 'Todavía no hay ideas. Pulsa «Buscar ideas ahora».' })); return; }
+  const last = d.data[0].encontrada;
+  el.replaceChildren(...d.data.map((x) => {
+    const c = document.createElement('article'); c.className = 'pc-xc';
+    const a = document.createElement('a'); if (/^https:\/\//.test(x.url)) { a.href = x.url; a.target = '_blank'; a.rel = 'noopener'; }
+    a.appendChild(pcThumb({ miniatura: x.miniatura, estado: '' }, true)); c.appendChild(a);
+    const b = document.createElement('div'); b.style.display = 'flex'; b.style.flexDirection = 'column'; b.style.gap = '6px'; b.style.minWidth = '0';
+    const chips = document.createElement('div'); chips.className = 'pc-chips';
+    if (x.encontrada === last) { const n = document.createElement('span'); n.className = 'pc-pill pc-new'; n.textContent = 'Nueva'; chips.appendChild(n); }
+    if (x.formato) { const f = document.createElement('span'); f.className = 'pc-pill'; f.textContent = x.formato; chips.appendChild(f); }
+    if (x.veces_media) { const f = document.createElement('span'); f.className = 'pc-pill ok'; f.textContent = pc.fmt1(x.veces_media) + '× su media'; chips.appendChild(f); }
+    b.appendChild(chips);
+    const h = document.createElement('h3'); h.textContent = x.titulo; b.appendChild(h);
+    const m = document.createElement('div'); m.className = 'pc-muted'; m.textContent = `${x.canal} · ${pc.short(x.vistas)} vistas · ${pc.fmt(x.vph)} vistas/h · ${x.duracion_s} s`; b.appendChild(m);
+    if (x.por_que) { const p = document.createElement('p'); const s = document.createElement('b'); s.textContent = 'Por qué funciona: '; p.append(s, x.por_que); b.appendChild(p); }
+    if (x.idea) {
+      const box = document.createElement('div'); box.className = 'pc-idea-box';
+      const s = document.createElement('b'); s.textContent = 'Idea para DatoCrack'; s.style.display = 'block';
+      const p = document.createElement('p'); p.textContent = x.idea;
+      box.append(s, p);
+      if (x.titulo_propuesto) { const t = document.createElement('p'); t.className = 'pc-muted'; t.textContent = 'Título: «' + x.titulo_propuesto + '»'; box.appendChild(t); }
+      b.appendChild(box);
+    }
+    c.appendChild(b); return c;
+  }));
+});
+(function () {
+  const b = document.getElementById('buscar-ideas'); if (!b) return;
+  b.addEventListener('click', async () => {
+    if (!window.pcBuscarIdeas) return;
+    b.disabled = true; const t = b.textContent; b.textContent = 'Buscando… (≈1 min)';
+    try { await window.pcBuscarIdeas(); } finally { b.disabled = false; b.textContent = t; }
+  });
+})();
+</script>

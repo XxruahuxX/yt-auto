@@ -9,6 +9,7 @@ Credenciales en /mnt/project-files/yt-auto/secrets/ (tiktok.env, tiktok_token.js
 from __future__ import annotations
 
 import json
+import os
 import secrets as _sec
 import sys
 import time
@@ -17,7 +18,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
 
-SECRETS = Path("/mnt/project-files/yt-auto/secrets")
+SECRETS = Path(os.environ.get("YT_SECRETS_DIR", "/mnt/project-files/yt-auto/secrets"))
 ENV = SECRETS / "tiktok.env"
 TOKEN = SECRETS / "tiktok_token.json"
 LOG = Path("data/tiktok_uploads.json")
@@ -27,7 +28,7 @@ API = "https://open.tiktokapis.com/v2"
 
 
 def creds() -> tuple[str, str]:
-    kv = dict(l.split("=", 1) for l in ENV.read_text().split() if "=" in l)
+    kv = dict(l.split("=", 1) for l in ENV.read_text(encoding="utf-8").split() if "=" in l)
     return kv["TIKTOK_CLIENT_KEY"], kv["TIKTOK_CLIENT_SECRET"]
 
 
@@ -42,7 +43,7 @@ def _save(tok: dict) -> dict:
     if "access_token" not in tok:
         raise SystemExit(f"Error de TikTok: {tok}")
     tok["obtained_at"] = int(time.time())
-    TOKEN.write_text(json.dumps(tok, indent=2))
+    TOKEN.write_text(json.dumps(tok, indent=2), encoding="utf-8")
     TOKEN.chmod(0o600)
     return tok
 
@@ -57,7 +58,7 @@ def exchange(redirected: str) -> dict:
 
 
 def access_token() -> str:
-    tok = json.loads(TOKEN.read_text())
+    tok = json.loads(TOKEN.read_text(encoding="utf-8"))
     if time.time() > tok["obtained_at"] + tok.get("expires_in", 86400) - 300:
         key, sec = creds()
         r = requests.post(f"{API}/oauth/token/", data={
@@ -145,7 +146,7 @@ def _title(stem: str) -> str:
     if not g.exists():
         return ""
     import yaml
-    d = yaml.safe_load(g.read_text())
+    d = yaml.safe_load(g.read_text(encoding="utf-8"))
     tags = " ".join("#" + t.replace(" ", "") for t in (d.get("tags") or [])[:5])
     return f"{d.get('title', '')} {tags} #futbol #datocrack".strip()
 
@@ -173,7 +174,7 @@ def main(argv: list[str]) -> None:
         tok = exchange(argv[1])
         print("Token guardado. open_id:", tok.get("open_id"))
     elif cmd == "upload":
-        log = json.loads(LOG.read_text()) if LOG.exists() else {}
+        log = json.loads(LOG.read_text(encoding="utf-8")) if LOG.exists() else {}
         for f in argv[1:]:
             p = Path(f)
             if p.stem in log:
@@ -181,7 +182,7 @@ def main(argv: list[str]) -> None:
             pid, modo = upload(p, _title(p.stem))
             log[p.stem] = {"publish_id": pid, "modo": modo, "at": int(time.time())}
             LOG.parent.mkdir(exist_ok=True)
-            LOG.write_text(json.dumps(log, indent=2))
+            LOG.write_text(json.dumps(log, indent=2), encoding="utf-8")
             print(p.stem, "->", modo, pid)
     elif cmd == "stats":
         stats()

@@ -189,7 +189,7 @@ def _save(x: np.ndarray, out: Path) -> float:
         return w.getnframes() / w.getframerate()
 
 
-CACHE = Path(os.environ.get("GEMINI_CACHE", "/mnt/project-files/yt-auto/voces/cache"))
+CACHE = Path(os.environ.get("GEMINI_CACHE") or Path(os.environ.get("YT_PROJECT_DIR", "/mnt/project-files/yt-auto")) / "voces" / "cache")
 
 
 def _cfg(style: str | None, voice: str | None) -> tuple[str, str]:

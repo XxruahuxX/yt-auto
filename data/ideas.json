@@ -1,0 +1,137 @@
+[
+ {
+  "idea": "Cierre en bucle en todos los Shorts",
+  "area": "Retención",
+  "impacto": "Alta",
+  "esfuerzo": "Baja",
+  "por_que": "El 044 (final que enlaza con el principio) retiene al 79 % del público en el último segundo y supera el 100 % de visionado medio. La mediana del canal en el último segundo es del 32 %.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Publicar los borradores de TikTok automáticamente",
+  "area": "Distribución",
+  "impacto": "Alta",
+  "esfuerzo": "Media",
+  "por_que": "Se han enviado 44 vídeos a TikTok (40 como borrador) y la cuenta tiene 28 publicados: al menos 16 se quedaron sin publicar. El token ya tiene el permiso video.publish; falta usar la publicación directa en tiktok.py.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Playlist y vídeo relacionado para «La Concentración»",
+  "area": "Crecimiento",
+  "impacto": "Alta",
+  "esfuerzo": "Baja",
+  "por_que": "Enlazar cada capítulo con el siguiente (campo «vídeo relacionado» de Shorts) y crear una playlist de la serie para que el espectador encadene capítulos.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Registrar el coste real de cada paso",
+  "area": "Costes",
+  "impacto": "Media",
+  "esfuerzo": "Baja",
+  "por_que": "Guardar en data/costes.jsonl el usageMetadata de cada petición a Gemini y los tokens de cada sesión de guion. Hoy el panel estima la voz por caracteres y segundos de audio, y el guion solo por el tamaño del YAML.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Actualizar el panel cada día con una tarea programada",
+  "area": "Automatización",
+  "impacto": "Media",
+  "esfuerzo": "Baja",
+  "por_que": "Ejecutar python -m ytauto.panel cada mañana y subir los ficheros al panel, para no depender de hacerlo a mano.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Alertas de vídeos que se quedan atrás",
+  "area": "Automatización",
+  "impacto": "Media",
+  "esfuerzo": "Media",
+  "por_que": "Avisar si un vídeo publicado va por debajo de la mitad de las vistas/hora medianas a las 24 h, o si uno queda privado sin fecha de publicación.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Pregunta fijada en comentarios",
+  "area": "Comunidad",
+  "impacto": "Media",
+  "esfuerzo": "Baja",
+  "por_que": "Casi todos los vídeos tienen 0-1 comentarios. Un comentario fijado con una pregunta (¿quién ganaría?, ¿lo sabías?) da señal de interacción al algoritmo.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Pedir la suscripción en los retos y la serie",
+  "area": "Crecimiento",
+  "impacto": "Media",
+  "esfuerzo": "Baja",
+  "por_que": "Los retos «encuéntralo» suman 9-11 suscriptores por vídeo; los de dato y quiz, 0-2. Poner el «sígueme para el capítulo siguiente» donde ya funciona.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Horario pensado para Latinoamérica",
+  "area": "Distribución",
+  "impacto": "Baja",
+  "esfuerzo": "Baja",
+  "por_que": "México y Argentina dan el doble de vistas que España. Las 21:00 de España son las 14:00 en México y las 17:00 en Argentina; probar un hueco a las 02:00 UTC (20:00 en México).",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Probar títulos con «Probar y comparar» de YouTube Studio",
+  "area": "Crecimiento",
+  "impacto": "Baja",
+  "esfuerzo": "Baja",
+  "por_que": "Permite probar hasta 3 títulos por vídeo. Útil para decidir entre gancho con pregunta o con afirmación, que está en la cola de experimentos.",
+  "estado": "Propuesta",
+  "origen": "Claude, con los datos del 27-nov"
+ },
+ {
+  "idea": "Movimientos de la mascota",
+  "area": "Diseño",
+  "impacto": "-",
+  "esfuerzo": "-",
+  "por_que": "Primer repertorio de gestos: piensa con un «?», salta y celebra con «¡DATO!» y chuta el balón.",
+  "estado": "Aprobada",
+  "origen": "Oficina de diseño, 2026-11-15"
+ },
+ {
+  "idea": "Contador de dato clave",
+  "area": "Diseño",
+  "impacto": "-",
+  "esfuerzo": "-",
+  "por_que": "Para los vídeos de datos: el número clave sube de 0 a su valor con un anillo que se llena y una barra que lo desglosa (ej. 32 = 12 + 20). Fija el dato en la memoria del espectador.",
+  "estado": "Aprobada",
+  "origen": "Oficina de diseño, 2026-11-19"
+ },
+ {
+  "idea": "Mascota más natural",
+  "area": "Diseño",
+  "impacto": "-",
+  "esfuerzo": "-",
+  "por_que": "Ojos que parpadean y miran, respiración, cambio de peso con los pies clavados, brazos y cabeza con inercia y 9 gestos nuevos (asiente, niega, encoge hombros, se rasca, sorpresa, se ríe, aplaude, impaciente, salto con carga y aterrizaje).",
+  "estado": "Aprobada",
+  "origen": "Oficina de diseño, 2026-11-19"
+ },
+ {
+  "idea": "Impactos de cómic",
+  "area": "Diseño",
+  "impacto": "-",
+  "esfuerzo": "-",
+  "por_que": "En los golpes fuertes: «¡PAM!» con líneas de velocidad al chutar y «¡PUM!» con polvo cuando el portero cae. Se quedan fijos en su sitio, duran menos de 1 s y no tapan a nadie. Uno o dos por vídeo como máximo.",
+  "estado": "Pendiente",
+  "origen": "Oficina de diseño, 2026-11-23"
+ },
+ {
+  "idea": "«SUPERTIRO»: efectos de anime en 3D",
+  "area": "Diseño",
+  "impacto": "-",
+  "esfuerzo": "-",
+  "por_que": "Kit de efectos para el 3D: aura con llamas y ojos que brillan, estela de energía en el balón, mano gigante del portero, ondas expansivas, líneas de velocidad y rótulo con el nombre de la técnica. Base para el vídeo «equipo de anime contra equipo normal».",
+  "estado": "Pendiente",
+  "origen": "Oficina de diseño, 2026-11-26"
+ }
+]

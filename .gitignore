@@ -2,6 +2,7 @@
 data/*
 !data/uploads.json
 !data/tiktok_uploads.json
+!data/ideas.json
 reports/*
 !reports/experimentos.md
 !reports/own_*.md
@@ -12,3 +13,4 @@ token*.json
 models/
 videos/
 mt/
+secrets/

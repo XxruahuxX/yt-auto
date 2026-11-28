@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DatoCrack · Panel</title>
+<style>
+/* Tokens del panel: claro por defecto, oscuro si el sistema lo pide. */
+:root {
+  --color-fg: #1b1d22; --color-fg-muted: #5f6470; --color-bg: #ffffff; --color-panel: #f6f7f9;
+  --color-border-line: #e1e4ea; --color-ok: #1a7f37; --color-warn: #b35c00; --color-bad: #c62828;
+  --accent: #2563eb;
+  --cds-chart-muted: #b8bec9; --cds-chart-grid: #eceef2; --cds-chart-axis: #c9ced8; --cds-chart-reference: #8a919e;
+  --cds-text-secondary: #5f6470; --cds-surface-popover: #ffffff; --cds-border: #d5d9e0;
+  --cds-shadow-popover: 0 4px 16px rgba(20, 24, 33, .12);
+  --font-anthropic-sans: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  --font-anthropic-serif: Georgia, "Times New Roman", serif;
+  --cds-font-size-caption: 12px; --cds-font-size-body: 14px; --cds-font-size-heading: 17px; --cds-font-size-title: 28px;
+  --cds-font-weight-medium: 600;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 12px; --cds-gap-lg: 20px; --cds-gap-xl: 32px;
+  --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 16px; --cds-pad-xl: 24px;
+  --cds-radius: 8px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-fg: #e8eaee; --color-fg-muted: #9aa1ad; --color-bg: #121418; --color-panel: #1b1e24;
+    --color-border-line: #2c3039; --color-ok: #4cc26b; --color-warn: #f0a35a; --color-bad: #ff6b6b;
+    --accent: #6b9cff;
+    --cds-chart-muted: #4a505c; --cds-chart-grid: #262a32; --cds-chart-axis: #3a3f4a; --cds-chart-reference: #7b8290;
+    --cds-text-secondary: #9aa1ad; --cds-surface-popover: #22262e; --cds-border: #353a45;
+    --cds-shadow-popover: 0 4px 16px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.4 var(--font-anthropic-sans); }
+.app-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: var(--cds-gap-md); padding: 10px 24px; background: var(--color-bg); border-bottom: 1px solid var(--color-border-line); }
+.app-bar .app-estado { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); flex: 1; min-width: 0; }
+.app-bar .app-estado.err { color: var(--color-bad); }
+.app-btn { font: inherit; padding: 6px 14px; border-radius: var(--cds-radius); border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+.app-btn:disabled { opacity: .6; cursor: progress; }
+.app-btn:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+#dash-root { padding: 20px 24px 40px; max-width: 1400px; margin: 0 auto; }
+.dash-select { font: inherit; padding: 6px 10px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background-color: var(--color-bg); color: var(--color-fg); max-width: 100%; }
+.dash-skeleton { position: relative; color: transparent !important; }
+.dash-skeleton:empty::after, .dash-skeleton::after { content: ""; position: absolute; inset: 0; border-radius: 6px; background: var(--color-panel); }
+@media (max-width: 600px) { .app-bar, #dash-root { padding-left: 16px; padding-right: 16px; } }
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <button class="app-btn" id="actualizar" type="button">Actualizar</button>
+  <span class="app-estado" id="estado">Cargando datos guardados…</span>
+</div>
+<div id="dash-root"></div>
+
+<script src="d3.min.js"></script>
+<script>
+// Versión mínima de la API «dash» que usa panel.html, para que el mismo panel funcione en la app.
+(function () {
+  const store = {}, calcs = {}, draws = {};
+  let error = null;
+  const run = (name) => {
+    const f = draws[name]; if (!f) return;
+    document.querySelectorAll(`[data-draw="${name}"]`).forEach((el) => {
+      if (el.closest('[hidden]')) return;
+      try { f(el); } catch (e) { console.error('drawing', name, e); }
+    });
+  };
+  window.dash = {
+    colors: ['var(--accent)', 'var(--color-warn)', 'var(--color-ok)'],
+    data(id) {
+      if (calcs[id]) {
+        const c = calcs[id], ins = c.inputs.map((i) => dash.data(i));
+        if (ins.some((x) => x.status !== 'ok')) return { status: ins.find((x) => x.status !== 'ok').status, data: null };
+        try { return { status: 'ok', data: c.fn(...ins.map((x) => x.data)) }; } catch (e) { console.error('calc', id, e); return { status: 'error', data: null }; }
+      }
+      if (store[id]) return { status: 'ok', data: store[id] };
+      return { status: error ? 'error' : 'loading', data: [] };
+    },
+    calc(id, o) { calcs[id] = o; },
+    loader() {}, onData() {}, setLink(name) { try { history.replaceState(null, '', '#' + name); } catch (e) {} },
+    params() { return {}; }, setParams() {}, resetParams() {},
+    draw(name, fn) { if (fn) { draws[name] = fn; } else { run(name); } }
+  };
+  window.__dashRedraw = () => Object.keys(draws).forEach(run);
+  window.__dashSet = (data) => {
+    error = null;
+    Object.entries(data).forEach(([k, v]) => { if (Array.isArray(v)) store[k] = v; });
+    window.__dashRedraw();
+  };
+  window.__dashError = () => { error = true; window.__dashRedraw(); };
+  let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(window.__dashRedraw, 120); });
+  // Las pestañas muestran secciones ocultas: dibujarlas al abrirlas.
+  document.addEventListener('click', (e) => { if (e.target.closest('.pc-tab')) setTimeout(window.__dashRedraw, 0); });
+})();
+</script>
+<script>
+(async function () {
+  const root = document.getElementById('dash-root'), estado = document.getElementById('estado'), btn = document.getElementById('actualizar');
+  // Cargar panel.html y ejecutar sus scripts en orden.
+  const html = await (await fetch('panel.html')).text();
+  const tpl = document.createElement('template'); tpl.innerHTML = html;
+  const scripts = [...tpl.content.querySelectorAll('script')];
+  scripts.forEach((s) => s.remove());
+  root.appendChild(tpl.content);
+  scripts.forEach((s) => { const n = document.createElement('script'); n.textContent = s.textContent; document.body.appendChild(n); });
+  window.__dashRedraw();
+
+  const api = () => new Promise((res) => {
+    if (window.pywebview && window.pywebview.api) return res(window.pywebview.api);
+    window.addEventListener('pywebviewready', () => res(window.pywebview.api), { once: true });
+  });
+  const show = (r, ok) => {
+    if (!r || r.error) { estado.textContent = r ? r.error : 'Sin respuesta.'; estado.classList.add('err'); if (!ok) window.__dashError(); return; }
+    estado.classList.remove('err');
+    const f = r.canal && r.canal[0] ? r.canal[0].fecha.replace('T', ' ').slice(0, 16) : '';
+    estado.textContent = ok + (f ? ` · datos del ${f} UTC` : '') + (r.aviso ? ' · ' + r.aviso : '');
+    window.pcExternasFecha = r.externas_fecha || null;
+    window.__dashSet(r);
+  };
+  const a = await api();
+  show(await a.datos(), 'Datos guardados');
+  window.pcBuscarIdeas = async () => {
+    estado.classList.remove('err'); estado.textContent = 'Buscando Shorts que funcionan en otros canales…';
+    show(await a.buscar_ideas(), 'Ideas actualizadas');
+  };
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; estado.classList.remove('err');
+    estado.textContent = 'Pidiendo datos a YouTube y TikTok… (unos 40 s; si toca buscar ideas de otros canales, 1 min más)';
+    try { show(await a.actualizar(), 'Actualizado'); } finally { btn.disabled = false; }
+  });
+})();
+</script>
+</body>
+</html>
